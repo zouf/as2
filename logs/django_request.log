@@ -1,0 +1,706 @@
+2012-08-01 11:53:17,512 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 101, in get_response
+    request.path_info)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 209, in resolve
+    return ResolverMatch(self.callback, args, kwargs, self.name)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 216, in callback
+    self._callback = get_callable(self._callback_str)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/utils/functional.py", line 27, in wrapper
+    result = func(*args)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 92, in get_callable
+    lookup_view = getattr(import_module(mod_name), func_name)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/utils/importlib.py", line 35, in import_module
+    __import__(name)
+  File "/Users/zouf/Sites/as2/api/views.py", line 8, in <module>
+    from api.prepop import prepop_businesses, prepop_sorts, prepop_queries
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 6, in <module>
+    from api.categories import get_master_summary_tag, add_tag_to_bus
+  File "/Users/zouf/Sites/as2/api/categories.py", line 7, in <module>
+    from api.views import get_default_user
+ImportError: cannot import name get_default_user
+2012-08-01 11:57:15,671 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 101, in get_response
+    request.path_info)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 209, in resolve
+    return ResolverMatch(self.callback, args, kwargs, self.name)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 216, in callback
+    self._callback = get_callable(self._callback_str)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/utils/functional.py", line 27, in wrapper
+    result = func(*args)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 92, in get_callable
+    lookup_view = getattr(import_module(mod_name), func_name)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/utils/importlib.py", line 35, in import_module
+    __import__(name)
+  File "/Users/zouf/Sites/as2/api/views.py", line 15, in <module>
+    import api.prepop as prepop
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 6, in <module>
+    from api.categories import get_master_summary_tag, add_tag_to_bus
+  File "/Users/zouf/Sites/as2/api/categories.py", line 7, in <module>
+    from api.views import get_default_user
+ImportError: cannot import name get_default_user
+2012-08-01 11:57:38,493 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 101, in get_response
+    request.path_info)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 209, in resolve
+    return ResolverMatch(self.callback, args, kwargs, self.name)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 216, in callback
+    self._callback = get_callable(self._callback_str)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/utils/functional.py", line 27, in wrapper
+    result = func(*args)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 101, in get_callable
+    (lookup_view, mod_name))
+ViewDoesNotExist: Could not import api.views.prepopulate_database. View does not exist in module api.views.
+2012-08-01 11:58:18,487 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 101, in get_response
+    request.path_info)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 209, in resolve
+    return ResolverMatch(self.callback, args, kwargs, self.name)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 216, in callback
+    self._callback = get_callable(self._callback_str)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/utils/functional.py", line 27, in wrapper
+    result = func(*args)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 101, in get_callable
+    (lookup_view, mod_name))
+ViewDoesNotExist: Could not import api.views.prepop. View does not exist in module api.views.
+2012-08-01 11:58:37,430 [ERROR] django.request: Internal Server Error: /api/businesses/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 101, in get_response
+    request.path_info)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 209, in resolve
+    return ResolverMatch(self.callback, args, kwargs, self.name)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 216, in callback
+    self._callback = get_callable(self._callback_str)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/utils/functional.py", line 27, in wrapper
+    result = func(*args)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 101, in get_callable
+    (lookup_view, mod_name))
+ViewDoesNotExist: Could not import api.views.get_businesses. View does not exist in module api.views.
+2012-08-01 11:58:58,779 [ERROR] django.request: Internal Server Error: /api/businesses/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 101, in get_response
+    request.path_info)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 300, in resolve
+    sub_match = pattern.resolve(new_path)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 209, in resolve
+    return ResolverMatch(self.callback, args, kwargs, self.name)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 216, in callback
+    self._callback = get_callable(self._callback_str)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/utils/functional.py", line 27, in wrapper
+    result = func(*args)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 92, in get_callable
+    lookup_view = getattr(import_module(mod_name), func_name)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/utils/importlib.py", line 35, in import_module
+    __import__(name)
+  File "/Users/zouf/Sites/as2/api/views.py", line 2, in <module>
+    import  api.authenticate as auth
+  File "/Users/zouf/Sites/as2/api/authenticate.py", line 8, in <module>
+    from api.views import get_default_user
+ImportError: cannot import name get_default_user
+2012-08-01 12:00:01,672 [WARNING] django.request: Not Found: /api/prepop/
+2012-08-01 12:00:48,668 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepop
+    prepop.prepop_businesses(request.user)
+AttributeError: 'function' object has no attribute 'prepop_businesses'
+2012-08-01 12:01:13,956 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(request.user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 147, in prepop_businesses
+    add_tag_to_bus(b, get_master_summary_tag(), get_default_user())
+  File "/Users/zouf/Sites/as2/api/categories.py", line 24, in add_tag_to_bus
+    bustag = BusinessCategory.objects.create(tag=tag,business=b,creator=user)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 137, in create
+    return self.get_query_set().create(**kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 375, in create
+    obj = self.model(**kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 367, in __init__
+    raise TypeError("'%s' is an invalid keyword argument for this function" % kwargs.keys()[0])
+TypeError: 'creator' is an invalid keyword argument for this function
+2012-08-01 12:02:22,128 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(request.user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 147, in prepop_businesses
+    add_tag_to_bus(b, get_master_summary_tag(), get_default_user())
+  File "/Users/zouf/Sites/as2/api/categories.py", line 27, in add_tag_to_bus
+    Page.objects.get(category=bustag)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 131, in get
+    return self.get_query_set().get(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 361, in get
+    num = len(clone)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 85, in __len__
+    self._result_cache = list(self.iterator())
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 291, in iterator
+    for row in compiler.results_iter():
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 763, in results_iter
+    for rows in self.execute_sql(MULTI):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 818, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+DatabaseError: column wiki_page.category_id does not exist
+LINE 1: ...", "wiki_page"."content", "wiki_page"."rendered", "wiki_page...
+                                                             ^
+
+2012-08-01 12:04:00,493 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(request.user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 147, in prepop_businesses
+    add_tag_to_bus(b, get_master_summary_tag(), get_default_user())
+  File "/Users/zouf/Sites/as2/api/categories.py", line 27, in add_tag_to_bus
+    Page.objects.get(category=bustag)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 131, in get
+    return self.get_query_set().get(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 361, in get
+    num = len(clone)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 85, in __len__
+    self._result_cache = list(self.iterator())
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 291, in iterator
+    for row in compiler.results_iter():
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 763, in results_iter
+    for rows in self.execute_sql(MULTI):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 818, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+DatabaseError: column wiki_page.category_id does not exist
+LINE 1: ...", "wiki_page"."content", "wiki_page"."rendered", "wiki_page...
+                                                             ^
+
+2012-08-01 12:04:30,702 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(request.user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 147, in prepop_businesses
+    add_tag_to_bus(b, get_master_summary_tag(), get_default_user())
+  File "/Users/zouf/Sites/as2/api/categories.py", line 28, in add_tag_to_bus
+    Page.objects.get(category=bustag)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 131, in get
+    return self.get_query_set().get(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 361, in get
+    num = len(clone)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 85, in __len__
+    self._result_cache = list(self.iterator())
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 291, in iterator
+    for row in compiler.results_iter():
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 763, in results_iter
+    for rows in self.execute_sql(MULTI):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 818, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+DatabaseError: column wiki_page.category_id does not exist
+LINE 1: ...", "wiki_page"."content", "wiki_page"."rendered", "wiki_page...
+                                                             ^
+
+2012-08-01 12:06:42,881 [WARNING] django.request: Not Found: /invites/
+2012-08-01 12:06:55,361 [WARNING] django.request: Not Found: /invites/
+2012-08-01 12:07:23,307 [WARNING] django.request: Not Found: /invites/
+2012-08-01 12:08:14,601 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(request.user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 147, in prepop_businesses
+    add_tag_to_bus(b, get_master_summary_tag(), get_default_user())
+  File "/Users/zouf/Sites/as2/api/categories.py", line 31, in add_tag_to_bus
+    pg.save()
+  File "/Users/zouf/Sites/as2/wiki/models.py", line 20, in save
+    self.rendered = wikify(self.content)
+  File "/Users/zouf/Sites/as2/wiki/templatetags/wiki.py", line 18, in wikify
+    wiki_root = reverse('wiki.views.index', args=[], kwargs={})
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 476, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/urlresolvers.py", line 396, in _reverse_with_prefix
+    "arguments '%s' not found." % (lookup_view_s, args, kwargs))
+NoReverseMatch: Reverse for 'wiki.views.index' with arguments '()' and keyword arguments '{}' not found.
+2012-08-01 12:11:20,671 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(request.user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 148, in prepop_businesses
+    add_photo_by_url(phurl,b,user,default=True)
+TypeError: add_photo_by_url() takes exactly 6 arguments (4 given)
+2012-08-01 12:12:04,850 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(request.user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 148, in prepop_businesses
+    add_photo_by_url(phurl,b,user,default=True)
+TypeError: add_photo_by_url() takes exactly 6 arguments (4 given)
+2012-08-01 12:15:21,518 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 683, in prepopulate
+    prepop.prepop_sorts(request.user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 50, in prepop_sorts
+    t = Tag(descr=descr,creator=user,icon=icon)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 355, in __init__
+    setattr(self, field.name, rel_obj)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/fields/related.py", line 366, in __set__
+    self.field.name, self.field.rel.to._meta.object_name))
+ValueError: Cannot assign "<django.utils.functional.SimpleLazyObject object at 0x103e9dfd0>": "Tag.creator" must be a "User" instance.
+2012-08-01 12:37:31,917 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 147, in prepop_businesses
+    add_tag_to_bus(b, get_master_summary_tag(), get_default_user())
+  File "/Users/zouf/Sites/as2/api/categories.py", line 24, in add_tag_to_bus
+    bustag = BusinessCategory.objects.create(tag=tag,business=b)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 137, in create
+    return self.get_query_set().create(**kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 377, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 555, in save_base
+    transaction.commit_unless_managed(using=using)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/transaction.py", line 120, in commit_unless_managed
+    connection.commit_unless_managed()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/__init__.py", line 203, in commit_unless_managed
+    self._commit()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 235, in _commit
+    return self.connection.commit()
+IntegrityError: insert or update on table "api_businesscategory" violates foreign key constraint "api_businesscategory_business_id_fkey"
+DETAIL:  Key (business_id)=(6) is not present in table "api_business".
+
+2012-08-01 12:38:15,895 [ERROR] django.request: Internal Server Error: /api/businesses/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 238, in get_businesses
+    top_businesses = get_bus_data_ios(businesses ,user)
+  File "/Users/zouf/Sites/as2/api/utility.py", line 18, in get_bus_data_ios
+    d = get_single_bus_data_ios(b, user)
+  File "/Users/zouf/Sites/as2/api/utility.py", line 93, in get_single_bus_data_ios
+    d['categories'].append(get_category_data(bt,user))
+  File "/Users/zouf/Sites/as2/api/serializer.py", line 42, in get_category_data
+    pgr = Page.objects.get(businesstag=category)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 131, in get
+    return self.get_query_set().get(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 358, in get
+    clone = self.filter(*args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 621, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 639, in _filter_or_exclude
+    clone.query.add_q(Q(*args, **kwargs))
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/query.py", line 1250, in add_q
+    can_reuse=used_aliases, force_having=force_having)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/query.py", line 1122, in add_filter
+    process_extras=process_extras)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/query.py", line 1316, in setup_joins
+    "Choices are: %s" % (name, ", ".join(names)))
+FieldError: Cannot resolve keyword 'businesstag' into field. Choices are: category, content, id, name, rendered
+2012-08-01 12:38:59,109 [ERROR] django.request: Internal Server Error: /api/businesses/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 238, in get_businesses
+    top_businesses = get_bus_data_ios(businesses ,user)
+  File "/Users/zouf/Sites/as2/api/utility.py", line 18, in get_bus_data_ios
+    d = get_single_bus_data_ios(b, user)
+  File "/Users/zouf/Sites/as2/api/utility.py", line 93, in get_single_bus_data_ios
+    d['categories'].append(get_category_data(bt,user))
+  File "/Users/zouf/Sites/as2/api/serializer.py", line 48, in get_category_data
+    data['categoryContent'] = pgr.page.rendered
+AttributeError: 'Page' object has no attribute 'page'
+2012-08-01 12:39:32,442 [ERROR] django.request: Internal Server Error: /api/businesses/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 241, in get_businesses
+    return server_data(top_businesses)
+  File "/Users/zouf/Sites/as2/api/views.py", line 49, in server_data
+    return HttpResponse(json.dumps(response_data), mimetype="application/json")
+  File "/Library/Python/2.7/site-packages/simplejson/__init__.py", line 321, in dumps
+    return _default_encoder.encode(obj)
+  File "/Library/Python/2.7/site-packages/simplejson/encoder.py", line 237, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "/Library/Python/2.7/site-packages/simplejson/encoder.py", line 311, in iterencode
+    return _iterencode(o, 0)
+  File "/Library/Python/2.7/site-packages/simplejson/encoder.py", line 213, in default
+    raise TypeError(repr(o) + " is not JSON serializable")
+TypeError: <django.contrib.localflavor.us.forms.USPhoneNumberField object at 0x103d8d210> is not JSON serializable
+2012-08-01 12:43:29,574 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 71, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+IntegrityError: null value in column "zipcode" violates not-null constraint
+
+2012-08-01 12:44:18,940 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 71, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+IntegrityError: null value in column "zipcode" violates not-null constraint
+
+2012-08-01 12:47:21,354 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 66, in save
+    self.zipcode  = int(zipcode)
+TypeError: int() argument must be a string or a number, not 'NoneType'
+2012-08-01 12:47:26,614 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 66, in save
+    self.zipcode  = int(zipcode)
+TypeError: int() argument must be a string or a number, not 'NoneType'
+2012-08-01 12:47:27,654 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 66, in save
+    self.zipcode  = int(zipcode)
+TypeError: int() argument must be a string or a number, not 'NoneType'
+2012-08-01 12:48:06,507 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 77, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+IntegrityError: null value in column "zipcode" violates not-null constraint
+
+2012-08-01 12:48:47,206 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 77, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+IntegrityError: null value in column "zipcode" violates not-null constraint
+
+2012-08-01 12:49:15,345 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 78, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+IntegrityError: null value in column "zipcode" violates not-null constraint
+
+2012-08-01 12:52:12,440 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 68, in save
+    self.zipcode  = int(zipcode)
+TypeError: int() argument must be a string or a number, not 'NoneType'
+2012-08-01 12:52:25,462 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 73, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+IntegrityError: null value in column "zipcode" violates not-null constraint
+
+2012-08-01 12:52:45,581 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 73, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+IntegrityError: null value in column "zipcode" violates not-null constraint
+
+2012-08-01 12:53:03,478 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 74, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+IntegrityError: null value in column "zipcode" violates not-null constraint
+
+2012-08-01 12:53:15,055 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 74, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+DatabaseError: value too long for type character varying(2)
+
+2012-08-01 12:53:31,037 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 75, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+DatabaseError: value too long for type character varying(2)
+
+2012-08-01 12:53:44,146 [ERROR] django.request: Internal Server Error: /api/prepopulate/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/Users/zouf/Sites/as2/api/views.py", line 682, in prepopulate
+    prepop.prepop_businesses(user)
+  File "/Users/zouf/Sites/as2/api/prepop.py", line 138, in prepop_businesses
+    b.save()
+  File "/Users/zouf/Sites/as2/api/models.py", line 75, in save
+    super(Business, self).save()
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 463, in save
+    self.save_base(using=using, force_insert=force_insert, force_update=force_update)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/base.py", line 551, in save_base
+    result = manager._insert([self], fields=fields, return_id=update_pk, using=using, raw=raw)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/manager.py", line 203, in _insert
+    return insert_query(self.model, objs, fields, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/query.py", line 1576, in insert_query
+    return query.get_compiler(using=using).execute_sql(return_id)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/models/sql/compiler.py", line 910, in execute_sql
+    cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/util.py", line 40, in execute
+    return self.cursor.execute(sql, params)
+  File "/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/django/db/backends/postgresql_psycopg2/base.py", line 52, in execute
+    return self.cursor.execute(query, args)
+DatabaseError: value too long for type character varying(2)
+
