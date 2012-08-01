@@ -3509,3 +3509,5 @@
 2012-08-01 12:55:49,209 [DEBUG] django.db.backends: (0.042) SELECT "wiki_page"."id", "wiki_page"."name", "wiki_page"."content", "wiki_page"."rendered", "wiki_page"."category_id" FROM "wiki_page" WHERE "wiki_page"."category_id" = 2 ; args=(2,)
 2012-08-01 12:55:49,254 [DEBUG] django.db.backends: (0.043) SELECT COUNT(*) FROM "api_usersubscription" WHERE ("api_usersubscription"."tag_id" = 1  AND "api_usersubscription"."user_id" = 1 ); args=(1, 1)
 2012-08-01 12:55:49,298 [DEBUG] django.db.backends: (0.042) SELECT SUM("api_rating"."rating") AS "rating__sum", COUNT("api_rating"."rating") AS "rating__count" FROM "api_businessrating" LEFT OUTER JOIN "api_rating" ON ("api_businessrating"."rating_ptr_id" = "api_rating"."id") WHERE "api_businessrating"."business_id" = 2 ; args=(2,)
+2012-08-01 15:07:59,861 [WARNING] geopy: BeautifulSoup was not found. The SemanticMediaWiki geocoder will not work.
+2012-08-01 15:08:02,170 [WARNING] geopy: BeautifulSoup was not found. The SemanticMediaWiki geocoder will not work.

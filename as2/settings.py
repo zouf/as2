@@ -250,7 +250,6 @@ INSTALLED_APPS = (
      #'djcelery',
     'storages',
     'queries',
-    'endless_pagination',   
     'wiki',
     'django.contrib.admin',
 	'django.contrib.contenttypes',

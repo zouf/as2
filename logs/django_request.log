@@ -704,3 +704,69 @@ Traceback (most recent call last):
     return self.cursor.execute(query, args)
 DatabaseError: value too long for type character varying(2)
 
+2012-08-01 15:07:59,930 [ERROR] django.request: Internal Server Error: /api/businesses/
+Traceback (most recent call last):
+  File "/usr/local/lib/python2.7/dist-packages/django/core/handlers/base.py", line 101, in get_response
+    request.path_info)
+  File "/usr/local/lib/python2.7/dist-packages/django/core/urlresolvers.py", line 298, in resolve
+    for pattern in self.url_patterns:
+  File "/usr/local/lib/python2.7/dist-packages/django/core/urlresolvers.py", line 328, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+  File "/usr/local/lib/python2.7/dist-packages/django/core/urlresolvers.py", line 323, in urlconf_module
+    self._urlconf_module = import_module(self.urlconf_name)
+  File "/usr/local/lib/python2.7/dist-packages/django/utils/importlib.py", line 35, in import_module
+    __import__(name)
+  File "/home/ubuntu/deploy/apache/../as2/urls.py", line 6, in <module>
+    admin.autodiscover()
+  File "/usr/local/lib/python2.7/dist-packages/django/contrib/admin/__init__.py", line 29, in autodiscover
+    import_module('%s.admin' % app)
+  File "/usr/local/lib/python2.7/dist-packages/django/utils/importlib.py", line 35, in import_module
+    __import__(name)
+  File "/usr/local/lib/python2.7/dist-packages/django/contrib/auth/admin.py", line 171, in <module>
+    admin.site.register(Group, GroupAdmin)
+  File "/usr/local/lib/python2.7/dist-packages/django/contrib/admin/sites.py", line 92, in register
+    validate(admin_class, model)
+  File "/usr/local/lib/python2.7/dist-packages/django/contrib/admin/validation.py", line 22, in validate
+    models.get_apps()
+  File "/usr/local/lib/python2.7/dist-packages/django/db/models/loading.py", line 126, in get_apps
+    self._populate()
+  File "/usr/local/lib/python2.7/dist-packages/django/db/models/loading.py", line 64, in _populate
+    self.load_app(app_name, True)
+  File "/usr/local/lib/python2.7/dist-packages/django/db/models/loading.py", line 86, in load_app
+    app_module = import_module(app_name)
+  File "/usr/local/lib/python2.7/dist-packages/django/utils/importlib.py", line 35, in import_module
+    __import__(name)
+ImportError: No module named endless_pagination
+2012-08-01 15:08:02,239 [ERROR] django.request: Internal Server Error: /invites/
+Traceback (most recent call last):
+  File "/usr/local/lib/python2.7/dist-packages/django/core/handlers/base.py", line 101, in get_response
+    request.path_info)
+  File "/usr/local/lib/python2.7/dist-packages/django/core/urlresolvers.py", line 298, in resolve
+    for pattern in self.url_patterns:
+  File "/usr/local/lib/python2.7/dist-packages/django/core/urlresolvers.py", line 328, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+  File "/usr/local/lib/python2.7/dist-packages/django/core/urlresolvers.py", line 323, in urlconf_module
+    self._urlconf_module = import_module(self.urlconf_name)
+  File "/usr/local/lib/python2.7/dist-packages/django/utils/importlib.py", line 35, in import_module
+    __import__(name)
+  File "/home/ubuntu/deploy/apache/../as2/urls.py", line 6, in <module>
+    admin.autodiscover()
+  File "/usr/local/lib/python2.7/dist-packages/django/contrib/admin/__init__.py", line 29, in autodiscover
+    import_module('%s.admin' % app)
+  File "/usr/local/lib/python2.7/dist-packages/django/utils/importlib.py", line 35, in import_module
+    __import__(name)
+  File "/usr/local/lib/python2.7/dist-packages/django/contrib/auth/admin.py", line 171, in <module>
+    admin.site.register(Group, GroupAdmin)
+  File "/usr/local/lib/python2.7/dist-packages/django/contrib/admin/sites.py", line 92, in register
+    validate(admin_class, model)
+  File "/usr/local/lib/python2.7/dist-packages/django/contrib/admin/validation.py", line 22, in validate
+    models.get_apps()
+  File "/usr/local/lib/python2.7/dist-packages/django/db/models/loading.py", line 126, in get_apps
+    self._populate()
+  File "/usr/local/lib/python2.7/dist-packages/django/db/models/loading.py", line 64, in _populate
+    self.load_app(app_name, True)
+  File "/usr/local/lib/python2.7/dist-packages/django/db/models/loading.py", line 86, in load_app
+    app_module = import_module(app_name)
+  File "/usr/local/lib/python2.7/dist-packages/django/utils/importlib.py", line 35, in import_module
+    __import__(name)
+ImportError: No module named endless_pagination
