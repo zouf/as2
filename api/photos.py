@@ -16,7 +16,7 @@ Created on Jul 27, 2012
 
 #CODE NEEDS TO BE REFACTORED
 def get_photo_url(b):
-    qset  = Photo.objects.filter(business=b,is_default=True)
+    qset  = Photo.objects.filter(business=b)
     if qset.count() < 1:
         return False
     ph = qset[0].image_thumb
@@ -30,6 +30,7 @@ def add_photo_by_url(phurl, business,user,default,caption,title):
         urlretrieve(phurl, outpath)
     except:
         return None
+
     p = Photo(user=user, business=business, image=outpath, title=title, caption=caption,is_default=default)
     p.save(False)
 

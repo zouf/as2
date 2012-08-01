@@ -460,6 +460,19 @@ def remove_comment(request,oid):
 '''
 Code to handle photos
 '''
+def get_all_photos(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+    except ReadJSONError as e:
+        return server_error(e.value)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+
+    allphotos= Photo.objects.all()
+    data = serial.get_photos_data(allphotos,user,order_by='date')
+    return server_data(data)
+
 
 def get_photos(request,oid):
     try:
