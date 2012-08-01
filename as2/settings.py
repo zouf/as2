@@ -211,6 +211,9 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+APPEND_SLASH = True
+ 
+
 ROOT_URLCONF = 'as2.urls'
 
 # URL of the login page.
