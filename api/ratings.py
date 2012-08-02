@@ -6,7 +6,7 @@ Created on Aug 1, 2012
 #from django.db.models.aggregates import Sum, Count
 #import ios_interface 
 
-from django.db.models.aggregates import Count, Sum
+from django.db.models.aggregates import Count, Sum, Avg
 from api.models import PhotoRating, DiscussionRating, BusinessRating, \
     CategoryRating
 
@@ -23,11 +23,13 @@ def getCommentRatings(discussion):
     return [numPos, numNeg]
     
 def getCategoryRatings(category):
-    ratingFilter = CategoryRating.objects.filter(category=category, rating__range=["1", "5"])
-    ratingFilter = ratingFilter.aggregate(Count('rating'))
-    numPos = ratingFilter['rating__count']
-    numNeg = DiscussionRating.objects.filter(rating=0).count()
-    return [numPos, numNeg]
+    #ratingFilter = CategoryRating.objects.filter(category=category, rating__range=["1", "5"])
+    if CategoryRating.objects.all().count() == 0:
+        return 0
+    ratingFilter = CategoryRating.objects.all().aggregate(Avg('rating'))
+    avg = ratingFilter['rating__avg']
+    #numNeg = DiscussionRating.objects.filter(rating=0).count()
+    return avg
 
 def getPhotoRatings(photo):
     ratingFilter = PhotoRating.objects.filter(photo=photo, rating__range=["1", "5"])

@@ -20,7 +20,12 @@ urlpatterns = patterns('api.views',
     (r'^business/category/add/?$', 'add_business_category'),
     (r'^business/category/remove/(?P<oid>\d+)/?$', 'remove_business_category'),
     (r'^business/category/rate/(?P<oid>\d+)/?$', 'rate_business_category'),
+    
     (r'^tags/?$', 'get_tags'),
+    (r'^tag/(?P<oid>\d+)/?$', 'get_tag'),
+    (r'^tag/subscribe/(?P<oid>\d+)/?$', 'subscribe_tag'),
+    (r'^tag/unsubscribe/(?P<oid>\d+)/?$', 'unsubscribe_tag'),
+
 
 
    #currently not designed / implemented    

@@ -1,8 +1,7 @@
 #from allsortz.search import get_all_nearby
-import  api.authenticate as auth 
 from api.models import Photo, PhotoRating, BusinessDiscussion, \
-    CategoryDiscussion, PhotoDiscussion, Discussion, Business, \
-    BusinessCategory, CategoryRating, Tag, DiscussionRating, BusinessRating
+    CategoryDiscussion, PhotoDiscussion, Discussion, Business, BusinessCategory, \
+    CategoryRating, Tag, DiscussionRating, BusinessRating, UserSubscription
 from api.utility import get_bus_data_ios, get_single_bus_data_ios, ReadJSONError, \
     get_json_post_or_error, get_json_get_or_error
 from django.contrib.auth.models import User
@@ -11,6 +10,7 @@ from geopy import geocoders, distance
 from queries.models import Query, QueryTag
 from queries.views import perform_query_from_param, perform_query_from_obj
 from wiki.models import Page
+import api.authenticate as auth
 import api.photos as photos
 import api.prepop as prepop
 import api.serializer as serial
@@ -79,6 +79,13 @@ def rate_business(request,oid):
     except: 
         return server_error('Business with id '+str(oid)+'not found')    
         
+    if rating < 1:
+        rating = 1
+    elif rating > 4:
+        rating = 4
+        
+    #XXX TODO make sure rating is an int
+    #remove existing ratings
     if BusinessRating.objects.filter(business=bus,user=user).count() > 0:
         BusinessRating.objects.filter(business=bus,user=user).delete()
     BusinessRating.objects.create(business=bus, rating=rating,user=user) 
@@ -259,6 +266,7 @@ def get_business_categories(request,oid):
     data = serial.get_categories_data(categories,user)
     return server_data(data)
 
+'''Associates a tag with a business '''
 def get_business_category(request,oid):
     try:
         user = auth.authenticate_api_request(request)
@@ -274,6 +282,7 @@ def get_business_category(request,oid):
     data = serial.get_category_data(category,user)
     return server_data(data)
 
+'''Rates a business' tag-business relationship '''
 def rate_business_category(request,oid):
     try:
         user = auth.authenticate_api_request(request)
@@ -287,11 +296,22 @@ def rate_business_category(request,oid):
     except: 
         return server_error('Category with id '+str(oid)+'not found')
     
-    CategoryRating.objects.create(user=user,tag=category,rating=rating)
+    if rating < 1:
+        rating = 1
+    elif rating > 4:
+        rating = 4
+    
+    #XXX TODO make sure rating is an int
+    #remove existing rating
+    if CategoryRating.objects.filter(category=category,user=user).count() > 0:
+        CategoryRating.objects.filter(category=category,user=user).delete()
+    CategoryRating.objects.create(category=category, rating=rating,user=user) 
     
     data = serial.get_category_data(category,user)
     return server_data(data)
 
+
+'''Associates a tag with a business '''
 def add_business_category(request,oid):
     try:
         user = auth.authenticate_api_request(request)
@@ -313,6 +333,7 @@ def add_business_category(request,oid):
     data = serial.get_category_data(category,user)
     return server_data(data)
 
+'''Disassociates a tag with a business '''
 def remove_business_category(request,oid):
     try:
         user = auth.authenticate_api_request(request)
@@ -334,6 +355,54 @@ def get_tags(request):
     data = serial.get_tags_data(Tag.objects.all(),user)
     return server_data(data)
 
+
+def get_tag(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+        tag = Tag.objects.get(id=oid)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    except Tag.DoesNotExist:
+        return server_error("Tag with ID "+str(oid) + " not found")
+     
+    data = serial.get_tag_data(tag,user)
+    return server_data(data)
+
+def subscribe_tag(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "edit")
+        tag = Tag.objects.get(id=oid)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    except Tag.DoesNotExist:
+        return server_error("Tag with ID "+str(oid) + " not found")
+     
+    try:
+        UserSubscription.objects.create(user=user,tag=tag)
+    except UserSubscription.DoesNotExist:
+        return server_error("Could not subscribe user. ")
+    data = serial.get_tag_data(tag,user)
+    return server_data(data)
+
+
+def unsubscribe_tag(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "edit")
+        tag = Tag.objects.get(id=oid)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    except Tag.DoesNotExist:
+        return server_error("Tag with ID "+str(oid) + " not found")
+     
+    try:
+        UserSubscription.objects.filter(user=user,tag=tag).delete()
+    except :
+        return server_error("Error occurred. Could not unsubscribe user.")
+    data = serial.get_tag_data(tag,user)
+    return server_data(data)
 
 '''
 Code to handle comments
@@ -375,6 +444,15 @@ def rate_comment(request,oid):
     except: 
         return server_error('Comment with id '+str(oid)+'not found')
 
+    if rating < 0:
+        rating = 0
+    elif rating > 1:
+        rating = 1
+    
+    #XXX TODO make sure rating is an int
+    #remove existing rating
+    if DiscussionRating.objects.filter(user=user,comment=comment).count() > 0:
+        DiscussionRating.objects.filter(user=user,comment=comment).delete()
     DiscussionRating.objects.create(user=user,rating=rating,comment=comment)
     data = serial.get_comment_data(comment,user)
     return server_data(data)
@@ -545,6 +623,15 @@ def rate_photo(request,oid):
     except Photo.DoesNotExist: 
         return server_error('Photo with id '+str(oid)+' not found.')
     
+    if rating < 0:
+        rating = 0
+    elif rating > 1:
+        rating = 1
+        
+    #XXX TODO make sure rating is an int
+    #remove existing rating
+    if PhotoRating.objects.filter(user=user,photo=photo).count()> 0:
+        PhotoRating.objects.filter(user=user,photo=photo).delete()
     PhotoRating.objects.create(rating = rating,user=user,photo=photo)
     data = serial.get_photo_data(photo,user)
     return server_data(data)

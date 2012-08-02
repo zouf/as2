@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 
-def get_tags_data(tag,user):
+def get_tags_data(tags,user):
     data = []
-    for t in Tag.objects.all():
+    for t in tags:
         data.append(get_tag_data(t,user))
     return data
 
@@ -26,33 +26,29 @@ def get_tag_data(tag,user):
     data = dict()
     data['tagName'] = tag.descr
     data['tagID'] = tag.id
+    tagfilter = UserSubscription.objects.filter(user=user,tag=tag)
+    if tagfilter.count() > 0:
+        data['userIsSubscribed'] = True
+    else:
+        data['userIsSubscribed'] = False 
     return data
     
 def get_category_data(category,user):
-    data = get_tag_data(category.tag, user)
-    [pos,neg] = ratings.getCategoryRatings(category)
-    totalRatings = pos+neg
-    data['categoryID'] = category.id
-    if totalRatings != 0:
-        data['categoryRating'] = pos / totalRatings
-    else:
-        data['categoryRating'] = 0.0
+    data = dict()
+    avg = ratings.getCategoryRatings(category)
+    data['categoryRating'] = avg
+    data['tag'] = get_tag_data(category.tag, user)
 
     try:
         pg = Page.objects.get(category=category)
     except Page.DoesNotExist:
         pg = Page(name=category.tag.descr,category=category)
         pg.save()
-        
-    
     data['categoryContent'] = pg.rendered
-    tagfilter = UserSubscription.objects.filter(user=user,tag=category.tag)
-    if tagfilter.count() > 0:
-        data['userIsSubscribed'] = True
-    else:
-        data['userIsSubscribed'] = False 
+
     return data
 
+    
 
 def get_categories_data(categories,user):
     data = []
