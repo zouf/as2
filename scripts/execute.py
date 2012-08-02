@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-from recommendation.views import val_nmf
+from recommendation.views import val_nmf,build_pred_server
 import os
 import sys
 
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "rateout.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "as2.settings")
   
     pargs = []
     

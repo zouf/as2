@@ -1,5 +1,4 @@
-from django.conf.urls import patterns
-from django.conf.urls import url, patterns, include
+from django.conf.urls import url, patterns
 
 urlpatterns = patterns('api.views',
     (r'^prepopulate/?$','prepopulate'),
@@ -37,6 +36,7 @@ urlpatterns = patterns('api.views',
     (r'^photo/(?P<oid>\d+)/?$', 'get_photo'),
     (r'^photo/add/?$', 'add_photo'),
     (r'^photo/remove/(?P<oid>\d+)/?$', 'remove_photo'),
+    (r'^photo/edit/(?P<oid>\d+)/?$', 'edit_photo'),
     (r'^photo/rate/(?P<oid>\d+)/?$', 'rate_photo'),
 
     (r'^queries/?$', 'get_queries'),

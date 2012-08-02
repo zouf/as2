@@ -126,9 +126,7 @@ def edit_business(request,oid):
     except:
         return server_error("Getting business with id "+str(oid)+" failed")
     
-    print(request.POST)
     if 'businessName' in request.POST:
-        print('mod that stuff!')
         bus.name = request.POST['businessName']
     
     if 'streetAddr'  in request.POST:
@@ -143,9 +141,7 @@ def edit_business(request,oid):
     if 'businessState' in request.POST:
         bus.state = request.POST['businessState']
         
-    print(bus.name)
     bus.save()
-    print(bus.name)
     bus.dist = distance.distance(user.current_location,(bus.lat,bus.lon)).miles
     bus_data = get_single_bus_data_ios(bus,user)
     return server_data(bus_data)
@@ -234,9 +230,9 @@ def get_businesses(request):
     
         
     businesses = perform_query_from_param(user, (lat, lng),weights,tags,searchText)
-    print('before serial')
+    print('Performing serialization...')
     top_businesses = get_bus_data_ios(businesses ,user)
-    print('after serial')
+    print('Serialization complete...')
 
     return server_data(top_businesses)
 
@@ -503,14 +499,35 @@ def get_photo(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        auth.authorize_user(user,request,"get")
         photo = Photo.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)       
     except Photo.DoesNotExist: 
-        return server_error('Photo with id '+str(oid)+' not found. Deletion failed')
+        return server_error('Photo with id '+str(oid)+' not found.')
+    
+    data = serial.get_photo_data(photo,user)
+    return server_data(data)
+
+def edit_photo(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "edit")
+        photo = Photo.objects.get(id=oid)
+    except ReadJSONError as e:
+        return server_error(e.value)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)       
+    except Photo.DoesNotExist: 
+        return server_error('Photo with id '+str(oid)+' not found.')
+    
+    if 'photoCaption' in request.POST:
+        photo.caption = request.POST['photoCaption']
+    if 'photoTitle' in request.POST:
+        photo.title = request.POST['photoTitle']
+        
+    photo.save(isUpload=False,isTextMod=True)
     
     data = serial.get_photo_data(photo,user)
     return server_data(data)
@@ -520,13 +537,14 @@ def rate_photo(request,oid):
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
         rating = get_json_get_or_error('rating', request)
+        photo = Photo.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
-
-
-    photo = Photo.objects.get(id=oid)            
+    except Photo.DoesNotExist: 
+        return server_error('Photo with id '+str(oid)+' not found.')
+    
     PhotoRating.objects.create(rating = rating,user=user,photo=photo)
     data = serial.get_photo_data(photo,user)
     return server_data(data)
@@ -581,6 +599,8 @@ def remove_photo(request,oid):
     except Photo.DoesNotExist: 
         return server_error('Photo with id '+str(oid)+' not found. Deletion failed')
     return server_data("Deletion of photo id= " +str(oid)+ " successful")
+
+
 
 
 '''

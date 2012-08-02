@@ -6,8 +6,9 @@ Created on Jul 19, 2012
 #from photos.models import BusinessPhoto
 from api.models import Business, BusinessRating, BusinessCategory
 from api.photos import get_photo_url
-from api.ratings import getBusinessRatings, getBusAverageRating
+from api.ratings import getBusinessRatings
 from api.serializer import get_category_data
+from recommendation.recengine import get_best_current_recommendation
 
 
 #TODO: matt fix this to handle ratings from 1-4
@@ -95,6 +96,5 @@ def get_single_bus_data_ios(b, user):
 
     if d['ratingForCurrentUser'] == 0:
         #b.recommendation = get_best_current_recommendation(b, user)
-
-        d['ratingRecommendation'] = getBusAverageRating(b)
+        d['ratingRecommendation'] = get_best_current_recommendation(b, user)
     return d

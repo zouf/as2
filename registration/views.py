@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
-from privatebeta.models import InviteRequest
+#from privatebeta.models import InviteRequest
 from registration.backends import get_backend
 
 
@@ -191,17 +191,17 @@ def register(request, backend, success_url=None, form_class=None,
             first_name =request.POST['firstname'] 
             last_name =request.POST['lastname'] 
             email = request.POST['email']
-            
-            try:
-                ir = InviteRequest.objects.get(email=email)
-                print('checking for '+str(email))
-                if ir.invited == False:
-                    print('not invited!')
-                    return HttpResponseRedirect("/invites/signuprequired/")
-            except: 
-                print('error in signgup')
-                return HttpResponseRedirect("/invites/signuprequired/")
-                
+#            
+#            try:
+#                ir = InviteRequest.objects.get(email=email)
+#                print('checking for '+str(email))
+#                if ir.invited == False:
+#                    print('not invited!')
+#                    return HttpResponseRedirect("/invites/signuprequired/")
+#            except: 
+#                print('error in signgup')
+#                return HttpResponseRedirect("/invites/signuprequired/")
+#                
             
             new_user = backend.register(request, **form.cleaned_data)
             new_user.first_name = first_name

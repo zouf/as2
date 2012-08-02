@@ -233,7 +233,7 @@ def run_nmf_internal(R,N,M, K, Steps, Alpha, fp):
 #      fp.write(str(r[2])+"\n")
     #print(R)
     #run_nmf_c(list& BusinessRatings, int N, int M, int K, int p_Steps, double p_Alpha, list& p_P, list &p_Q)
-    fastnmf.run_nmf_from_python(R,N,M,K, Steps, Alpha, P,Q)
+    #fastnmf.run_nmf_from_python(R,N,M,K, Steps, Alpha, P,Q)
     return P, Q
     #nR = numpy.dot(nP, nQ.T)
     #return nR

@@ -4,26 +4,25 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from recommendation.models import UserFactor, BusinessFactor, Recommendation
 from recommendation.nmf import run_nmf_mult_k, get_p_q_best
+import logging
 import numpy
 
 
-
-def build_pred_server():
+logger = logging.getLogger(__name__)
+def build_predictions():
     k = 42
     Steps = 5000
     Alpha = 0.05
-    print("BEFORE")
+    print("Run Matrix Factorization to get predictions")
+    print("Alpha: "+str(Alpha)+"\n")
+    print("Steps: "+str(Steps)+"\n")
+    print("K: "+str(k)+"\n")
     P, Q, arrID2bid, arrID2uid = get_p_q_best(k, Steps, Alpha)
-    print("AFTER)")
-
-#    print(len(arrID2uid))
-#    print(len(P))
-#    #print(len(P))
+    print("Done running Matrix Factorization")
 
     i = 0
-
     factors = []
-
+    print("Creating user factors and saving them")
     for row in P:
         k = 0
         actualUID = arrID2uid[i]
@@ -40,6 +39,7 @@ def build_pred_server():
 
     i = 0
     factors = []
+    print("Creating business factors and saving them")
     for row in Q:
         actualBID = arrID2bid[i]
         #this business hasn't been rated
@@ -54,8 +54,13 @@ def build_pred_server():
             k += 1
         i += 1
     BusinessFactor.objects.bulk_create(factors)
-
+    print(factors)
     Predictions = numpy.dot(P,numpy.transpose(Q))
+    if Predictions == 0:
+        logger.debug('Predictions == 0. Returning')
+        print('Predictions == 0. Returning')
+        return
+    print(Predictions)
     i = 0
     predictions = []
     for row in Predictions:
@@ -128,33 +133,19 @@ def val_nmf(K, Steps):
     Alpha = 0.05
     run_nmf_mult_k(K, Steps, Alpha)
 
-#def nmf_specific_k(k,Steps):
-#  K=[k]
-#  Steps = 5000
-#  Alpha = 0.05
-#  run_nmf_mult_k(K,Steps,Alpha)
-
 
 def validate_production_data():
-    # K = [12,13,14,15,16,17,18]
-#    K = [12,14,16,18,20,22,24,26]
-    #K = [2,5,10,15,20,25,30,35,40]
     K = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60]
-    #K = [32, 34, 36, 38, 40, 42, 44, 46, 48, 50]
-    #K = [46,48,50]
-    #K = [62,64,66,68,70,72,74,76,78,80]
-    #K = [50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90]
-    #Steps = 30000
     Steps = 5000
     Alpha = 0.05
     run_nmf_mult_k(K, Steps, Alpha)
 
 
-def simple_validate():
-    #pop_test_user_bus_data(numUsers=30, numBusinesses=20)
-    #generate_nmf_test(numFactors=6, density=.3)
-    print("here?")
-    K = [1, 3, 6, 9, 12]
-    Steps = 20000
-    Alpha = 0.001
-    run_nmf_mult_k(K, Steps, Alpha)
+#def simple_validate():
+#    #pop_test_user_bus_data(numUsers=30, numBusinesses=20)
+#    #generate_nmf_test(numFactors=6, density=.3)
+#    print("here?")
+#    K = [1, 3, 6, 9, 12]
+#    Steps = 20000
+#    Alpha = 0.001
+#    run_nmf_mult_k(K, Steps, Alpha)

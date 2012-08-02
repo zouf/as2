@@ -1,9 +1,13 @@
 #from celery.execute import send_task
 from api.models import BusinessRating, Business
+from api.ratings import getBusAverageRating
 from recommendation.models import UserFactor, BusinessFactor
 from recommendation.normalization import getNormFactors
+import logging
 import numpy as np
 
+
+logger = logging.getLogger(__name__)
 
 def get_best_current_recommendation(business, user):
 
@@ -11,8 +15,12 @@ def get_best_current_recommendation(business, user):
         #  barplot(my.factors)
         #  my.prediction <- my.factors %*% t(m@fit@W)
         #  items$title[order(my.prediction, decreasing=T)[1:10]]
+        
 
         NumFactors = 42
+        normalizationFactor = getNormFactors(user.id, business.id)
+        businessAverage = getBusAverageRating(business)
+        
         ufset = UserFactor.objects.filter(user=user)
         myFactors = np.zeros(NumFactors)
 
@@ -22,7 +30,9 @@ def get_best_current_recommendation(business, user):
             myFactors[factor] = relation
 
         if ufset.count() == 0:
-            return 0
+            logger.debug("Getting business average since the user has no factors")
+            print("Getting business average since the user has no factors")
+            return businessAverage
 
         bfset = BusinessFactor.objects.filter(business=business)
         busFactors = np.zeros(NumFactors)
@@ -32,96 +42,98 @@ def get_best_current_recommendation(business, user):
             busFactors[factor] = relation
         
         if bfset.count() == 0:
-            return 0
+            logger.debug("Getting business average since the business has no factors")
+            print("Getting business average since the business has no factors")
+            return businessAverage 
 
-        prediction = np.dot(myFactors, busFactors) + getNormFactors(user.id, business.id)
-        print(prediction)
-        print("PREDICTION!!!\n")
+        logger.debug("Getting recommendation from actual predictions")
+        print("Getting recommendation from actual predictions")
+
+        prediction = np.dot(myFactors, busFactors) + normalizationFactor
         rec = round(prediction * 2) / 2  # round to half
 
         if rec > 4.0:
             rec = 4.0
         elif rec < 1.0:
             rec = 1.0
-
         #Recommendation.objects.filter(username=user, business=business)
         return rec
 
-
-class RecEngine:
-    best_recommendation_table = dict()
-    workerSpawned = False
-
-    def setBestRecTable(self, newTable):
-        print "Before"
-        self.best_recommendation_table = newTable
-        print self.best_recommendation_table
-        print "After"
-
-    def getBestRecTable(self):
-        return self.best_recommendation_table
-
-#    def spawn_worker_task(self):
-#        if not self.workerSpawned:
-#            send_task("tasks.build_recommendations")
-#            self.workerSpawned = True
-
-    def get_top_BusinessRatings(self, user,  numToPrint):
-        NumFactors = 42
-        ufset = UserFactor.objects.filter(user=user)
-        myFactors = np.zeros(NumFactors)
-
-        ratFilter = BusinessRating.objects.filter(username=user)
-
-        id2bus = {}
-        ct = 0
-        for bus in Business.objects.all():
-            id2bus[ct] = bus
-            ct = ct + 1
-
-        busrelations = np.zeros((Business.objects.all().count(), NumFactors))
-        for bc in id2bus.items():
-            bfset = BusinessFactor.objects.filter(business=bc[1])
-            for bf in bfset:
-                busrelations[bc[0], bf.latentFactor] = bf.relation
-
-        myFactors = np.zeros(NumFactors)
-        for k in range(0, NumFactors):
-            for r in ratFilter:
-                bfset = BusinessFactor.objects.filter(business=r.business).filter(latentFactor=k)
-                for bf in bfset:
-                    relation = bf.relation
-                    myFactors[k] += relation * r.BusinessRating
-
-        myBusinessRatings = np.dot(myFactors, np.transpose(busrelations))
-
-        dtype = [('index', int), ('BusinessRating', float)]
-
-        pairedBusinessRatings = []
-        for i in range(Business.objects.all().count()):
-            pairedBusinessRatings.append((i, myBusinessRatings[i]))
-
-        myPR = np.array(pairedBusinessRatings, dtype)
-
-        print(myPR)
-        myPR = np.sort(myPR, order=['BusinessRating'])
-        print(myPR)
-
-        top10 = []
-
-        end = 0
-        if len(myPR) < numToPrint:
-            end = len(myPR)
-        else:
-            end = numToPrint
-        for i in range(0, end):
-            #dont append stuff user has already rated
-            bus = id2bus[myPR[len(myPR) - i - 1]['index']]
-            queryrat = BusinessRating.objects.filter(username=user, business=bus)
-            if queryrat.count() == 0:  # hasn't been a BusinessRating yet
-                top10.append(id2bus[myPR[len(myPR) - i - 1]['index']])
-
-        return top10
-
-    # CALLED BY THE VIEW TO GET THE BES    T CURRENT RECOMMENDATION
-    
+#
+#class RecEngine:
+#    best_recommendation_table = dict()
+#    workerSpawned = False
+#
+#    def setBestRecTable(self, newTable):
+#        print "Before"
+#        self.best_recommendation_table = newTable
+#        print self.best_recommendation_table
+#        print "After"
+#
+#    def getBestRecTable(self):
+#        return self.best_recommendation_table
+#
+##    def spawn_worker_task(self):
+##        if not self.workerSpawned:
+##            send_task("tasks.build_recommendations")
+##            self.workerSpawned = True
+#
+#    def get_top_BusinessRatings(self, user,  numToPrint):
+#        NumFactors = 42
+#        ufset = UserFactor.objects.filter(user=user)
+#        myFactors = np.zeros(NumFactors)
+#
+#        ratFilter = BusinessRating.objects.filter(username=user)
+#
+#        id2bus = {}
+#        ct = 0
+#        for bus in Business.objects.all():
+#            id2bus[ct] = bus
+#            ct = ct + 1
+#
+#        busrelations = np.zeros((Business.objects.all().count(), NumFactors))
+#        for bc in id2bus.items():
+#            bfset = BusinessFactor.objects.filter(business=bc[1])
+#            for bf in bfset:
+#                busrelations[bc[0], bf.latentFactor] = bf.relation
+#
+#        myFactors = np.zeros(NumFactors)
+#        for k in range(0, NumFactors):
+#            for r in ratFilter:
+#                bfset = BusinessFactor.objects.filter(business=r.business).filter(latentFactor=k)
+#                for bf in bfset:
+#                    relation = bf.relation
+#                    myFactors[k] += relation * r.BusinessRating
+#
+#        myBusinessRatings = np.dot(myFactors, np.transpose(busrelations))
+#
+#        dtype = [('index', int), ('BusinessRating', float)]
+#
+#        pairedBusinessRatings = []
+#        for i in range(Business.objects.all().count()):
+#            pairedBusinessRatings.append((i, myBusinessRatings[i]))
+#
+#        myPR = np.array(pairedBusinessRatings, dtype)
+#
+#        print(myPR)
+#        myPR = np.sort(myPR, order=['BusinessRating'])
+#        print(myPR)
+#
+#        top10 = []
+#
+#        end = 0
+#        if len(myPR) < numToPrint:
+#            end = len(myPR)
+#        else:
+#            end = numToPrint
+#        for i in range(0, end):
+#            #dont append stuff user has already rated
+#            bus = id2bus[myPR[len(myPR) - i - 1]['index']]
+#            queryrat = BusinessRating.objects.filter(username=user, business=bus)
+#            if queryrat.count() == 0:  # hasn't been a BusinessRating yet
+#                top10.append(id2bus[myPR[len(myPR) - i - 1]['index']])
+#
+#        return top10
+#
+#    # CALLED BY THE VIEW TO GET THE BES    T CURRENT RECOMMENDATION
+#    

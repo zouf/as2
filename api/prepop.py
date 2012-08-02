@@ -145,7 +145,7 @@ def prepop_businesses(user):
             
         #setBusLatLng(b)        
         add_tag_to_bus(b, get_master_summary_tag(), get_default_user())
-        add_photo_by_url(phurl=phurl,business=b,user=user, default=True,caption="Caption defaulted to name: "+str(b.name), title=str(b.name))
+        add_photo_by_url(phurl=phurl,business=b,user=user, default=True,caption="Caption, defaulted to name: "+str(b.name), title=str(b.name))
 
 def prepop_queries(user):
     user = get_default_user()
