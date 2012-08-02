@@ -76,7 +76,7 @@ if DEPLOY:
     DATABASES = {
         'default': {
             'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'allsortzdeploygeo',                      # Or path to database file if using sqlite3.
+            'NAME': 'as_deploy',                      # Or path to database file if using sqlite3.
                 # Not used with sqlite3.
             'USER': 'root',
             'PASSWORD': 'zoufzouf',                  # Not used with sqlite3.
@@ -95,7 +95,7 @@ else:
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         #'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'allsortzdeploygeo',                      # Or path to database file if using sqlite3.
+        'NAME': 'as_test',                      # Or path to database file if using sqlite3.
         'USER': 'root',                      # Not used with sqlite3.
         'PASSWORD': 'zoufzouf',                  # Not used with sqlite3.
         'HOST': 'db.allsortz.com',

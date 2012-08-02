@@ -1,0 +1,6 @@
+1. openssl genrsa -des3 -out server.key 4096
+2. openssl req -new -key server.key -out server.csr
+2a Input fields requested
+3. openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+4. sudo cp server.crt  /etc/ssl/certs/server.crt
+5. sudo cp server.key /etc/ssl/private/
