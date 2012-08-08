@@ -8,6 +8,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
+    url(r'^/?', 'coming_soon.views.coming_soon'),
+
     url(r'^wiki/', include('wiki.urls')),       
     
 

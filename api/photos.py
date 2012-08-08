@@ -26,9 +26,11 @@ def get_photo_url(b):
 def add_photo_by_url(phurl, business,user,default,caption,title):
     outpath =settings.STATIC_ROOT+str(business.id)+"_"+str(business.city)+"_"+str(business.state)
     #print('retrieve'+str(urlparse.urlunparse(phurl)))
+    
     try:
         urlretrieve(phurl, outpath)
     except:
+        print('exception')
         return None
 
     p = Photo(user=user, business=business, image=outpath, title=title, caption=caption,is_default=default)
