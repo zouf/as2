@@ -70,7 +70,7 @@ def rate_business(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
-        rating = get_json_get_or_error('rating', request)
+        rating = int(get_json_get_or_error('rating', request))
         bus = Business.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
@@ -78,7 +78,7 @@ def rate_business(request,oid):
         return server_error(e.value)
     except: 
         return server_error('Business with id '+str(oid)+'not found')    
-        
+    print("RATING"+str(rating));
     if rating < 1:
         rating = 1
     elif rating > 4:
@@ -86,6 +86,7 @@ def rate_business(request,oid):
         
     #XXX TODO make sure rating is an int
     #remove existing ratings
+    print("RATING"+str(rating));
     if BusinessRating.objects.filter(business=bus,user=user).count() > 0:
         BusinessRating.objects.filter(business=bus,user=user).delete()
     BusinessRating.objects.create(business=bus, rating=rating,user=user) 
@@ -287,7 +288,7 @@ def rate_business_category(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
-        rating = get_json_get_or_error('rating', request)
+        rating = int(get_json_get_or_error('rating', request))
         category = BusinessCategory.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
@@ -435,7 +436,7 @@ def rate_comment(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
-        rating = get_json_get_or_error('rating', request)
+        rating = int(get_json_get_or_error('rating', request))
         comment = Discussion.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
@@ -614,7 +615,7 @@ def rate_photo(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
-        rating = get_json_get_or_error('rating', request)
+        rating = int(get_json_get_or_error('rating', request))
         photo = Photo.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
