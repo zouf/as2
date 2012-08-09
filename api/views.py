@@ -78,7 +78,6 @@ def rate_business(request,oid):
         return server_error(e.value)
     except: 
         return server_error('Business with id '+str(oid)+'not found')    
-    print("RATING"+str(rating));
     if rating < 1:
         rating = 1
     elif rating > 4:
@@ -86,7 +85,6 @@ def rate_business(request,oid):
         
     #XXX TODO make sure rating is an int
     #remove existing ratings
-    print("RATING"+str(rating));
     if BusinessRating.objects.filter(business=bus,user=user).count() > 0:
         BusinessRating.objects.filter(business=bus,user=user).delete()
     BusinessRating.objects.create(business=bus, rating=rating,user=user) 
