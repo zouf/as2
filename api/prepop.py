@@ -4,14 +4,18 @@ Created on Apr 2, 2012
 @author: Joey
 '''
 from api.categories import get_master_summary_tag, add_tag_to_bus
-from api.models import Tag, Business, TypeOfBusiness, BusinessType
+from api.models import Tag, Business, TypeOfBusiness, BusinessType, \
+    BusinessRating
 from api.photos import add_photo_by_url
 from as2 import settings
 from django.contrib.auth.models import User
+from numpy.oldnumeric.random_array import binomial
 from queries.models import Query
-
 import csv
 import logging
+import random
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +24,16 @@ def get_default_user():
         user = User.objects.get(username='matt')
     except:
         user = User(first_name='Matt', email='matty@allsortz.com', username='zouf')
+        user.set_password("testing")
+        user.save()
+        
+    return user
+
+def create_blank_user(n):
+    try:
+        user = User.objects.get(username='blank'+str(n))
+    except:
+        user = User(first_name='Blank', email='blank'+str(n)+'@allsortz.com', username='blank'+str(n))
         user.set_password("testing")
         user.save()
         
@@ -182,6 +196,51 @@ def create_business(name, address, state, city, lat, lon):
     
     add_tag_to_bus(b,get_master_summary_tag())
     return b
+
+def prepop_ratings():
+    print("prepop")
+    BusinessRating.objects.all().delete()
+    
+    
+    random.seed(666)
+    
+    NumBusiness = Business.objects.count()
+    rating_given_sd = NumBusiness / 2
+    pos_rating_sd = NumBusiness   / 4
+    for user in User.objects.all():
+        print('User ' + str(user))
+        i = 0
+        center = random.randint(0, NumBusiness-1)
         
-
-
+        for business in Business.objects.all():
+            print('Rating ' + str(business))
+            #norm_given_rat = stats.norm(center,rating_given_sd)  #gaussian distribution for giving a rating
+            prob_rat_given =  0.5 # norm_given_rat.pdf(i)  *  1/norm_given_rat.pdf(center)
+            
+            # print('\n')
+            # print("Mu is " + str(center))
+            # print("pos_rating_stdev is " + str(rating_given_sd))
+            # print("x is " + str(i))
+            # print("Prob LHS " + str(prob_lhs))
+            # print("Prob RHS " + str(prob_rhs))
+            # print("result is " + str(prob_sel))
+            
+            rat_given_rv = binomial(1, prob_rat_given, 1) #1 if rated, 0 otherwise
+            if rat_given_rv[0] != 0:
+                #norm_pos_rat = stats.norm(center,pos_rating_sd) #create a normal distribution
+                prob_pos_rat =  0.7 #norm_pos_rat.pdf(i)  *  1/norm_pos_rat.pdf(center) #probability positive
+                pos_rat_rv = binomial(1, prob_pos_rat, 1) #1 if positive, 0 negative
+                rating_scaled = 0
+                
+                if pos_rat_rv[0] == 1:
+                    rating_scaled = random.randint(3,4)  #3,4 = POSITIVE
+                else:
+                    rating_scaled = random.randint(1,2)  #1,2, = NEGATIVE
+                rat = BusinessRating(business=business, user=user, rating=int(rating_scaled))
+                rat.save()
+            #no rating        
+            i=i+1
+        
+def prepop_users():
+    for i in xrange(1,20,1):
+        create_blank_user(i)

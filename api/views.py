@@ -12,6 +12,7 @@ from queries.models import Query, QueryTag
 from queries.views import perform_query_from_param, perform_query_from_obj
 from wiki.models import Page
 import api.authenticate as auth
+import api.json_serializer as serial
 import api.photos as photos
 import api.prepop as prepop
 import logging
@@ -892,7 +893,8 @@ def remove_query(request,oid):
 def edit_query(requst):
     return server_error("unimplemented")
  
-def prepopulate(request):
+def prepopulate_database(request):
+    print('prepop')
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "superuser")
@@ -912,6 +914,9 @@ def prepopulate(request):
     prepop.prepop_businesses(user)
     prepop.prepop_sorts(user)
     prepop.prepop_queries(user)
+    prepop.prepop_users()
+    prepop.prepop_ratings()
+
     return server_data('Prepop successful')
 
         

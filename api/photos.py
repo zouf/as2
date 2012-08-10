@@ -22,6 +22,14 @@ def get_photo_url(b):
     ph = qset[0].image_thumb
     return ph.url
 
+def get_photo_id(b):
+    qset  = Photo.objects.filter(business=b)
+    if qset.count() < 1:
+        return False
+    return qset[0].id
+
+
+
 
 def add_photo_by_url(phurl, business,user,default,caption,title):
     outpath =settings.STATIC_ROOT+str(business.id)+"_"+str(business.city)+"_"+str(business.state)

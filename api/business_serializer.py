@@ -6,7 +6,7 @@ Created on Jul 19, 2012
 #from photos.models import BusinessPhoto
 from api.json_serializer import get_categories_data, get_bustypes_data
 from api.models import Business, BusinessRating, BusinessCategory, BusinessType
-from api.photos import get_photo_url
+from api.photos import get_photo_url, get_photo_id
 from api.ratings import getBusinessRatings
 from decimal import getcontext, Decimal
 from recommendation.recengine import get_best_current_recommendation
@@ -81,9 +81,7 @@ def get_single_bus_data_ios(b, user):
         d['distanceFromCurrentUser'] = str(dec/Decimal(1))
     else:
         d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
-    d['photo'] = get_photo_url(b)
-    
-    
+    d['photo'] = get_photo_id(b)
     [hates,neutrals,likes,loves,avg] = getBusinessRatings(b)
     d['ratingOverAllUsers']  = avg
     d['numberOfRatings'] = hates+neutrals+likes+loves
