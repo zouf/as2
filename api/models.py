@@ -135,7 +135,7 @@ class  Photo(models.Model):
         #Save instance of Photo
         super(Photo, self).save()
      
-''' A tag. It's a topic / way to categorize businesses as well as
+''' A tag. It's a topic / discussion about a business as well as
 annotate a user's interests ''' 
 class Tag(models.Model):
     creator = models.ForeignKey(User)
@@ -147,6 +147,28 @@ class Tag(models.Model):
     def __unicode__(self):
         return self.descr
     
+    
+''' A tag. It's a topic / way to categorize businesses as well as
+annotate a user's interests ''' 
+class TypeOfBusiness(models.Model):
+    creator = models.ForeignKey(User)
+    date = models.DateTimeField(auto_now=True)
+    descr = models.TextField(max_length=100)
+    icon = models.TextField(max_length=100)
+    class Admin:
+        pass
+    def __unicode__(self):
+        return self.descr
+    
+''' A tag. It's a topic / way to categorize businesses as well as
+annotate a user's interests ''' 
+class BusinessType(models.Model):
+    business = models.ForeignKey(Business)
+    bustype = models.ForeignKey(TypeOfBusiness)
+    def __unicode__(self):
+        return str(self.business) + ": " + str(self.bustype)
+    
+
     
 ''' A relationship between business and tag 
 These are the business' sorts '''

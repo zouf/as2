@@ -17,15 +17,22 @@ urlpatterns = patterns('api.views',
     #returns the categories associated  with a business
     (r'^business/categories/(?P<oid>\d+)/?$', 'get_business_categories'),
     (r'^business/category/(?P<oid>\d+)/?$', 'get_business_category'),
-    (r'^business/category/add/?$', 'add_business_category'),
+    (r'^business/category/add/(?P<oid>\d+)/?$', 'add_business_category'),
     (r'^business/category/remove/(?P<oid>\d+)/?$', 'remove_business_category'),
     (r'^business/category/rate/(?P<oid>\d+)/?$', 'rate_business_category'),
+
+    (r'^business/types/(?P<oid>\d+)/?$', 'add_business_category'),
+    (r'^business/type/add/(?P<oid>\d+)/?$', 'add_business_category'),
+    (r'^business/type/remove/(?P<oid>\d+)/?$', 'add_business_category'),
     
     (r'^tags/?$', 'get_tags'),
     (r'^tag/(?P<oid>\d+)/?$', 'get_tag'),
     (r'^tag/subscribe/(?P<oid>\d+)/?$', 'subscribe_tag'),
     (r'^tag/unsubscribe/(?P<oid>\d+)/?$', 'unsubscribe_tag'),
 
+    (r'^tags/?$', 'get_tags'),
+    (r'^tag/(?P<oid>\d+)/?$', 'get_tag'),
+    (r'^tag/add/?$', 'add_tag'),
 
 
    #currently not designed / implemented    

@@ -1,7 +1,8 @@
 #from allsortz.search import get_all_nearby
 from api.models import Photo, PhotoRating, BusinessDiscussion, \
     CategoryDiscussion, PhotoDiscussion, Discussion, Business, BusinessCategory, \
-    CategoryRating, Tag, DiscussionRating, BusinessRating, UserSubscription
+    CategoryRating, Tag, DiscussionRating, BusinessRating, UserSubscription, \
+    TypeOfBusiness, BusinessType
 from api.utility import get_bus_data_ios, get_single_bus_data_ios, ReadJSONError, \
     get_json_post_or_error, get_json_get_or_error
 from django.contrib.auth.models import User
@@ -49,7 +50,7 @@ def server_data(data):
     return HttpResponse(json.dumps(response_data), mimetype="application/json")    
 
 '''
-Code to handle businesses
+PRAGMA Code to handle businesses
 '''
 
 def get_business(request,oid):
@@ -244,7 +245,7 @@ def get_businesses(request):
 
 
 '''
-Code to handle business categories
+PRAGMA Code to handle business categories
 '''
 
 
@@ -329,6 +330,8 @@ def add_business_category(request,oid):
         category = BusinessCategory.objects.get(business=bus, tag=tag)
     else:
         category = BusinessCategory.objects.create(business=bus,tag=tag,creator=user)
+        pg = Page(name=category.tag.descr,category=category)
+        pg.save()
     data = serial.get_category_data(category,user)
     return server_data(data)
 
@@ -337,7 +340,10 @@ def remove_business_category(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "remove")
-        BusinessCategory.objects.filter(id=oid).delete()
+        bc = BusinessCategory.objects.get(id=oid)
+        pg = Page.objects.get(category=bc)
+        pg.delete()
+        bc.delete()
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -346,9 +352,67 @@ def remove_business_category(request,oid):
         return server_error('Category with id '+str(oid)+'not found')
     return server_data("Deletion successful")
 
+''' 
+PRAGMA Code to handle business types
+''' 
+def get_business_types(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+        bus = Business.objects.get(id=oid)
+    except ReadJSONError as e:
+        return server_error(e.value)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    except: 
+        return server_error('Business with id '+str(oid)+'not found')
+        
+    bustypes = BusinessType.objects.filter(business=bus)
+    data = serial.get_bustypes_data(bustypes,user)
+    return server_data(data)
+
+
+'''Associates a type with a business '''
+def add_business_type(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "add")
+        typeid = get_json_get_or_error('typeID', request)
+        bus = Business.objects.get(id=oid)
+        typeofbusiness = TypeOfBusiness.objects.get(id=typeid)
+    except ReadJSONError as e:
+        return server_error(e.value)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    except: 
+        return server_error('Retrieving business and type failed (IDs: '+str(oid)+ ' and ' + str(typeid))
+    
+    if BusinessType.objects.filter(business=bus,typeofbusiness=typeofbusiness).count() == 0:
+        BusinessType.objects.create(business=bus,typeofbusiness=typeofbusiness,creator=user)
+    
+    bustypes = BusinessType.objects.filter(business=bus)
+    data = serial.get_bustypes_data(bustypes,user)
+    return server_data(data)
+
+'''Disassociates a type with a business '''
+def remove_business_type(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "remove")
+        BusinessType.objects.filter(id=oid).delete()
+    except ReadJSONError as e:
+        return server_error(e.value)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    except:
+        return server_error('BusType with id '+str(oid)+'not found')
+    return server_data("Deletion successful")
+
+
 def get_tags(request):
     try:
         user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
     data = serial.get_tags_data(Tag.objects.all(),user)
@@ -367,6 +431,50 @@ def get_tag(request,oid):
      
     data = serial.get_tag_data(tag,user)
     return server_data(data)
+
+
+''' Get types of business (e.g. sandwich, etc. '''
+def get_types(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    data = serial.get_tags_data(TypeOfBusiness.objects.all(),user)
+    return server_data(data)
+
+
+def get_type(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+        typeofbusiness = TypeOfBusiness.objects.get(id=oid)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    except TypeOfBusiness.DoesNotExist:
+        return server_error("Type with ID "+str(oid) + " not found")
+     
+    data = serial.get_type_data(typeofbusiness)
+    return server_data(data)
+
+def add_type(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "add")
+        descr = get_json_post_or_error('tagDescr', request)
+        if TypeOfBusiness.objects.filter(descr=descr):
+            typeofbusiness = TypeOfBusiness.objects.get(descr=descr)
+        else:
+            typeofbusiness = TypeOfBusiness.objects.create(descr=descr,creator=user)    
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    except:
+        return server_error("Type could not be created")
+     
+    data = serial.get_type_data(typeofbusiness)
+    return server_data(data)
+
+
 
 def subscribe_tag(request,oid):
     try:
@@ -404,7 +512,7 @@ def unsubscribe_tag(request,oid):
     return server_data(data)
 
 '''
-Code to handle comments
+PRAGMA Code to handle comments
 '''
 
 def get_comments(request):
@@ -531,7 +639,7 @@ def remove_comment(request,oid):
 
 
 '''
-Code to handle photos
+PRAGMA Code to handle photos
 '''
 def get_all_photos(request):
     try:
@@ -690,7 +798,7 @@ def remove_photo(request,oid):
 
 
 '''
-Code to handle queries
+PRAGMA Code to handle queries
 ''' 
 
 def get_queries(request):

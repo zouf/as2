@@ -48,7 +48,22 @@ def get_category_data(category,user):
 
     return data
 
+def get_type_data(typeofbusiness,user):
+    data = dict()
+    data['typeName'] = typeofbusiness.descr
+    data['typeID'] = typeofbusiness.id
+    return data
+
+def get_bustype_data(bustype,user):
+    data = dict()
+    data['type'] = get_type_data(bustype.typeofbusiness, user)
+    return data
     
+def get_bustypes_data(bustypes,user):
+    data = []
+    for bt in bustypes:
+        data.append(get_bustype_data(bt,user))
+    return data
 
 def get_categories_data(categories,user):
     data = []

@@ -4,10 +4,11 @@ Created on Jul 19, 2012
 @author: zouf
 '''
 #from photos.models import BusinessPhoto
-from api.models import Business, BusinessRating, BusinessCategory
+from api.models import Business, BusinessRating, BusinessCategory, BusinessType
 from api.photos import get_photo_url
 from api.ratings import getBusinessRatings
-from api.serializer import get_category_data
+from api.serializer import get_category_data, get_bustypes_data, \
+    get_categories_data
 from recommendation.recengine import get_best_current_recommendation
 
 
@@ -64,12 +65,17 @@ def get_single_bus_data_ios(b, user):
     d['longitude'] = b.lon
     d['businessID'] = b.id
     d['businessPhone'] = b.phone
+    d['businessHours'] = ['M-F 9am-9pm','S-Sun 9am-9pm'] #TODO Set hours
+    d['businessURL'] = ['http://www.allsortz.com'] #TODO Set URL
+
+
+    
     d['zipcode'] = b.zipcode
 
     d['distanceFromCurrentUser'] = str(b.get_distance(user))
     d['photo'] = get_photo_url(b)
     
-
+    
     [hates,neutrals,likes,loves,avg] = getBusinessRatings(b)
     d['ratingOverAllUsers']  = avg
     d['numberOfRatings'] = hates+neutrals+likes+loves
@@ -89,10 +95,10 @@ def get_single_bus_data_ios(b, user):
         d['ratingForCurrentUser'] = 0
 
     bustags = BusinessCategory.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
-    d['categories'] = []
-    for bt in bustags:
-        d['categories'].append(get_category_data(bt,user))
+    d['categories'] = get_categories_data(bustags,user)
 
+    bustypes = BusinessType.objects.filter(business=b)  
+    d['types'] = get_bustypes_data(bustypes,user)
 
     if d['ratingForCurrentUser'] == 0:
         #b.recommendation = get_best_current_recommendation(b, user)
