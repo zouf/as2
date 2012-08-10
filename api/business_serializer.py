@@ -82,6 +82,7 @@ def get_single_bus_data_ios(b, user):
     else:
         d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
     d['photo'] = get_photo_id(b)
+    d['photoURL'] = get_photo_url(b)
     [hates,neutrals,likes,loves,avg] = getBusinessRatings(b)
     d['ratingOverAllUsers']  = avg
     d['numberOfRatings'] = hates+neutrals+likes+loves
