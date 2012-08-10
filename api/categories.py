@@ -24,7 +24,6 @@ def add_tag_to_bus(b,tag,user=get_default_user()):
         bustag = BusinessCategory.objects.create(tag=tag,business=b)
     
     try:
-        print(bustag.id)
         Page.objects.get(category=bustag)
     except Page.DoesNotExist:
         pg = Page(name=tag.descr,category = bustag)

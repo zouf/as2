@@ -1,10 +1,10 @@
 #from allsortz.search import get_all_nearby
+from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
+    get_json_get_or_error, get_json_post_or_error, get_bus_data_ios
 from api.models import Photo, PhotoRating, BusinessDiscussion, \
     CategoryDiscussion, PhotoDiscussion, Discussion, Business, BusinessCategory, \
     CategoryRating, Tag, DiscussionRating, BusinessRating, UserSubscription, \
     TypeOfBusiness, BusinessType
-from api.utility import get_bus_data_ios, get_single_bus_data_ios, ReadJSONError, \
-    get_json_post_or_error, get_json_get_or_error
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from geopy import geocoders, distance
@@ -14,9 +14,10 @@ from wiki.models import Page
 import api.authenticate as auth
 import api.photos as photos
 import api.prepop as prepop
-import api.serializer as serial
 import logging
 import simplejson as json
+
+
 
 
 
@@ -431,6 +432,8 @@ def get_tag(request,oid):
      
     data = serial.get_tag_data(tag,user)
     return server_data(data)
+
+
 
 
 ''' Get types of business (e.g. sandwich, etc. '''

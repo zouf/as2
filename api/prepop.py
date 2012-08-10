@@ -4,13 +4,12 @@ Created on Apr 2, 2012
 @author: Joey
 '''
 from api.categories import get_master_summary_tag, add_tag_to_bus
-from api.models import Tag, Business, Photo
+from api.models import Tag, Business, TypeOfBusiness, BusinessType
 from api.photos import add_photo_by_url
 from as2 import settings
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect
 from queries.models import Query
-from wiki.models import Page
+
 import csv
 import logging
 
@@ -33,7 +32,7 @@ def create_user(username, uid):
 
 
 def prepop_sorts(user):
-    reader = csv.reader(open(settings.BASE_DIR+'/prepop/sorts.csv', 'U'), delimiter=',', quotechar='"')
+    reader = csv.reader(open(settings.BASE_DIR+'/prepop/sorts2.csv', 'U'), delimiter=',', quotechar='"')
     i = 0
     for row in reader:
         i+=1
@@ -126,27 +125,44 @@ def prepop_businesses(user):
         city = row[2]
         state = row[3]
         phurl = row[4]
+        types = row[5]
+        hours = row[6]
+        phone = row[7]
+        businessURL = row[8]
         print('name: '+str(name))
         print('addr: '+str(addr))
         print('city: '+str(city))
         print('state: '+str(state))
         
         
-        bset = Business.objects.filter(name=name,address=addr,state=state,city=city)
-        if bset.count() == 0:
-            b = Business(name=name.encode("utf8"), city=city.encode("utf8"), state=state, address=addr.encode("utf8"), lat=0, lon=0)
-            b.save()
-        elif bset.count() > 1:
-            Business.objects.filter(name=name.encode("utf8"), city=city.encode("utf8"), state=state, address=addr.encode("utf8")).delete()
-            b = Business(name=name.encode("utf8"), city=city.encode("utf8"), state=state, address=addr.encode("utf8"), lat=0, lon=0)
-            b.save()
-        else:
-            b = bset[0]
+
             
+        if Business.objects.filter(name=name,address=addr,state=state,city=city).count() >= 1:
+            Business.objects.filter(name=name.encode("utf8"), city=city.encode("utf8"), state=state, address=addr.encode("utf8")).delete()
+        
+        #bset = Business.objects.filter(name=name,address=addr,state=state,city=city)
+  
+        b = Business(name=name.encode("utf8"), city=city.encode("utf8"), state=state, 
+            address=addr.encode("utf8"), lat=0, lon=0,phone=phone,
+            url=businessURL,hours=hours)
+        b.save()
+    
+
+        add_photo_by_url(phurl=phurl,business=b,user=user, default=True,caption="Caption, defaulted to name: "+str(b.name), title=str(b.name))
         #setBusLatLng(b)        
         add_tag_to_bus(b, get_master_summary_tag(), get_default_user())
-        add_photo_by_url(phurl=phurl,business=b,user=user, default=True,caption="Caption, defaulted to name: "+str(b.name), title=str(b.name))
-
+        for t in Tag.objects.all():
+            add_tag_to_bus(b, t, get_default_user())
+        for t in types.split(','):
+            if TypeOfBusiness.objects.filter(descr=t).count() > 0:
+                typeofbus = TypeOfBusiness.objects.get(descr=t)
+            else:
+                typeofbus = TypeOfBusiness.objects.create(descr=t,creator=get_default_user(),icon="default.png")
+            BusinessType.objects.create(business=b,bustype=typeofbus)    
+            
+        
+        
+      
 def prepop_queries(user):
     user = get_default_user()
     for t in Tag.objects.all():

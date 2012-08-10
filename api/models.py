@@ -18,15 +18,17 @@ import urllib2
 class Business(models.Model):
     name = models.CharField(max_length=250)
     date = models.DateTimeField(auto_now=True)
-
+    
     lat = models.FloatField()
     lon = models.FloatField()
     geom = models.PointField()
 
     address = models.CharField(max_length=250)
     city = models.CharField(max_length=100)
+    hours = models.CharField(max_length=100)
+    url = models.URLField()
     
-
+    
     # Right now: America centric 
     state = USStateField()  
     phone = PhoneNumberField()
@@ -39,7 +41,7 @@ class Business(models.Model):
     #gets distance between this business and a user
     def get_distance(self,user):
         if user.current_location:
-            distance.distance(user.current_location,(self.lat,self.lon)).miles
+            return distance.distance(user.current_location,(self.lat,self.lon)).miles
         else:
             return None
         

@@ -29,10 +29,9 @@ urlpatterns = patterns('api.views',
     (r'^tag/(?P<oid>\d+)/?$', 'get_tag'),
     (r'^tag/subscribe/(?P<oid>\d+)/?$', 'subscribe_tag'),
     (r'^tag/unsubscribe/(?P<oid>\d+)/?$', 'unsubscribe_tag'),
-
     (r'^tags/?$', 'get_tags'),
     (r'^tag/(?P<oid>\d+)/?$', 'get_tag'),
-    (r'^tag/add/?$', 'add_tag'),
+    #(r'^tag/add/?$', 'add_tag'),
 
 
    #currently not designed / implemented    
