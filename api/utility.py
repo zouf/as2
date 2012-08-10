@@ -64,9 +64,12 @@ def get_single_bus_data_ios(b, user):
     d['latitude'] = b.lat
     d['longitude'] = b.lon
     d['businessID'] = b.id
-    d['businessPhone'] = b.phone
+    if b.phone == None or b.phone == '':
+        d['businessPhone'] = '555 555-5555'
+    else:
+        d['businessPhone'] = b.phone
     d['businessHours'] = ['M-F 9am-9pm','S-Sun 9am-9pm'] #TODO Set hours
-    d['businessURL'] = ['http://www.allsortz.com'] #TODO Set URL
+    d['businessURL'] = 'http://www.allsortz.com' #TODO Set URL
 
 
     
