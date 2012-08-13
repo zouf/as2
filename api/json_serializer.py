@@ -4,10 +4,10 @@ Created on Jul 27, 2012
 @author: zouf
 '''
 
-import api.ratings as ratings 
-from api.models import DiscussionRating, PhotoRating,  UserSubscription
+from api.models import DiscussionRating, PhotoRating, UserSubscription
 from queries.models import QueryTag
 from wiki.models import Page
+import api.ratings as ratings
 import logging
 
 
@@ -46,6 +46,12 @@ def get_category_data(category,user):
         pg.save()
     data['categoryContent'] = pg.rendered
 
+    return data
+
+def get_types_data(types,user):
+    data = []
+    for t in types:
+        data.append(get_type_data(t,user))
     return data
 
 def get_type_data(typeofbusiness,user):

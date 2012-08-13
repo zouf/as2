@@ -444,7 +444,7 @@ def get_types(request):
         auth.authorize_user(user, request, "get")
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
-    data = serial.get_tags_data(TypeOfBusiness.objects.all(),user)
+    data = serial.get_types_data(TypeOfBusiness.objects.all(),user)
     return server_data(data)
 
 
