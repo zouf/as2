@@ -840,6 +840,25 @@ def get_query(request,oid):
     data = serial.get_query_data(query,user)
     return server_data(data)
  
+     
+def get_query_base(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+    except ReadJSONError as e:
+        return server_error(e.value)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+
+    tags = serial.get_tags_data(Tag.objects.all(),user)
+    types = serial.get_types_data(TypeOfBusiness.objects.all(),user)
+    data = dict()
+    data['tags'] = tags;
+    data['types'] = types;
+    return server_data(data)
+ 
+
+    
 
     
 def add_query(request):

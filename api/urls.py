@@ -55,6 +55,7 @@ urlpatterns = patterns('api.views',
     (r'^photo/edit/(?P<oid>\d+)/?$', 'edit_photo'),
     (r'^photo/rate/(?P<oid>\d+)/?$', 'rate_photo'),
 
+    (r'^query/base/?$', 'get_query_base'),
     (r'^queries/?$', 'get_queries'),
     (r'^query/(?P<oid>\d+)/?$', 'get_query'),
     (r'^query/remove/(?P<oid>\d+)/?$', 'get_query'),
