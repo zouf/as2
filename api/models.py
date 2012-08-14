@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageOps
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
 from django.contrib.gis.geos.factory import fromstr
@@ -126,9 +126,20 @@ class  Photo(models.Model):
     
             #each of which corresponds to an ImageField of the same name
             for field_name, size in IMAGE_SIZES.iteritems():
+                width, height = imgFile.size
+                
+                if width > height:
+                    fitSize = (height, height)
+                else:
+                    fitSize = (width,width)
+                
+               
+                #img.thumbnail(size, Image.ANTIALIAS)              
+                
                 field = getattr(self, field_name)
                 working = imgFile.copy()
-                working.thumbnail(size, Image.ANTIALIAS)
+                working = ImageOps.fit(working,fitSize, Image.ANTIALIAS)
+                working.thumbnail(size,Image.ANTIALIAS)
                 fp=StringIO.StringIO()
                 working.save(fp, "png", quality=95)
                 cf = ContentFile(fp.getvalue())

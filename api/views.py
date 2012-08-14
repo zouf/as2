@@ -4,7 +4,7 @@ from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
 from api.models import Photo, PhotoRating, BusinessDiscussion, \
     CategoryDiscussion, PhotoDiscussion, Discussion, Business, BusinessCategory, \
     CategoryRating, Tag, DiscussionRating, BusinessRating, UserSubscription, \
-    TypeOfBusiness, BusinessType
+    TypeOfBusiness, BusinessType, Rating
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from geopy import geocoders, distance
@@ -924,6 +924,8 @@ def prepopulate_database(request):
         return server_error(e.value)
 
     if 'clear' in request.GET:
+        print "DELETING EVERYTHING!"
+        Rating.objects.all().delete()
         Business.objects.all().delete()
         Page.objects.all().delete()
         Photo.objects.all().delete()

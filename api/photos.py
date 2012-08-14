@@ -43,7 +43,7 @@ def add_photo_by_url(phurl, business,user,default,caption,title):
 
     p = Photo(user=user, business=business, image=outpath, title=title, caption=caption,is_default=default)
     p.save(isUpload = False,isTextMod = False)
-
+    print(p)
     return p
 
 def add_photo_by_upload(img,b,user,default,caption,title):
