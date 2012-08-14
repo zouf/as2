@@ -63,6 +63,25 @@ def prepop_sorts(user):
         t = Tag(descr=descr,creator=user,icon=icon)
         t.save()
         
+def prepop_types(user):
+    reader = csv.reader(open(settings.BASE_DIR+'/prepop/types.csv', 'U'), delimiter=',', quotechar='"')
+    i = 0
+    for row in reader:
+        i+=1
+        if i == 1:
+            continue
+       
+        descr = row[0]
+        icon = row[1]
+
+        tset = TypeOfBusiness.objects.filter(descr=descr)
+        if tset.count() > 0:
+            continue
+             
+        t = TypeOfBusiness(descr=descr,creator=user,icon=icon)
+        t.save()
+        
+        
         
 #def prepop_traits(user):
 #    reader = csv.reader(open(settings.BASE_DIR+'/prepop/traits.csv', 'U'), delimiter=',', quotechar='"')

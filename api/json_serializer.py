@@ -26,6 +26,8 @@ def get_tag_data(tag,user):
     data = dict()
     data['tagName'] = tag.descr
     data['tagID'] = tag.id
+    data['tagIcon'] = tag.icon
+
     tagfilter = UserSubscription.objects.filter(user=user,tag=tag)
     if tagfilter.count() > 0:
         data['userIsSubscribed'] = True
@@ -58,6 +60,8 @@ def get_type_data(typeofbusiness,user):
     data = dict()
     data['typeName'] = typeofbusiness.descr
     data['typeID'] = typeofbusiness.id
+    data['typeIcon'] = typeofbusiness.icon
+
     return data
 
 def get_bustype_data(bustype,user):

@@ -929,13 +929,16 @@ def prepopulate_database(request):
         Photo.objects.all().delete()
         BusinessCategory.objects.all().delete()
         Tag.objects.all().delete()
+        TypeOfBusiness.objects.all().delete()
     
+    prepop.prepop_types(user)
     prepop.prepop_businesses(user)
     prepop.prepop_sorts(user)
     prepop.prepop_queries(user)
+    
     prepop.prepop_users()
     prepop.prepop_ratings()
-
+    
     return server_data('Prepop successful')
 
         
