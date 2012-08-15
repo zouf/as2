@@ -254,6 +254,7 @@ def get_businesses(request):
         
     businesses = perform_query_from_param(user, (lat, lng),weights,tags,searchText)
     print('Performing serialization...')
+    businesses = Business.objects.all()
     top_businesses = get_bus_data_ios(businesses ,user)
     print('Serialization complete...')
 
