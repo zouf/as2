@@ -1,6 +1,7 @@
 #from allsortz.search import get_all_nearby
 from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
-    get_json_get_or_error, get_json_post_or_error, get_bus_data_ios
+    get_json_get_or_error, get_json_post_or_error, get_bus_data_ios, \
+    get_json_post_or_warn
 from api.models import Photo, PhotoRating, BusinessDiscussion, \
     CategoryDiscussion, PhotoDiscussion, Discussion, Business, BusinessCategory, \
     CategoryRating, Tag, DiscussionRating, BusinessRating, UserSubscription, \
@@ -17,6 +18,7 @@ import api.photos as photos
 import api.prepop as prepop
 import logging
 import simplejson as json
+from boto.dynamodb.condition import NULL
 
 
 
@@ -45,9 +47,10 @@ def server_error(msg):
     response_data['result'] = msg
     return HttpResponse(json.dumps(response_data), mimetype="application/json")    
 
-def server_data(data):
+def server_data(data,requesttype=None):
     response_data = dict()
     response_data['success'] = True
+    response_data['requestType'] = requesttype
     response_data['result'] = data
     return HttpResponse(json.dumps(response_data), mimetype="application/json")    
 
@@ -96,23 +99,36 @@ def rate_business(request,oid):
     return server_data(bus_data)
     
 def add_business(request):
+    print(request.POST)
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
         bus = Business()
-        name=get_json_post_or_error('businessName', request)
-        addr=get_json_post_or_error('streetAddr', request)
-        city = get_json_post_or_error('businessCity', request)
-        state = get_json_post_or_error('businessState', request)
-        phone =  get_json_post_or_error('businessPhone', request)
+        name=get_json_post_or_warn('businessName', request)
+        addr=get_json_post_or_warn('businessStreet', request)
+        city = get_json_post_or_warn('businessCity', request)
+        state = get_json_post_or_warn('businessState', request)
+        phone =  get_json_post_or_warn('businessPhone', request)
+        url =  get_json_post_or_warn('businessURL', request)
+        
+        
+        print("Creating business!\n")
+        print(name)
+        print(addr)
+        print(city)
+        print(state)
+        print(phone)
+        print(url)
         
         #already exists
-        if Business.objects.filter(name=name,address=addr,city=city,state=state).count() ==  0:
-            bus = Business(name=name,address=addr,city=city,state=state)
+        bset = Business.objects.filter(name=name,address=addr,city=city,state=state)    
+        if bset.count() ==  0:
+            bus = Business(name=name,address=addr,city=city,state=state,phone=phone,url=url)
             bus.save()
-        elif Business.objects.filter(name=name,address=addr,city=city,state=state).count() > 1: #too many
-            Business.objects.filter(name=name,address=addr,city=city,state=state).delete()
-            Business.objects.create(name=name,address=addr,city=city,state=state,phone=phone)
+        elif bset.count() > 1: #too many
+            bset.delete()
+            bus = Business(name=name,address=addr,city=city,state=state,phone=phone,url=url)
+            bus.save()
         else:
             bus = Business.objects.get(name=name,address=addr,city=city,state=state)                    
     except ReadJSONError as e:
@@ -121,7 +137,7 @@ def add_business(request):
         return server_error(e.value) 
     bus.dist = distance.distance(user.current_location,(bus.lat,bus.lon)).miles
     bus_data = get_single_bus_data_ios(bus,user)
-    return server_data(bus_data)
+    return server_data(bus_data,"business")
 
 def edit_business(request,oid):
     try:
@@ -153,7 +169,7 @@ def edit_business(request,oid):
     bus.save()
     bus.dist = distance.distance(user.current_location,(bus.lat,bus.lon)).miles
     bus_data = get_single_bus_data_ios(bus,user)
-    return server_data(bus_data)
+    return server_data(bus_data,"business")
 
 def remove_business(request,oid):
     try:
@@ -168,7 +184,7 @@ def remove_business(request,oid):
         return server_error(e.value)
     except:
         return server_error("Deleting business with id "+str(oid)+" failed")
-    return server_data("Deletion of business "+str(name)+ " was a success")
+    return server_data("Deletion of business "+str(name)+ " was a success","message")
 
 def query_businesses(request,oid):
     try:
@@ -335,7 +351,7 @@ def add_business_category(request,oid):
         pg = Page(name=category.tag.descr,category=category)
         pg.save()
     data = serial.get_category_data(category,user)
-    return server_data(data)
+    return server_data(data,"businessCategory")
 
 '''Disassociates a tag with a business '''
 def remove_business_category(request,oid):
@@ -352,7 +368,7 @@ def remove_business_category(request,oid):
         return server_error(e.value)
     except:
         return server_error('Category with id '+str(oid)+'not found')
-    return server_data("Deletion successful")
+    return server_data("Deletion successful","message")
 
 ''' 
 PRAGMA Code to handle business types
@@ -371,7 +387,7 @@ def get_business_types(request,oid):
         
     bustypes = BusinessType.objects.filter(business=bus)
     data = serial.get_bustypes_data(bustypes,user)
-    return server_data(data)
+    return server_data(data,"businessType")
 
 
 '''Associates a type with a business '''
@@ -394,7 +410,7 @@ def add_business_type(request,oid):
     
     bustypes = BusinessType.objects.filter(business=bus)
     data = serial.get_bustypes_data(bustypes,user)
-    return server_data(data)
+    return server_data(data,"businessType")
 
 '''Disassociates a type with a business '''
 def remove_business_type(request,oid):
@@ -408,7 +424,7 @@ def remove_business_type(request,oid):
         return server_error(e.value)
     except:
         return server_error('BusType with id '+str(oid)+'not found')
-    return server_data("Deletion successful")
+    return server_data("Deletion successful","message")
 
 
 def get_tags(request):
@@ -418,7 +434,7 @@ def get_tags(request):
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
     data = serial.get_tags_data(Tag.objects.all(),user)
-    return server_data(data)
+    return server_data(data,"tag")
 
 
 def get_tag(request,oid):
@@ -432,20 +448,23 @@ def get_tag(request,oid):
         return server_error("Tag with ID "+str(oid) + " not found")
      
     data = serial.get_tag_data(tag,user)
-    return server_data(data)
+    return server_data(data,"tag")
 
 
 
 
 ''' Get types of business (e.g. sandwich, etc. '''
 def get_types(request):
+    print('get types')
+    print(request.POST)
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        print('error!')
         return server_error(e.value)
     data = serial.get_types_data(TypeOfBusiness.objects.all(),user)
-    return server_data(data)
+    return server_data(data,"type")
 
 
 def get_type(request,oid):
@@ -459,7 +478,7 @@ def get_type(request,oid):
         return server_error("Type with ID "+str(oid) + " not found")
      
     data = serial.get_type_data(typeofbusiness)
-    return server_data(data)
+    return server_data(data,"type")
 
 def add_type(request,oid):
     try:
@@ -476,7 +495,7 @@ def add_type(request,oid):
         return server_error("Type could not be created")
      
     data = serial.get_type_data(typeofbusiness)
-    return server_data(data)
+    return server_data(data,"type")
 
 
 
@@ -822,7 +841,7 @@ def get_queries(request):
     else:
         queries = Query.objects.filter(creator=user)
     data = serial.get_queries_data(queries,user)
-    return server_data(data)
+    return server_data(data,"query")
     
     
 def get_query(request,oid):
@@ -838,7 +857,7 @@ def get_query(request,oid):
         return server_error("Query with ID "+str(oid)+" not found")
 
     data = serial.get_query_data(query,user)
-    return server_data(data)
+    return server_data(data,"query")
  
      
 def get_query_base(request):
@@ -855,7 +874,7 @@ def get_query_base(request):
     data = dict()
     data['tags'] = tags;
     data['types'] = types;
-    return server_data(data)
+    return server_data(data,"query")
  
 
     

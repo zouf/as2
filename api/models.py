@@ -50,6 +50,9 @@ class Business(models.Model):
         location = urllib.quote_plus(smart_str(loc))
         dd = urllib2.urlopen("http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false" % location).read() 
         ft = simplejson.loads(dd)
+        zipcode = None
+        lat = None
+        lng = None
         if ft["status"] == 'OK':
             lat = str(ft["results"][0]['geometry']['location']['lat']) 
             lng = str(ft["results"][0]['geometry']['location']['lng'])
@@ -61,12 +64,21 @@ class Business(models.Model):
                         if tp == "postal_code":
                             zipcode = jsonStr['long_name']
                             break
-        
-        self.zipcode  = zipcode
-        self.lat = lat
-        self.lon = lng 
-        self.geom = fromstr('POINT('+str(self.lon)+ ' '+str(self.lat)+')', srid=4326)
-        
+       
+        if zipcode is not None:
+            self.zipcode  = zipcode
+        else:
+            self.zipcode = ''
+            
+        if lat and lng:
+            self.lat = lat
+            self.lon = lng 
+            self.geom = fromstr('POINT('+str(self.lon)+ ' '+str(self.lat)+')', srid=4326)
+        else:
+            self.lat = 0
+            self.lon = 0 
+            self.geom = fromstr('POINT('+str(self.lon)+ ' '+str(self.lat)+')', srid=4326)
+
         super(Business, self).save()
     class Admin:
         pass

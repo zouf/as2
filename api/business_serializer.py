@@ -10,8 +10,9 @@ from api.photos import get_photo_url, get_photo_id
 from api.ratings import getBusinessRatings
 from decimal import getcontext, Decimal
 from recommendation.recengine import get_best_current_recommendation
+import logging
 
-
+logger = logging.getLogger(__name__)
 #TODO: matt fix this to handle ratings from 1-4
 #is SideBar is true if we're going to use smaller data
 def get_bus_data_ios(business_list, user):
@@ -33,6 +34,13 @@ def get_json_post_or_error(key,request):
         return request.POST[key]
     raise ReadJSONError("POST Key: " + str(key) + " not found in request " + str(request.path))
 
+
+def get_json_post_or_warn(key,request):
+    if key in request.POST:
+        return request.POST[key]
+    logger.debug("Business added without key "+ str(key));
+    print('business added without key ' + str(key))
+    return ''
 
 
 def get_json_get_or_error(key,request):
