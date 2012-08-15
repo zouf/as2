@@ -18,8 +18,6 @@ import api.photos as photos
 import api.prepop as prepop
 import logging
 import simplejson as json
-from boto.dynamodb.condition import NULL
-
 
 
 
