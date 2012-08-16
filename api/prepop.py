@@ -77,7 +77,6 @@ def prepop_types(user):
         tset = TypeOfBusiness.objects.filter(descr=descr)
         if tset.count() > 0:
             continue
-             
         t = TypeOfBusiness(descr=descr,creator=user,icon=icon)
         t.save()
         
@@ -187,6 +186,7 @@ def prepop_businesses(user):
         for t in Tag.objects.all():
             add_tag_to_bus(b, t, get_default_user())
         for t in types.split(','):
+            t = t.strip(None)
             if TypeOfBusiness.objects.filter(descr=t).count() > 0:
                 typeofbus = TypeOfBusiness.objects.get(descr=t)
             else:
