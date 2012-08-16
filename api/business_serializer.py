@@ -10,6 +10,7 @@ from api.photos import get_photo_url, get_photo_id
 from api.ratings import getBusinessRatings
 from decimal import getcontext, Decimal
 from recommendation.recengine import get_best_current_recommendation
+import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,21 +30,35 @@ class ReadJSONError(Exception):
         return repr(self.value)
 
  
-def get_json_post_or_error(key,request):
+def get_request_post_or_error(key,request):
     if key in request.POST:
         return request.POST[key]
     raise ReadJSONError("POST Key: " + str(key) + " not found in request " + str(request.path))
 
 
-def get_json_post_or_warn(key,request):
+def get_request_post_or_warn(key,request):
     if key in request.POST:
         return request.POST[key]
-    logger.debug("Business added without key "+ str(key));
-    print('business added without key ' + str(key))
+    logger.debug("WARNING: could not get post with key"+ str(key));
+    print('WARNING: could not get post with key ' + str(key))
+    return ''
+
+def get_request_postlist_or_warn(key,request):
+    if key in request.POST:
+        print('in request.postlist')
+        print('trying to get list for ' + str(key))
+        print(request.POST[key])
+        try:
+            types = request.POST[key]
+            return (json.loads(types))
+        except Exception as e:
+            print(e.value)
+    logger.debug("WARNING: could not get post list with key "+ str(key));
+    print('WARNING: could not get post list with key ' + str(key))
     return ''
 
 
-def get_json_get_or_error(key,request):
+def get_request_get_or_error(key,request):
     if key in request.GET:
         return request.GET[key]
     raise ReadJSONError("GET Key: '" + str(key) + "' not found in request " + str(request.path))

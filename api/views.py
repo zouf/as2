@@ -1,7 +1,8 @@
 #from allsortz.search import get_all_nearby
+from api.business_operations import add_business_server, edit_business_server
 from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
-    get_json_get_or_error, get_json_post_or_error, get_bus_data_ios, \
-    get_json_post_or_warn
+    get_request_get_or_error, get_request_post_or_error, get_bus_data_ios, \
+    get_request_post_or_warn, get_request_postlist_or_warn
 from api.models import Photo, PhotoRating, BusinessDiscussion, \
     CategoryDiscussion, PhotoDiscussion, Discussion, Business, BusinessCategory, \
     CategoryRating, Tag, DiscussionRating, BusinessRating, UserSubscription, \
@@ -74,7 +75,7 @@ def rate_business(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
-        rating = int(get_json_get_or_error('rating', request))
+        rating = int(get_request_get_or_error('rating', request))
         bus = Business.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
@@ -87,53 +88,35 @@ def rate_business(request,oid):
     elif rating > 4:
         rating = 4
         
-    #XXX TODO make sure rating is an int
+    #XXX TODO allow rating as float
     #remove existing ratings
     if BusinessRating.objects.filter(business=bus,user=user).count() > 0:
         BusinessRating.objects.filter(business=bus,user=user).delete()
     BusinessRating.objects.create(business=bus, rating=rating,user=user) 
-    bus.dist = distance.distance(user.current_location,(bus.lat,bus.lon)).miles
+    #bus.dist = distance.distance(user.current_location,(bus.lat,bus.lon)).miles
     bus_data = get_single_bus_data_ios(bus,user)
     return server_data(bus_data)
     
 def add_business(request):
-    print(request.POST)
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
         bus = Business()
-        name=get_json_post_or_warn('businessName', request)
-        addr=get_json_post_or_warn('businessStreet', request)
-        city = get_json_post_or_warn('businessCity', request)
-        state = get_json_post_or_warn('businessState', request)
-        phone =  get_json_post_or_warn('businessPhone', request)
-        url =  get_json_post_or_warn('businessURL', request)
-        
-        
-        print("Creating business!\n")
-        print(name)
-        print(addr)
-        print(city)
-        print(state)
-        print(phone)
-        print(url)
-        
-        #already exists
-        bset = Business.objects.filter(name=name,address=addr,city=city,state=state)    
-        if bset.count() ==  0:
-            bus = Business(name=name,address=addr,city=city,state=state,phone=phone,url=url)
-            bus.save()
-        elif bset.count() > 1: #too many
-            bset.delete()
-            bus = Business(name=name,address=addr,city=city,state=state,phone=phone,url=url)
-            bus.save()
-        else:
-            bus = Business.objects.get(name=name,address=addr,city=city,state=state)                    
+        name=get_request_post_or_warn('businessName', request)
+        addr=get_request_post_or_warn('businessStreet', request)
+        city = get_request_post_or_warn('businessCity', request)
+        state = get_request_post_or_warn('businessState', request)
+        phone =  get_request_post_or_warn('businessPhone', request)
+        url =  get_request_post_or_warn('businessURL', request)
+        types = get_request_postlist_or_warn('selectedTypes',request)
+        bus = add_business_server(name=name,addr=addr,city=city,state=state,phone=phone,url=url,types=types)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value) 
-    bus.dist = distance.distance(user.current_location,(bus.lat,bus.lon)).miles
+    except Exception as e:
+        return server_error(e.value)
+    
     bus_data = get_single_bus_data_ios(bus,user)
     return server_data(bus_data,"business")
 
@@ -142,6 +125,15 @@ def edit_business(request,oid):
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "edit")
         bus = Business.objects.get(id = oid)
+        
+        name=get_request_post_or_warn('businessName', request)
+        addr=get_request_post_or_warn('businessStreet', request)
+        city = get_request_post_or_warn('businessCity', request)
+        state = get_request_post_or_warn('businessState', request)
+        phone =  get_request_post_or_warn('businessPhone', request)
+        url =  get_request_post_or_warn('businessURL', request)
+        types = get_request_postlist_or_warn('selectedTypes',request)
+        bus = edit_business_server(bus=bus,name=name,addr=addr,city=city,state=state,phone=phone,url=url,types=types)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -149,23 +141,7 @@ def edit_business(request,oid):
     except:
         return server_error("Getting business with id "+str(oid)+" failed")
     
-    if 'businessName' in request.POST:
-        bus.name = request.POST['businessName']
-    
-    if 'streetAddr'  in request.POST:
-        bus.addr = request.POST['streetAddr']
-    
-    if 'businessCity'  in request.POST:
-        bus.city = request.POST['businessCity']
-
-    if 'businessPhone'  in request.POST:
-        return server_error("Phone not implemented")
-    
-    if 'businessState' in request.POST:
-        bus.state = request.POST['businessState']
-        
-    bus.save()
-    bus.dist = distance.distance(user.current_location,(bus.lat,bus.lon)).miles
+    #bus.dist = distance.distance(user.current_location,(bus.lat,bus.lon)).miles
     bus_data = get_single_bus_data_ios(bus,user)
     return server_data(bus_data,"business")
 
@@ -304,7 +280,7 @@ def rate_business_category(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
-        rating = int(get_json_get_or_error('rating', request))
+        rating = int(get_request_get_or_error('rating', request))
         category = BusinessCategory.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
@@ -333,7 +309,7 @@ def add_business_category(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
-        tagid = get_json_get_or_error('tagID', request)
+        tagid = get_request_get_or_error('tagID', request)
         bus = Business.objects.get(id=oid)
         tag = Tag.objects.get(id=tagid)
     except ReadJSONError as e:
@@ -394,7 +370,7 @@ def add_business_type(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
-        typeid = get_json_get_or_error('typeID', request)
+        typeid = get_request_get_or_error('typeID', request)
         bus = Business.objects.get(id=oid)
         typeofbusiness = TypeOfBusiness.objects.get(id=typeid)
     except ReadJSONError as e:
@@ -454,13 +430,10 @@ def get_tag(request,oid):
 
 ''' Get types of business (e.g. sandwich, etc. '''
 def get_types(request):
-    print('get types')
-    print(request.POST)
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-        print('error!')
         return server_error(e.value)
     data = serial.get_types_data(TypeOfBusiness.objects.all(),user)
     return server_data(data,"type")
@@ -483,7 +456,7 @@ def add_type(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
-        descr = get_json_post_or_error('tagDescr', request)
+        descr = get_request_post_or_error('tagDescr', request)
         if TypeOfBusiness.objects.filter(descr=descr):
             typeofbusiness = TypeOfBusiness.objects.get(descr=descr)
         else:
@@ -564,7 +537,7 @@ def rate_comment(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
-        rating = int(get_json_get_or_error('rating', request))
+        rating = int(get_request_get_or_error('rating', request))
         comment = Discussion.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
@@ -589,9 +562,9 @@ def rate_comment(request,oid):
 def add_comment(request):
     try: 
         user = auth.authenticate_api_request(request)
-        oid = get_json_get_or_error('commentBaseID', request)  
-        commentType = get_json_get_or_error('type', request)  
-        content = get_json_post_or_error('commentContent', request)  
+        oid = get_request_get_or_error('commentBaseID', request)  
+        commentType = get_request_get_or_error('type', request)  
+        content = get_request_post_or_error('commentContent', request)  
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -633,7 +606,7 @@ def edit_comment(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "edit")
-        content = get_json_post_or_error('commentContent', request)  
+        content = get_request_post_or_error('commentContent', request)  
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -681,8 +654,8 @@ def get_photos(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        phototype = get_json_get_or_error('type', request)  
-        order_by = get_json_get_or_error('order_by', request)  
+        phototype = get_request_get_or_error('type', request)  
+        order_by = get_request_get_or_error('order_by', request)  
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -743,7 +716,7 @@ def rate_photo(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
-        rating = int(get_json_get_or_error('rating', request))
+        rating = int(get_request_get_or_error('rating', request))
         photo = Photo.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
@@ -770,8 +743,8 @@ def add_photo(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
-        caption = get_json_post_or_error('photoCaption', request)
-        title = get_json_post_or_error('photoTitle', request)
+        caption = get_request_post_or_error('photoCaption', request)
+        title = get_request_post_or_error('photoTitle', request)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -827,7 +800,7 @@ def get_queries(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        querytype = get_json_get_or_error('type', request)
+        querytype = get_request_get_or_error('type', request)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -884,16 +857,16 @@ def add_query(request):
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
         query = Query()
-        query.name = get_json_post_or_error('queryName',request)
+        query.name = get_request_post_or_error('queryName',request)
         query.creator = user#get_json_or_error('queryName',request)
-        query.proximity = get_json_post_or_error('proximityWeight',request)
-        query.price = get_json_post_or_error('priceWeight',request)
-        query.value = get_json_post_or_error('valueWeight',request)
-        query.score = get_json_post_or_error('scoreWeight',request)
-        query.userHasVisited = get_json_post_or_error('userHasVisited',request)
-        query.text = get_json_post_or_error('searchText',request)
-        query.networked = get_json_post_or_error('networked',request)
-        query.deal = get_json_post_or_error('deal',request)
+        query.proximity = get_request_post_or_error('proximityWeight',request)
+        query.price = get_request_post_or_error('priceWeight',request)
+        query.value = get_request_post_or_error('valueWeight',request)
+        query.score = get_request_post_or_error('scoreWeight',request)
+        query.userHasVisited = get_request_post_or_error('userHasVisited',request)
+        query.text = get_request_post_or_error('searchText',request)
+        query.networked = get_request_post_or_error('networked',request)
+        query.deal = get_request_post_or_error('deal',request)
         query.is_default = False# get_json_or_error('deal',request)
         query.save()
         if 'queryTags' not in request.POST:
@@ -931,7 +904,6 @@ def edit_query(requst):
     return server_error("unimplemented")
  
 def prepopulate_database(request):
-    print('prepop')
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "superuser")
@@ -942,7 +914,6 @@ def prepopulate_database(request):
         return server_error(e.value)
 
     if 'clear' in request.GET:
-        print "DELETING EVERYTHING!"
         Rating.objects.all().delete()
         Business.objects.all().delete()
         Page.objects.all().delete()

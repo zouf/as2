@@ -18,6 +18,7 @@ def get_best_current_recommendation(business, user):
         
 
         NumFactors = 42
+        print(business.id)
         normalizationFactor = getNormFactors(user.id, business.id)
         businessAverage = getBusAverageRating(business)
         

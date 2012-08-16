@@ -315,7 +315,15 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
             'include_html': True,
-        }
+        },
+                 
+        'db_logging': {
+            'level' : 'DEBUG',
+            'class' : 'logging.handlers.RotatingFileHandler',
+            'backupCount' : 5,
+            'maxBytes': 1024*1024*5, # 5 MB,
+            'filename':  BASE_DIR+'/logs/django-db.log'
+            },
     },
     'loggers': {
 #        'ratings':{
@@ -323,6 +331,11 @@ LOGGING = {
 #            'level': 'DEBUG',
 #            'propagate': True      
 #            },
+        'django.db' : {
+            'handlers' : ['db_logging'],
+            'level' : 'DEBUG',
+            'propagate': False,
+            },
         '': {
             'handlers': ['allsortz_handler', 'send_email'],
             'level': 'DEBUG',

@@ -3,12 +3,13 @@ Created on May 8, 2012
 
 @author: zouf
 '''
-from django.contrib.auth.models import User
-from django.db.models.aggregates import Sum, Count
 from api.models import PhotoRating, DiscussionRating, BusinessRating, \
     CategoryRating, Business
+from django.contrib.auth.models import User
+from django.db.models.aggregates import Sum, Count
+import logging
 import math
-
+logger = logging.getLogger(__name__)
 
 def isTagRelevant(bt):
     numPos = getNumPosRatings(bt)
@@ -159,7 +160,18 @@ def ci_lowerbound(numPosRev, numTotalRev):
 def getBusAvg(bid):
     #       if bid in businessCache:
     #         return businessCache[bid]
-    ratingFilter = BusinessRating.objects.filter(business=Business.objects.get(id=bid)).aggregate(Sum('rating'), Count('rating'))
+    
+    try:
+        ratingFilter = BusinessRating.objects.filter(business=Business.objects.get(id=bid)).aggregate(Sum('rating'), Count('rating'))
+    except Business.DoesNotExist:
+        logger.error("Business with id "+str(bid)+ " DO NOT exist. ")
+        return 0
+    except BusinessRating.DoesNotExist:
+        logger.error("BusinessRating with id "+str(bid)+ " DO NOT exist. Probably need to rate the business")
+        return 0
+    except:
+        logger.error("Other exception")
+        return 0
     sumRating = ratingFilter['rating__sum']
     countRating = ratingFilter['rating__count']
 
