@@ -20,7 +20,7 @@ def get_photo_url(b):
     qset  = Photo.objects.filter(business=b)
     if qset.count() < 1:
         return DEFAULT_IMAGE
-    ph = qset[0].image
+    ph = qset[0].image_medium
     return ph.url
 
 def get_photo_id(b):

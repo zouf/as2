@@ -134,7 +134,7 @@ class  Photo(models.Model):
             #The IMAGE_SIZES looks like:
             IMAGE_SIZES = {'image'    : (225, 225),
                            'image_medium'    : (125,125),
-                           'image_thumb'    : (50,50)}
+                           'image_thumb'    : (80,80)}
     
             #each of which corresponds to an ImageField of the same name
             for field_name, size in IMAGE_SIZES.iteritems():
