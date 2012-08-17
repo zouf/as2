@@ -4,3 +4,4 @@
 .settings
 logs/*.log
 logs/allsortz_ratings.log
+.DS_STORE
