@@ -92,7 +92,8 @@ def get_single_bus_data_ios(b, user,detail):
         d['businessID'] = b.id
         d['businessHours'] = b.hours()  #TODO Set hours
         d['photoURL'] = get_photo_url(b)
-        
+        d['averagePrice'] = b.average_price()  #TODO Set hours
+
         bustypes = BusinessType.objects.filter(business=b)  
         d['types'] = get_bustypes_data(bustypes,user)
 
@@ -130,7 +131,6 @@ def get_single_bus_data_ios(b, user,detail):
    
             
         d['businessPhone'] = b.phone
-        d['averagePrice'] = b.average_price()  #TODO Set hours
         d['servesAlcohol'] = b.serves_alcohol()  #TODO Set hours
         d['hasWiFi'] = b.has_wifi()  #TODO Set hours
         d['businessURL'] = b.url #TODO Set URL
