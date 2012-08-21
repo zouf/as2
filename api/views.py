@@ -69,7 +69,7 @@ def get_business(request,oid):
     except: 
         return server_error('Business with id '+str(oid)+'not found')
     bus_data = get_single_bus_data_ios(bus,user,detail=True)
-    return server_data(bus_data)
+    return server_data(bus_data,"business")
 
 def rate_business(request,oid):
     try:
@@ -173,7 +173,7 @@ def query_businesses(request,oid):
         return server_error("Couldn't get query with ID " + str(oid))
 
     data = perform_query_from_obj(user,user.current_location,q)
-    return server_data(data) #server_data(top_businesses)
+    return server_data(data,"business") #server_data(top_businesses)
     
 def get_businesses(request):
     try:

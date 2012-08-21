@@ -83,20 +83,20 @@ def get_single_bus_data_ios(b, user,detail):
     d['businessCity'] = b.city
     d['businessState'] = b.state
     d['streetAddr'] = b.address
+    d['zipcode'] = b.zipcode
 
     d['latitude'] = b.lat
     d['longitude'] = b.lon
     d['businessID'] = b.id
-    if b.phone == None or b.phone == '':
-        d['businessPhone'] = '555 555-5555'
-    else:
-        d['businessPhone'] = b.phone
-    d['businessHours'] = ['M-F 9am-9pm','S-Sun 9am-9pm'] #TODO Set hours
-    d['businessURL'] = 'http://www.allsortz.com' #TODO Set URL
+        
+    d['businessPhone'] = b.phone
+    d['businessHours'] = b.hours()  #TODO Set hours
+    d['averagePrice'] = b.average_price()  #TODO Set hours
+    d['servesAlcohol'] = b.serves_alcohol()  #TODO Set hours
+    d['hasWiFi'] = b.has_wifi()  #TODO Set hours
+    d['businessURL'] = b.url #TODO Set URL
 
 
-    
-    d['zipcode'] = b.zipcode
   
     if b.get_distance(user) is not None:
         dec = Decimal(float(b.get_distance(user)))

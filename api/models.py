@@ -48,12 +48,14 @@ class Business(models.Model):
     def average_price(self):
         return BusinessMeta.objects.get(business=self).average_price
     
-    def servers_alcohol(self):
+    def serves_alcohol(self):
         return BusinessMeta.objects.get(business=self).serves
     
     def has_wifi(self):
         return BusinessMeta.objects.get(business=self).wifi
     
+    def hours(self):
+        return BusinessMeta.objects.get(business=self).hours
     
     
     
