@@ -14,6 +14,7 @@ import urllib
 import urllib2
 
 
+
 ''' A business can be any kind of merchant '''
 class Business(models.Model):
     name = models.CharField(max_length=250)
@@ -25,7 +26,6 @@ class Business(models.Model):
 
     address = models.CharField(max_length=250)
     city = models.CharField(max_length=100)
-    hours = models.CharField(max_length=100)
     url = models.URLField()
     
     
@@ -45,6 +45,18 @@ class Business(models.Model):
         else:
             return None
         
+    def average_price(self):
+        return BusinessMeta.objects.get(business=self).average_price
+    
+    def servers_alcohol(self):
+        return BusinessMeta.objects.get(business=self).serves
+    
+    def has_wifi(self):
+        return BusinessMeta.objects.get(business=self).wifi
+    
+    
+    
+    
     def save(self):
         loc = self.address + " " + self.city + ", " + self.state        
         location = urllib.quote_plus(smart_str(loc))
@@ -82,6 +94,16 @@ class Business(models.Model):
         super(Business, self).save()
     class Admin:
         pass
+    
+    
+class BusinessMeta(models.Model):
+    average_price = models.IntegerField()
+    wifi = models.BooleanField()
+    serves = models.BooleanField()
+    hours = models.CharField(max_length=100)
+
+    business = models.ForeignKey(Business)
+
 
 ''' A photo. To be associated with a business or a user '''
 class  Photo(models.Model):
@@ -434,7 +456,7 @@ class PhotoDiscussion(Discussion):
 '''   Types of ratings  '''
 class Rating(models.Model):
     user = models.ForeignKey(User)
-    rating = models.IntegerField()
+    rating = models.FloatField()
     class Admin:
         pass
     

@@ -16,10 +16,10 @@ import logging
 logger = logging.getLogger(__name__)
 #TODO: matt fix this to handle ratings from 1-4
 #is SideBar is true if we're going to use smaller data
-def get_bus_data_ios(business_list, user):
+def get_bus_data_ios(business_list, user,detail=False):
     data = []
     for b in business_list:
-        d = get_single_bus_data_ios(b, user)
+        d = get_single_bus_data_ios(b, user,detail=detail)
         data.append(d)
     return data
 
@@ -76,7 +76,7 @@ def get_all_nearby(mylat,mylng,distance=1):
 
 
 #isSideBar is true if we're using small images
-def get_single_bus_data_ios(b, user):
+def get_single_bus_data_ios(b, user,detail):
     d = dict()
     d['businessID'] = b.id
     d['businessName'] = b.name
@@ -125,7 +125,7 @@ def get_single_bus_data_ios(b, user):
         d['ratingForCurrentUser'] = 0
 
     bustags = BusinessCategory.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
-    d['categories'] = get_categories_data(bustags,user)
+    d['categories'] = get_categories_data(bustags,user,detail)
 
     bustypes = BusinessType.objects.filter(business=b)  
     d['types'] = get_bustypes_data(bustypes,user)

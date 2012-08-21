@@ -5,12 +5,13 @@ Created on Apr 2, 2012
 '''
 from api.categories import get_master_summary_tag, add_tag_to_bus
 from api.models import Tag, Business, TypeOfBusiness, BusinessType, \
-    BusinessRating
+    BusinessRating, BusinessMeta
 from api.photos import add_photo_by_url
 from as2 import settings
 from django.contrib.auth.models import User
 from numpy.oldnumeric.random_array import binomial
 from queries.models import Query
+from wiki.models import Page
 import csv
 import logging
 import random
@@ -46,7 +47,7 @@ def create_user(username, uid):
 
 
 def prepop_sorts(user):
-    reader = csv.reader(open(settings.BASE_DIR+'/prepop/sorts2.csv', 'U'), delimiter=',', quotechar='"')
+    reader = csv.reader(open(settings.BASE_DIR+'/prepop/sorts.csv', 'U'), delimiter=',', quotechar='"')
     i = 0
     for row in reader:
         i+=1
@@ -147,44 +148,75 @@ def prepop_businesses(user):
         user = get_default_user()
     reader = csv.reader(open(settings.BASE_DIR+'/prepop/businesses.csv', 'U'), delimiter=',', quotechar='"')
     i = 0
+    indices = {}
+    tag_indices ={}
     for row in reader:
         i+=1
         if i == 1:
+            bpoint = 0
+            for hindex in xrange(0,len(row)):
+                if row[hindex] == 'Main':
+                    bpoint = hindex
+                    break
+                indices[row[hindex]] = hindex
+            for tindex in xrange(bpoint,len(row)):
+                tag_indices[row[tindex]] = tindex
+                
             continue
     
-        name = row[0]
-        addr = row[1]
-        city = row[2]
-        state = row[3]
-        phurl = row[4]
-        types = row[5]
-        hours = row[6]
-        phone = row[7]
-        businessURL = row[8]
-        print('name: '+str(name))
-        print('addr: '+str(addr))
-        print('city: '+str(city))
-        print('state: '+str(state))
+        name = row[indices['Business']]
+        addr =  row[indices['Address']]
+        city =  row[indices['City']]
+        state =  row[indices['State']]
+        phurl =  row[indices['phurl']]
+        types =  row[indices['Types']]
+        serves_alcohol = row[ indices['Alcohol']]
+        has_wifi =  row[indices['Wifi']]
+        average_score =  row[indices['Score']]
+        average_price =  row[indices['Price']]
+        hours=  row[indices['Hours']]
+        phone =  row[indices['Phone']]
+        businessURL =  row[indices['URL']]
         
+        if has_wifi == 'Yes':
+            wifi = True
+        else:
+            wifi = False
         
-
-            
-        if Business.objects.filter(name=name,address=addr,state=state,city=city).count() >= 1:
-            Business.objects.filter(name=name.encode("utf8"), city=city.encode("utf8"), state=state, address=addr.encode("utf8")).delete()
-        
-        #bset = Business.objects.filter(name=name,address=addr,state=state,city=city)
-  
-        b = Business(name=name.encode("utf8"), city=city.encode("utf8"), state=state, 
-            address=addr.encode("utf8"), lat=0, lon=0,phone=phone,
-            url=businessURL,hours=hours)
-        b.save()
+        if serves_alcohol == 'Yes':
+            serves = True
+        else:
+            serves = False
     
+     
+        if Business.objects.filter(name=name,address=addr,state=state,city=city).count() > 0:
+            Business.objects.filter(name=name.encode("utf8"), city=city.encode("utf8"), state=state, address=addr.encode("utf8")).delete()
+        b = Business(name=name.encode("utf8"), city=city.encode("utf8"), state=state, 
+            address=addr.encode("utf8"), lat=0, lon=0,phone=phone, url=businessURL)
+        b.save()
 
+        bmset = BusinessMeta.objects.filter(business=b).filter()
+        if bmset.count() > 0:
+            bmset.delete()
+        bm = BusinessMeta(business=b,hours=hours,average_price=average_price,serves=serves,wifi=wifi)
+        bm.save()
+        
         add_photo_by_url(phurl=phurl,business=b,user=user, default=True,caption="Caption, defaulted to name: "+str(b.name), title=str(b.name))
-        #setBusLatLng(b)        
-        add_tag_to_bus(b, get_master_summary_tag(), get_default_user())
-        for t in Tag.objects.all():
-            add_tag_to_bus(b, t, get_default_user())
+        
+        for t,rindex in tag_indices.items():           
+            tg = Tag.objects.get(descr=t)
+            bustag = add_tag_to_bus(b, tg, user)
+            if row[rindex] != '':
+                print(t)
+                print('Tag added to bus!')
+                pg = Page.objects.get(category=bustag)
+                print('Populating page' + str(bustag.tag.descr))
+                pg.content = row[rindex]
+                pg.save()
+                print('Page done. ID is '+ str(pg.id))
+                print('content should be ' + str(row[rindex]))
+        
+        
         for t in types.split(','):
             t = t.strip(None)
             if TypeOfBusiness.objects.filter(descr=t).count() > 0:

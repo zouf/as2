@@ -6,7 +6,7 @@ from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
 from api.models import Photo, PhotoRating, BusinessDiscussion, \
     CategoryDiscussion, PhotoDiscussion, Discussion, Business, BusinessCategory, \
     CategoryRating, Tag, DiscussionRating, BusinessRating, UserSubscription, \
-    TypeOfBusiness, BusinessType, Rating
+    TypeOfBusiness, BusinessType, Rating, BusinessMeta
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from geopy import geocoders, distance
@@ -68,7 +68,7 @@ def get_business(request,oid):
         return server_error(e.value)
     except: 
         return server_error('Business with id '+str(oid)+'not found')
-    bus_data = get_single_bus_data_ios(bus,user)
+    bus_data = get_single_bus_data_ios(bus,user,detail=True)
     return server_data(bus_data)
 
 def rate_business(request,oid):
@@ -231,7 +231,7 @@ def get_businesses(request):
     businesses = perform_query_from_param(user, (lat, lng),weights,tags,searchText)
     print('Performing serialization...')
     businesses = Business.objects.all()
-    top_businesses = get_bus_data_ios(businesses ,user)
+    top_businesses = get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
 
     return server_data(top_businesses)
@@ -902,6 +902,26 @@ def remove_query(request,oid):
  
 def edit_query(requst):
     return server_error("unimplemented")
+ 
+def internal_populate_database():
+    Rating.objects.all().delete()
+    Business.objects.all().delete()
+    BusinessMeta.objects.all().delete()
+    Page.objects.all().delete()
+    Photo.objects.all().delete()
+    BusinessCategory.objects.all().delete()
+    Tag.objects.all().delete()
+    TypeOfBusiness.objects.all().delete()
+    user = get_default_user()
+    
+    prepop.prepop_types(user)
+    prepop.prepop_sorts(user)
+
+    prepop.prepop_businesses(user)
+    prepop.prepop_queries(user)
+    
+    prepop.prepop_users()
+    prepop.prepop_ratings()
  
 def prepopulate_database(request):
     try:

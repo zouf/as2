@@ -28,7 +28,8 @@ def add_tag_to_bus(b,tag,user=get_default_user()):
     except Page.DoesNotExist:
         pg = Page(name=tag.descr,category = bustag)
         pg.save()
-        
+    return bustag
+
 def is_master_summary_tag(t): 
     if t == get_master_summary_tag():
         return True

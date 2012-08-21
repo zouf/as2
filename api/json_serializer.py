@@ -35,18 +35,19 @@ def get_tag_data(tag,user):
         data['userIsSubscribed'] = False 
     return data
     
-def get_category_data(category,user):
+def get_category_data(category,user,detail):
     data = dict()
     avg = ratings.getCategoryRatings(category)
     data['categoryRating'] = avg
-    data['tag'] = get_tag_data(category.tag, user)
+    data['tag'] = get_tag_data(category.tag, user,detail)
 
     try:
         pg = Page.objects.get(category=category)
     except Page.DoesNotExist:
         pg = Page(name=category.tag.descr,category=category)
         pg.save()
-    data['categoryContent'] = pg.rendered
+    if detail:
+        data['categoryContent'] = pg.rendered
 
     return data
 
@@ -75,10 +76,10 @@ def get_bustypes_data(bustypes,user):
         data.append(get_bustype_data(bt,user))
     return data
 
-def get_categories_data(categories,user):
+def get_categories_data(categories,user,detail):
     data = []
     for cat in categories:
-        data.append(get_category_data(cat,user))
+        data.append(get_category_data(cat,user,detail))
     return data
     
 
