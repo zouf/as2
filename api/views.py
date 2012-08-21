@@ -943,8 +943,8 @@ def prepopulate_database(request):
         TypeOfBusiness.objects.all().delete()
     
     prepop.prepop_types(user)
-    prepop.prepop_businesses(user)
     prepop.prepop_sorts(user)
+    prepop.prepop_businesses(user)
     prepop.prepop_queries(user)
     
     prepop.prepop_users()

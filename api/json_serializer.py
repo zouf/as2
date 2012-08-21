@@ -39,7 +39,7 @@ def get_category_data(category,user,detail):
     data = dict()
     avg = ratings.getCategoryRatings(category)
     data['categoryRating'] = avg
-    data['tag'] = get_tag_data(category.tag, user,detail)
+    data['tag'] = get_tag_data(category.tag, user)
 
     try:
         pg = Page.objects.get(category=category)
