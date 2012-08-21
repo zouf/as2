@@ -5,13 +5,15 @@ Created on Jul 19, 2012
 '''
 #from photos.models import BusinessPhoto
 from api.json_serializer import get_categories_data, get_bustypes_data
-from api.models import Business, BusinessRating, BusinessCategory, BusinessType
+from api.models import Business, BusinessRating, BusinessCategory, BusinessType, \
+    BusinessCache
 from api.photos import get_photo_url, get_photo_id
 from api.ratings import getBusinessRatings
 from decimal import getcontext, Decimal
 from recommendation.recengine import get_best_current_recommendation
 import json
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 #TODO: matt fix this to handle ratings from 1-4
@@ -77,60 +79,72 @@ def get_all_nearby(mylat,mylng,distance=1):
 
 #isSideBar is true if we're using small images
 def get_single_bus_data_ios(b, user,detail):
-    d = dict()
-    d['businessID'] = b.id
-    d['businessName'] = b.name
-    d['businessCity'] = b.city
-    d['businessState'] = b.state
-    d['streetAddr'] = b.address
-    d['zipcode'] = b.zipcode
+    try:
+        print('trying to load from database)')
 
-    d['latitude'] = b.lat
-    d['longitude'] = b.lon
-    d['businessID'] = b.id
+        bstring = BusinessCache.objects.get(business=b).cachedata
+        d = json.loads(bstring)
+    except Exception as e:
+        d = dict()
+        print(e)
+        d['businessID'] = b.id
+        d['businessName'] = b.name
+        d['businessID'] = b.id
+        d['businessHours'] = b.hours()  #TODO Set hours
+        d['photoURL'] = get_photo_url(b)
         
-    d['businessPhone'] = b.phone
-    d['businessHours'] = b.hours()  #TODO Set hours
-    d['averagePrice'] = b.average_price()  #TODO Set hours
-    d['servesAlcohol'] = b.serves_alcohol()  #TODO Set hours
-    d['hasWiFi'] = b.has_wifi()  #TODO Set hours
-    d['businessURL'] = b.url #TODO Set URL
+        bustypes = BusinessType.objects.filter(business=b)  
+        d['types'] = get_bustypes_data(bustypes,user)
+
+        logger.debug('Creating cache for bus ' + str(b))
+            
+
+        if BusinessCache.objects.filter(business=b).count() > 0:
+            BusinessCache.objects.filter(business=b).delete()      
+        BusinessCache.objects.create(business=b,cachedata=json.dumps(d))
+    
+    userRatingSet = BusinessRating.objects.filter(user=user, business=b)
+    if user and userRatingSet.count() > 0:
+        #the user exists and has rated something
+        d['ratingForCurrentUser'] = userRatingSet[0].rating
+    else: 
+        #the user hasn't rated it!
+        d['ratingRecommendation'] = get_best_current_recommendation(b, user)
 
 
-  
     if b.get_distance(user) is not None:
         dec = Decimal(float(b.get_distance(user)))
         getcontext().prec = 2
         d['distanceFromCurrentUser'] = str(dec/Decimal(1))
     else:
         d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
-    d['photo'] = get_photo_id(b)
-    d['photoURL'] = get_photo_url(b)
-    [hates,neutrals,likes,loves,avg] = getBusinessRatings(b)
-    d['ratingOverAllUsers']  = avg
-    d['numberOfRatings'] = hates+neutrals+likes+loves
-    d['numberOfLoves'] = loves
-    d['numberOfLikes'] =likes
-    d['numberOfNeutrals'] = neutrals
-    d['numberOfHates'] = hates
+    if detail:
+        print('detail is true!')
+        d['businessCity'] = b.city
+        d['businessState'] = b.state
+        d['streetAddr'] = b.address
+        d['zipcode'] = b.zipcode
+    
+        d['latitude'] = b.lat
+        d['longitude'] = b.lon
+   
+            
+        d['businessPhone'] = b.phone
+        d['averagePrice'] = b.average_price()  #TODO Set hours
+        d['servesAlcohol'] = b.serves_alcohol()  #TODO Set hours
+        d['hasWiFi'] = b.has_wifi()  #TODO Set hours
+        d['businessURL'] = b.url #TODO Set URL
 
-    #the user exists and has rated something
-    if user and BusinessRating.objects.filter(user=user, business=b).count() > 0:
-        try:
-            r = BusinessRating.objects.get(user=user, business=b)
-        except BusinessRating.MultipleObjectsReturned:
-            r = BusinessRating.objects.filter(user=user,business=b)[0]
-        d['ratingForCurrentUser'] = r.rating
-    else:
-        d['ratingForCurrentUser'] = 0
+        d['photo'] = get_photo_id(b)
+        
+        [hates,neutrals,likes,loves,avg] = getBusinessRatings(b)
+        d['ratingOverAllUsers']  = avg
+        d['numberOfRatings'] = hates+neutrals+likes+loves
+        d['numberOfLoves'] = loves
+        d['numberOfLikes'] =likes
+        d['numberOfNeutrals'] = neutrals
+        d['numberOfHates'] = hates   
+        bustags = BusinessCategory.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
+        d['categories'] = get_categories_data(bustags,user,detail)
 
-    bustags = BusinessCategory.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
-    d['categories'] = get_categories_data(bustags,user,detail)
-
-    bustypes = BusinessType.objects.filter(business=b)  
-    d['types'] = get_bustypes_data(bustypes,user)
-
-    if d['ratingForCurrentUser'] == 0:
-        #b.recommendation = get_best_current_recommendation(b, user)
-        d['ratingRecommendation'] = get_best_current_recommendation(b, user)
     return d

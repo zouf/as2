@@ -3,7 +3,7 @@ Created on Aug 16, 2012
 
 @author: zouf
 '''
-from api.models import TypeOfBusiness, Business, BusinessType
+from api.models import TypeOfBusiness, Business, BusinessType, BusinessCache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ def associate_business_with_types(bus,types):
             pass
 
 def edit_business_server(bus,name,addr,city,state,phone,url,types):
-    print("Creating business!\n")
+    print("Editing business!\n")
     print(name)
     print(addr)
     print(city)
@@ -52,7 +52,8 @@ def edit_business_server(bus,name,addr,city,state,phone,url,types):
         
     if types != '': 
         associate_business_with_types(bus,types)   
-
+        
+    BusinessCache.objects.filter(business=bus).delete()
     bus.save()
     return bus
 

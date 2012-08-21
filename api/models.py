@@ -97,6 +97,11 @@ class Business(models.Model):
     class Admin:
         pass
     
+
+
+class BusinessCache(models.Model):
+    business = models.ForeignKey(Business)
+    cachedata = models.CharField(max_length=1500)
     
 class BusinessMeta(models.Model):
     average_price = models.IntegerField()

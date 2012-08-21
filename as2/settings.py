@@ -3,7 +3,7 @@
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 import os.path
 import socket
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))+'/..'

@@ -7,8 +7,8 @@ from api.models import Business
 
 class Recommendation(models.Model):
     business = models.ForeignKey(Business)
-    username = models.ForeignKey(User)
-    recommendation = models.IntegerField()
+    user = models.ForeignKey(User)
+    recommendation = models.FloatField()
 
     def __unicode__(self):
         return self.business.name

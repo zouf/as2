@@ -1,7 +1,7 @@
 #from celery.execute import send_task
 from api.models import BusinessRating, Business
 from api.ratings import getBusAverageRating
-from recommendation.models import UserFactor, BusinessFactor
+from recommendation.models import UserFactor, BusinessFactor, Recommendation
 from recommendation.normalization import getNormFactors
 import logging
 import numpy as np
@@ -15,7 +15,11 @@ def get_best_current_recommendation(business, user):
         #  barplot(my.factors)
         #  my.prediction <- my.factors %*% t(m@fit@W)
         #  items$title[order(my.prediction, decreasing=T)[1:10]]
-        
+        try:
+            r = Recommendation.objects.get(user=user,business=business)
+            return r.recommendation
+        except:
+            pass
 
         NumFactors = 42
         print(business.id)
@@ -33,6 +37,7 @@ def get_best_current_recommendation(business, user):
         if ufset.count() == 0:
             logger.debug("Getting business average since the user has no factors")
             print("Getting business average since the user has no factors")
+            Recommendation.objects.create(user=user,business=business,recommendation=businessAverage)
             return businessAverage
 
         bfset = BusinessFactor.objects.filter(business=business)
@@ -45,6 +50,8 @@ def get_best_current_recommendation(business, user):
         if bfset.count() == 0:
             logger.debug("Getting business average since the business has no factors")
             print("Getting business average since the business has no factors")
+            #cache the recommendations        
+            Recommendation.objects.create(user=user,business=business,recommendation=businessAverage)
             return businessAverage 
 
         logger.debug("Getting recommendation from actual predictions")
@@ -57,7 +64,8 @@ def get_best_current_recommendation(business, user):
             rec = 4.0
         elif rec < 1.0:
             rec = 1.0
-        #Recommendation.objects.filter(username=user, business=business)
+        
+        
         return rec
 
 #
