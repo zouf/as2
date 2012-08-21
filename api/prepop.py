@@ -222,7 +222,7 @@ def prepop_businesses(user):
             if TypeOfBusiness.objects.filter(descr=t).count() > 0:
                 typeofbus = TypeOfBusiness.objects.get(descr=t)
             else:
-                typeofbus = TypeOfBusiness.objects.create(descr=t,creator=get_default_user(),icon="default.png")
+                typeofbus = TypeOfBusiness.objects.create(descr=t,creator=get_default_user(),icon="blankicon.png")
             BusinessType.objects.create(business=b,bustype=typeofbus)    
             
         
