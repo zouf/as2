@@ -7,8 +7,10 @@ from api.models import Photo, PhotoRating, BusinessDiscussion, \
     CategoryDiscussion, PhotoDiscussion, Discussion, Business, BusinessCategory, \
     CategoryRating, Tag, DiscussionRating, BusinessRating, UserSubscription, \
     TypeOfBusiness, BusinessType, Rating, BusinessMeta
+from api.photos import add_photo_by_url
 from django.contrib.auth.models import User
 from django.http import HttpResponse
+from djangosphinx.models import SphinxSearch
 from geopy import geocoders, distance
 from queries.models import Query, QueryTag
 from queries.views import perform_query_from_param, perform_query_from_obj
@@ -18,7 +20,6 @@ import api.json_serializer as serial
 import api.photos as photos
 import api.prepop as prepop
 import logging
-from djangosphinx.models import SphinxSearch
 import simplejson as json
 
 
@@ -110,7 +111,10 @@ def add_business(request):
         phone =  get_request_post_or_warn('businessPhone', request)
         url =  get_request_post_or_warn('businessURL', request)
         types = get_request_postlist_or_warn('selectedTypes',request)
+        photoURL = get_request_post_or_warn('photoURL',request)
         bus = add_business_server(name=name,addr=addr,city=city,state=state,phone=phone,url=url,types=types)
+        add_photo_by_url(phurl=photoURL,business=bus,user=user, default=True,caption="Picture of "+str(bus.name), title=str(bus.name))
+
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
