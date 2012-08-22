@@ -6,6 +6,9 @@ import socket
 DEBUG = True
 
 SPHINX_API_VERSION = 0x116
+SPHINX_SERVER='db.allsortz.com'
+
+
 
 TEMPLATE_DEBUG = DEBUG
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))+'/..'

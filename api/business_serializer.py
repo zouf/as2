@@ -81,12 +81,10 @@ def get_all_nearby(mylat,mylng,distance=1):
 def get_single_bus_data_ios(b, user,detail):
     try:
         print('trying to load from database)')
-
         bstring = BusinessCache.objects.get(business=b).cachedata
         d = json.loads(bstring)
     except Exception as e:
         d = dict()
-        print(e)
         d['businessID'] = b.id
         d['businessName'] = b.name
         d['businessID'] = b.id
@@ -103,6 +101,7 @@ def get_single_bus_data_ios(b, user,detail):
         if BusinessCache.objects.filter(business=b).count() > 0:
             BusinessCache.objects.filter(business=b).delete()      
         BusinessCache.objects.create(business=b,cachedata=json.dumps(d))
+        pass
     
     userRatingSet = BusinessRating.objects.filter(user=user, business=b)
     if user and userRatingSet.count() > 0:

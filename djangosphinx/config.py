@@ -32,10 +32,11 @@ def relative_path(*args):
     return os.path.abspath(os.path.join(settings.SPHINX_ROOT, *args))
 
 context = {
-    'SPHINX_HOST': getattr(settings, 'SPHINX_HOST', '127.0.0.1'),
+    'SPHINX_HOST': getattr(settings, 'SPHINX_HOST', 'db.allsortz.com'),
     'SPHINX_PORT': getattr(settings, 'SPHINX_PORT', '3312'),
     'relative_path': relative_path,
 }
+
 if getattr(settings, 'DATABASES', None):
     context.update({
         'DATABASE_HOST': settings.DATABASES['default']['HOST'],

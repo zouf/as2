@@ -1,24 +1,24 @@
-import select
-import socket
-import time
-import struct
-import warnings
-import operator
+from datetime import datetime, date
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.db.models.query import QuerySet, Q
 import apis.current as sphinxapi
 import logging
+import operator
 import re
+import select
+import socket
+import struct
+import time
+import warnings
 try:
     import decimal
 except ImportError:
     from django.utils import _decimal as decimal # for Python 2.3
 
-from django.db.models.query import QuerySet, Q
-from django.conf import settings
 
 __all__ = ('SearchError', 'ConnectionError', 'SphinxSearch', 'SphinxRelation', 'SphinxQuerySet')
 
-from django.contrib.contenttypes.models import ContentType
-from datetime import datetime, date
 
 # server settings
 SPHINX_SERVER           = getattr(settings, 'SPHINX_SERVER', 'localhost')

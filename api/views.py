@@ -18,6 +18,7 @@ import api.json_serializer as serial
 import api.photos as photos
 import api.prepop as prepop
 import logging
+from djangosphinx.models import SphinxSearch
 import simplejson as json
 
 
@@ -189,19 +190,40 @@ def search_businesses(request):
     if searchText == '':
         businesses = Business.objects.all()
     else:
-        businesses = Business.objects.filter(name__search=searchText)
-#        tags = Tag.objects.filter(descr__search=searchText)
-#        for t in tags:
-#            businesstags = BusinessCategory.objects.filter(tag = t)
-#            for bt in businesstags:
-#                businesses.append(bt.business)
-        
-    print(businesses)
+        unique_businesses = dict()
+        qset = Business.search.query(searchText)
+        logger.info("Searching for "+str(searchText))
+        for b in qset:
+            searchWeight = b._sphinx['weight']
+            #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
+            unique_businesses[b.id] = b._get_current_object()
+        tags = Tag.search.query(searchText)
+        for t in tags:
+            searchWeight = t._sphinx['weight']
+            #print('tag ' + str(t) + ' has weight ' + str(searchWeight))
+            businesstags = BusinessCategory.objects.filter(tag = t._get_current_object())
+            for bt in businesstags:
+                #businesses.append(bt.business)
+                unique_businesses[bt.business.id] = bt.business
+
+        types = TypeOfBusiness.search.query(searchText)
+        for t in types:
+            print('type ' + str(t) + ' has weight ' + str(searchWeight))
+            businesstypes = BusinessType.objects.filter(bustype = t._get_current_object())
+            for bt in businesstypes:
+                #businesses.append(bt.business)
+                #print('append ' + str(bt.business))
+                unique_businesses[bt.business.id] = bt.business
+                
+        businesses = []
+        for (_,v) in unique_businesses.items():
+            #print(v)
+            businesses.append(v)
+
     print('Performing serialization...')
     serialized_businesses = get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
-    print(serialized_businesses)
-
+    
     return server_data(serialized_businesses,"business")
 
  
