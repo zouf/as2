@@ -79,7 +79,7 @@ def add_business_server(name,addr,city,state,phone,url,types):
             bus = Business.objects.get(name=name,address=addr,city=city,state=state)
   
         associate_business_with_types(bus,types)
-        print('creationg of business done')
+        print('creating of business done')
         return bus
     except Exception as e:
         logger.error(e.value)
