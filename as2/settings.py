@@ -87,6 +87,8 @@ if DEPLOY:
                 # Set to empty string for default. Not used with sqlite3.
         }
     }
+    #FOR SPHINX
+    
     DATABASE_ENGINE='postgresql'
     DATABASE_HOST='db.allsortz.com'
     DATABASE_PORT='5432'
@@ -109,6 +111,7 @@ else:
         'PORT': '5432',     
         }   
     }
+    #FOR SPHINX
     DATABASE_ENGINE='postgresql'
     DATABASE_HOST='db.allsortz.com'
     DATABASE_PORT='5432'
