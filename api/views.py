@@ -174,14 +174,37 @@ def query_businesses(request,oid):
 
     data = perform_query_from_obj(user,user.current_location,q)
     return server_data(data,"business") #server_data(top_businesses)
+   
+def search_businesses(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+    except:
+        return server_error('Failure to authenticate')  
+    searchText = get_request_post_or_warn('searchText', request)  
+    tags = get_request_post_or_warn('selectedSorts',request)
+    types = get_request_post_or_warn('selectedTypes', request)
     
+    print('searching with' + str(searchText))
+    businesses = Business.objects.filter(name=searchText)
+    print('Performing serialization...')
+    top_businesses = get_bus_data_ios(businesses ,user,detail=False)
+    print('Serialization complete...')
+    print(top_businesses)
+
+    return server_data(top_businesses,"business")
+
+ 
+ 
 def get_businesses(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-
     except:
         return server_error('Failure to authenticate')
+    
+    
+    
     weights = dict()
     #Weights for sorting. 
     #score weight
@@ -233,8 +256,7 @@ def get_businesses(request):
     businesses = Business.objects.all()
     top_businesses = get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
-
-    return server_data(top_businesses)
+    return server_data(top_businesses,"business")
 
 
 '''

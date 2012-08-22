@@ -6,6 +6,8 @@ urlpatterns = patterns('api.views',
     
     
     (r'^businesses/?$', 'get_businesses'),
+    (r'^businesses/search/?$', 'search_businesses'),
+
     (r'^businesses/query/(?P<oid>\d+)/?$', 'query_businesses'),
 
     (r'^business/(?P<oid>\d+)/?$', 'get_business'),
