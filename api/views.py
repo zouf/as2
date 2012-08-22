@@ -186,13 +186,23 @@ def search_businesses(request):
     types = get_request_post_or_warn('selectedTypes', request)
     
     print('searching with' + str(searchText))
-    businesses = Business.objects.filter(name=searchText)
+    if searchText == '':
+        businesses = Business.objects.all()
+    else:
+        businesses = Business.objects.filter(name__search=searchText)
+#        tags = Tag.objects.filter(descr__search=searchText)
+#        for t in tags:
+#            businesstags = BusinessCategory.objects.filter(tag = t)
+#            for bt in businesstags:
+#                businesses.append(bt.business)
+        
+    print(businesses)
     print('Performing serialization...')
-    top_businesses = get_bus_data_ios(businesses ,user,detail=False)
+    serialized_businesses = get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
-    print(top_businesses)
+    print(serialized_businesses)
 
-    return server_data(top_businesses,"business")
+    return server_data(serialized_businesses,"business")
 
  
  

@@ -5,6 +5,8 @@ import os.path
 import socket
 DEBUG = True
 
+SPHINX_API_VERSION = 0x116
+
 TEMPLATE_DEBUG = DEBUG
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))+'/..'
 
@@ -85,7 +87,12 @@ if DEPLOY:
                 # Set to empty string for default. Not used with sqlite3.
         }
     }
-    
+    DATABASE_ENGINE='postgresql'
+    DATABASE_HOST='db.allsortz.com'
+    DATABASE_PORT='5432'
+    DATABASE_USER='root'
+    DATABASE_NAME='as_deploy'
+    DATABASE_PASSWORD='zoufzouf'
     #for amazon RDS
     #'USER': 'zouf',                  
     # 'HOST': 'rateoutdb-mysql.carvpvtur6or.us-east-1.rds.amazonaws.com',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -101,8 +108,13 @@ else:
         'HOST': 'db.allsortz.com',
         'PORT': '5432',     
         }   
- 
     }
+    DATABASE_ENGINE='postgresql'
+    DATABASE_HOST='db.allsortz.com'
+    DATABASE_PORT='5432'
+    DATABASE_USER='root'
+    DATABASE_NAME='as_deploy'
+    DATABASE_PASSWORD='zoufzouf'
     
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -247,6 +259,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
+    'djangosphinx',
     'recommendation',
   	'registration', 
 	 #'celery',

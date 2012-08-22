@@ -5,6 +5,7 @@ from django.contrib.gis.geos.factory import fromstr
 from django.contrib.localflavor.us.models import USStateField, PhoneNumberField
 from django.core.files.base import ContentFile
 from django.utils.encoding import smart_str
+from djangosphinx.models import SphinxSearch
 from geopy import distance
 from os.path import basename
 import StringIO
@@ -15,11 +16,12 @@ import urllib2
 
 
 
+
 ''' A business can be any kind of merchant '''
 class Business(models.Model):
     name = models.CharField(max_length=250)
     date = models.DateTimeField(auto_now=True)
-    
+    search = SphinxSearch()
     lat = models.FloatField()
     lon = models.FloatField()
     geom = models.PointField()
@@ -193,6 +195,7 @@ class  Photo(models.Model):
 annotate a user's interests ''' 
 class Tag(models.Model):
     creator = models.ForeignKey(User)
+    search = SphinxSearch()
     date = models.DateTimeField(auto_now=True)
     descr = models.TextField(max_length=100)
     icon = models.TextField(max_length=100)
@@ -205,6 +208,7 @@ class Tag(models.Model):
 ''' A tag. It's a topic / way to categorize businesses as well as
 annotate a user's interests ''' 
 class TypeOfBusiness(models.Model):
+    search = SphinxSearch()
     creator = models.ForeignKey(User)
     date = models.DateTimeField(auto_now=True)
     descr = models.TextField(max_length=100)
