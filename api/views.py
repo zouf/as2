@@ -101,6 +101,7 @@ def rate_business(request,oid):
     
 def add_business(request):
     try:
+        print('add business')
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
         bus = Business()
@@ -113,16 +114,17 @@ def add_business(request):
         types = get_request_postlist_or_warn('selectedTypes',request)
         photoURL = get_request_post_or_warn('photoURL',request)
         bus = add_business_server(name=name,addr=addr,city=city,state=state,phone=phone,url=url,types=types)
-        add_photo_by_url(phurl=photoURL,business=bus,user=user, default=True,caption="Picture of "+str(bus.name), title=str(bus.name))
-
+    
+        if photoURL != '':
+            add_photo_by_url(phurl=photoURL,business=bus,user=user, default=True,caption="Picture of "+str(bus.name), title=str(bus.name))
+        print(request.POST)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value) 
-    except Exception as e:
-        return server_error(e.value)
+
     
-    bus_data = get_single_bus_data_ios(bus,user)
+    bus_data = get_single_bus_data_ios(bus,user,detail=True)
     return server_data(bus_data,"business")
 
 def edit_business(request,oid):

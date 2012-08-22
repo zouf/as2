@@ -3,7 +3,8 @@ Created on Aug 16, 2012
 
 @author: zouf
 '''
-from api.models import TypeOfBusiness, Business, BusinessType, BusinessCache
+from api.models import TypeOfBusiness, Business, BusinessType, BusinessCache, \
+    BusinessMeta
 import logging
 
 logger = logging.getLogger(__name__)
@@ -57,15 +58,15 @@ def edit_business_server(bus,name,addr,city,state,phone,url,types):
     bus.save()
     return bus
 
-def add_business_server(name,addr,city,state,phone,url,types):
-    print("Creating business!\n")
-    print(name)
-    print(addr)
-    print(city)
-    print(state)
-    print(phone)
-    print(url)
-    print(types)
+def add_business_server(name,addr,city,state,phone,url,types,hours='',average_price=-1,serves=None,wifi=None):
+#    print("Creating business!\n")
+#    print(name)
+#    print(addr)
+#    print(city)
+#    print(state)
+#    print(phone)
+#    print(url)
+#    print(types)
     try:
         bset = Business.objects.filter(name=name,address=addr,city=city,state=state)    
         if bset.count() ==  0:
@@ -78,9 +79,15 @@ def add_business_server(name,addr,city,state,phone,url,types):
         else:
             bus = Business.objects.get(name=name,address=addr,city=city,state=state)
   
+        bmset = BusinessMeta.objects.filter(business=bus).filter()
+        if bmset.count() > 0:
+            bmset.delete()
+        bm = BusinessMeta(business=bus,hours=hours,average_price=average_price,serves=serves,wifi=wifi)
+        bm.save()
         associate_business_with_types(bus,types)
-        print('creating of business done')
+        print('Creating ' + str(bus.name) + ' Done')
         return bus
     except Exception as e:
-        logger.error(e.value)
+        logger.error("error creating businesses " + str(e))
+        print("error creating  business" + str(e))
         return None

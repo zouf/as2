@@ -107,8 +107,8 @@ class BusinessCache(models.Model):
     
 class BusinessMeta(models.Model):
     average_price = models.IntegerField()
-    wifi = models.BooleanField()
-    serves = models.BooleanField()
+    wifi = models.NullBooleanField()
+    serves = models.NullBooleanField()
     hours = models.CharField(max_length=100)
 
     business = models.ForeignKey(Business)

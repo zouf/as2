@@ -34,14 +34,16 @@ def get_photo_id(b):
 
 def add_photo_by_url(phurl, business,user,default,caption,title):
     outpath =settings.STATIC_ROOT+str(business.id)+"_"+str(business.city)+"_"+str(business.state)
-    #print('retrieve'+str(urlparse.urlunparse(phurl)))
+    print('retrieve')
     
     try:
         urlretrieve(phurl, outpath)
-    except:
+        
+    except Exception as e:
         print('exception')
+        print(e)
         return None
-
+    print('done')
     p = Photo(user=user, business=business, image=outpath, title=title, caption=caption,is_default=default)
     p.save(isUpload = False,isTextMod = False)
     print(p)

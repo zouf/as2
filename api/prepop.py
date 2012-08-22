@@ -3,6 +3,7 @@ Created on Apr 2, 2012
 
 @author: Joey
 '''
+from api.business_operations import add_business_server
 from api.categories import get_master_summary_tag, add_tag_to_bus
 from api.models import Tag, Business, TypeOfBusiness, BusinessType, \
     BusinessRating, BusinessMeta
@@ -188,27 +189,28 @@ def prepop_businesses(user):
         else:
             serves = False
     
-     
-        if Business.objects.filter(name=name,address=addr,state=state,city=city).count() > 0:
-            Business.objects.filter(name=name.encode("utf8"), city=city.encode("utf8"), state=state, address=addr.encode("utf8")).delete()
-        b = Business(name=name.encode("utf8"), city=city.encode("utf8"), state=state, 
-            address=addr.encode("utf8"), lat=0, lon=0,phone=phone, url=businessURL)
-        b.save()
 
-        bmset = BusinessMeta.objects.filter(business=b).filter()
-        if bmset.count() > 0:
-            bmset.delete()
-        bm = BusinessMeta(business=b,hours=hours,average_price=average_price,serves=serves,wifi=wifi)
-        bm.save()
+     
+        b = add_business_server(name=name,addr=addr,state=state,city=city,phone=phone,
+                            types='', hours=hours,wifi=wifi,serves=serves, url=businessURL, 
+                            average_price=average_price)
         
-        add_photo_by_url(phurl=phurl,business=b,user=user, default=True,caption="Caption, defaulted to name: "+str(b.name), title=str(b.name))
+        add_photo_by_url(phurl=phurl,business=b,user=user, default=True,caption="Photo of "+str(b.name), title=str(b.name))
+
+        for t in types.split(','):
+            t = t.strip(None)
+            if TypeOfBusiness.objects.filter(descr=t).count() > 0:
+                typeofbus = TypeOfBusiness.objects.get(descr=t)
+            else:
+                typeofbus = TypeOfBusiness.objects.create(descr=t,creator=get_default_user(),icon="blankicon.png")
+            BusinessType.objects.create(business=b,bustype=typeofbus)    
         
+          
         for t,rindex in tag_indices.items():           
             tg = Tag.objects.get(descr=t)
             bustag = add_tag_to_bus(b, tg, user)
             if row[rindex] != '':
                 print(t)
-                print('Tag added to bus!')
                 pg = Page.objects.get(category=bustag)
                 print('Populating page' + str(bustag.tag.descr))
                 pg.content = row[rindex]
@@ -217,13 +219,7 @@ def prepop_businesses(user):
                 print('content should be ' + str(row[rindex]))
         
         
-        for t in types.split(','):
-            t = t.strip(None)
-            if TypeOfBusiness.objects.filter(descr=t).count() > 0:
-                typeofbus = TypeOfBusiness.objects.get(descr=t)
-            else:
-                typeofbus = TypeOfBusiness.objects.create(descr=t,creator=get_default_user(),icon="blankicon.png")
-            BusinessType.objects.create(business=b,bustype=typeofbus)    
+
             
         
         
