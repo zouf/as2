@@ -89,7 +89,6 @@ def get_single_bus_data_ios(b, user,detail):
         d['businessName'] = b.name
         d['businessID'] = b.id
         d['businessHours'] = b.hours()  #TODO Set hours
-        d['photoURL'] = get_photo_url(b)
         d['averagePrice'] = b.average_price()  #TODO Set hours
 
         bustypes = BusinessType.objects.filter(business=b)  
@@ -102,7 +101,7 @@ def get_single_bus_data_ios(b, user,detail):
             BusinessCache.objects.filter(business=b).delete()      
         BusinessCache.objects.create(business=b,cachedata=json.dumps(d))
         pass
-    
+    d['photoURL'] = get_photo_url(b)
     userRatingSet = BusinessRating.objects.filter(user=user, business=b)
     if user and userRatingSet.count() > 0:
         #the user exists and has rated something
