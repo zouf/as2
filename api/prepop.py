@@ -57,9 +57,12 @@ def prepop_topics(user):
        
         descr = row[0]
         icon = row[1]
-        parent = row[2]
-        print('Adding topic ' + str(descr) + ' parent is ' + str(parent))
-        add_topic(descr,parent,icon)
+        all_parents = row[2].split(', ')
+        parents = []
+        for p in all_parents:
+            parents.append(p.strip(None))
+        print('Adding topic ' + str(descr) + ' parent is ' + str(parents))
+        add_topic(descr,parents,icon)
     
         
 def prepop_types(user):

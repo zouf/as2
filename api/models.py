@@ -196,7 +196,7 @@ annotate a user's interests '''
 class Topic(models.Model):
     creator = models.ForeignKey(User)
     search = SphinxSearch()
-    parent_topic = models.ForeignKey('self', related_name='replies', 
+    parent_topics = models.ManyToManyField('self', related_name='parents', 
         null=True, blank=True)
     date = models.DateTimeField(auto_now=True)
     descr = models.TextField(max_length=100)
