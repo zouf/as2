@@ -1,6 +1,6 @@
+from api.models import  Topic
 from django.contrib.auth.models import User
 from django.db import models
-from api.models import Tag
 
 # Create your models here.
 
@@ -36,9 +36,9 @@ class Query(models.Model):
         return self.name
 
 
-class QueryTag(models.Model):
+class QueryTopic(models.Model):
     query = models.ForeignKey(Query)
-    tag = models.ForeignKey(Tag)
+    topic = models.ForeignKey(Topic)
 
 
 class UserQueryRelation(models.Model):

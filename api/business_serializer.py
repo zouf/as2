@@ -4,8 +4,8 @@ Created on Jul 19, 2012
 @author: zouf
 '''
 #from photos.models import BusinessPhoto
-from api.json_serializer import get_categories_data, get_bustypes_data
-from api.models import Business, BusinessRating, BusinessCategory, BusinessType, \
+from api.json_serializer import get_bustypes_data, get_bustopics_data
+from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
     BusinessCache
 from api.photos import get_photo_url, get_photo_id
 from api.ratings import getBusinessRatings
@@ -142,7 +142,7 @@ def get_single_bus_data_ios(b, user,detail):
         d['numberOfLikes'] =likes
         d['numberOfNeutrals'] = neutrals
         d['numberOfHates'] = hates   
-        bustags = BusinessCategory.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
-        d['categories'] = get_categories_data(bustags,user,detail)
+        bustags = BusinessTopic.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
+        d['categories'] = get_bustopics_data(bustags,user,detail)
 
     return d

@@ -6,9 +6,9 @@ Created on Aug 1, 2012
 #from django.db.models.aggregates import Sum, Count
 #import ios_interface 
 
-from django.db.models.aggregates import Count, Sum, Avg
 from api.models import PhotoRating, DiscussionRating, BusinessRating, \
-    CategoryRating
+    BusinessTopicRating
+from django.db.models.aggregates import Count, Sum, Avg
 
 HATE = 0
 NEUTRAL = 1
@@ -22,11 +22,10 @@ def getCommentRatings(discussion):
     numNeg = DiscussionRating.objects.filter(rating=0).count()
     return [numPos, numNeg]
     
-def getCategoryRatings(category):
-    #ratingFilter = CategoryRating.objects.filter(category=category, rating__range=["1", "5"])
-    if CategoryRating.objects.all().count() == 0:
+def getBusTopicRatings(bustopic):
+    if BusinessTopicRating.objects.all().count() == 0:
         return 0
-    ratingFilter = CategoryRating.objects.all().aggregate(Avg('rating'))
+    ratingFilter = BusinessTopicRating.objects.all().aggregate(Avg('rating'))
     avg = ratingFilter['rating__avg']
     #numNeg = DiscussionRating.objects.filter(rating=0).count()
     return avg
@@ -63,6 +62,10 @@ def getBusAverageRating(b):
     return avg
     #b = Business.objects.get(id=bid)
     #return b.average_rating
+
+
+def getAverageForTopics(b,topics):
+    return 0
 
 def getBusinessRatings(b):
     hates = BusinessRating.objects.filter(rating=HATE).count()

@@ -33,7 +33,7 @@ class Business(models.Model):
     
     # Right now: America centric 
     state = USStateField()  
-    phone = PhoneNumberField()
+    phone = PhoneNumberField(blank=True)
     zipcode = models.CharField(max_length=10,blank=True)
     
     objects = models.GeoManager()
@@ -191,11 +191,13 @@ class  Photo(models.Model):
         #Save instance of Photo
         super(Photo, self).save()
      
-''' A tag. It's a topic / discussion about a business as well as
+''' A topic. An attribute of a business as well as
 annotate a user's interests ''' 
-class Tag(models.Model):
+class Topic(models.Model):
     creator = models.ForeignKey(User)
     search = SphinxSearch()
+    parent_topic = models.ForeignKey('self', related_name='replies', 
+        null=True, blank=True)
     date = models.DateTimeField(auto_now=True)
     descr = models.TextField(max_length=100)
     icon = models.TextField(max_length=100)
@@ -205,9 +207,9 @@ class Tag(models.Model):
         return self.descr
     
     
-''' A tag. It's a topic / way to categorize businesses as well as
+''' A topic. It's a way to categorize businesses as well as
 annotate a user's interests ''' 
-class TypeOfBusiness(models.Model):
+class Type(models.Model):
     search = SphinxSearch()
     creator = models.ForeignKey(User)
     date = models.DateTimeField(auto_now=True)
@@ -218,29 +220,30 @@ class TypeOfBusiness(models.Model):
     def __unicode__(self):
         return self.descr
     
-''' A tag. It's a topic / way to categorize businesses as well as
+''' It's a topic / way to categorize businesses as well as
 annotate a user's interests ''' 
 class BusinessType(models.Model):
     business = models.ForeignKey(Business)
-    bustype = models.ForeignKey(TypeOfBusiness)
+    bustype = models.ForeignKey(Type)
     def __unicode__(self):
         return str(self.business) + ": " + str(self.bustype)
     
 
     
-''' A relationship between business and tag 
+''' A relationship between business and topic 
 These are the business' sorts '''
-class BusinessCategory(models.Model):
+class BusinessTopic(models.Model):
     business = models.ForeignKey(Business)
-    tag = models.ForeignKey(Tag)
+    topic = models.ForeignKey(Topic)
     def __unicode__(self):
-        return str(self.business) + ": " + str(self.tag)
+        return str(self.business) + ": " + str(self.topic)
     
     
-''' A user's subscription to a particular  tag '''
-class UserSubscription(models.Model):
+''' A user's subscription to a particular  topic '''
+class UserTopic(models.Model):
     user = models.ForeignKey(User)
-    tag = models.ForeignKey(Tag)
+    topic = models.ForeignKey(Topic)
+    importance = models.FloatField()
 
 
 ''' A user's favorite business '''
@@ -446,8 +449,8 @@ class Discussion(models.Model):
     class Admin:
         pass
     
-class CategoryDiscussion(Discussion):
-    businesstag = models.ForeignKey(BusinessCategory)
+class BusinessTopicDiscussion(Discussion):
+    businesstopic = models.ForeignKey(BusinessTopic)
     class Admin:
         pass
     
@@ -486,12 +489,12 @@ class PhotoRating(Rating):
     
     
     
-class CategoryRating(Rating):
-    category = models.ForeignKey(BusinessCategory)
+class BusinessTopicRating(Rating):
+    businesstopic = models.ForeignKey(BusinessTopic)
     class Admin:
         pass
     def __unicode__(self):
-        return str(self.rating) + " : " + str(self.category) + " - " + str(self.user) 
+        return str(self.rating) + " : " + str(self.businesstopic) + " - " + str(self.user) 
     
 class BusinessRating(Rating):
     business = models.ForeignKey(Business)

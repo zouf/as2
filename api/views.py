@@ -3,16 +3,16 @@ from api.business_operations import add_business_server, edit_business_server
 from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
     get_request_get_or_error, get_request_post_or_error, get_bus_data_ios, \
     get_request_post_or_warn, get_request_postlist_or_warn
-from api.models import Photo, PhotoRating, BusinessDiscussion, \
-    CategoryDiscussion, PhotoDiscussion, Discussion, Business, BusinessCategory, \
-    CategoryRating, Tag, DiscussionRating, BusinessRating, UserSubscription, \
-    TypeOfBusiness, BusinessType, Rating, BusinessMeta
+from api.models import Photo, PhotoRating, BusinessDiscussion, PhotoDiscussion, \
+    Discussion, Business, Topic, DiscussionRating, BusinessRating, Type, \
+    BusinessType, Rating, BusinessMeta, BusinessTopic, BusinessTopicDiscussion, \
+    BusinessTopicRating, UserTopic
 from api.photos import add_photo_by_url
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from djangosphinx.models import SphinxSearch
-from geopy import geocoders, distance
-from queries.models import Query, QueryTag
+from geopy import geocoders
+from queries.models import Query, QueryTopic
 from queries.views import perform_query_from_param, perform_query_from_obj
 from wiki.models import Page
 import api.authenticate as auth
@@ -85,10 +85,10 @@ def rate_business(request,oid):
         return server_error(e.value)
     except: 
         return server_error('Business with id '+str(oid)+'not found')    
-    if rating < 1:
-        rating = 1
-    elif rating > 4:
-        rating = 4
+    if rating < 0.0:
+        rating = 0.0
+    elif rating > 1.0:
+        rating = 1.0
         
     #XXX TODO allow rating as float
     #remove existing ratings
@@ -189,7 +189,7 @@ def search_businesses(request):
     except:
         return server_error('Failure to authenticate')  
     searchText = get_request_post_or_warn('searchText', request)  
-    tags = get_request_post_or_warn('selectedSorts',request)
+    topics = get_request_post_or_warn('selectedTopics',request)
     types = get_request_post_or_warn('selectedTypes', request)
     
     print('searching with' + str(searchText))
@@ -203,16 +203,16 @@ def search_businesses(request):
             searchWeight = b._sphinx['weight']
             #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
             unique_businesses[b.id] = b._get_current_object()
-        tags = Tag.search.query(searchText)
-        for t in tags:
+        topics = Topic.search.query(searchText)
+        for t in topics:
             searchWeight = t._sphinx['weight']
             #print('tag ' + str(t) + ' has weight ' + str(searchWeight))
-            businesstags = BusinessCategory.objects.filter(tag = t._get_current_object())
-            for bt in businesstags:
+            businesstopics = BusinessTopic.objects.filter(topic = t._get_current_object())
+            for bt in businesstopics:
                 #businesses.append(bt.business)
                 unique_businesses[bt.business.id] = bt.business
 
-        types = TypeOfBusiness.search.query(searchText)
+        types = Type.search.query(searchText)
         for t in types:
             print('type ' + str(t) + ' has weight ' + str(searchWeight))
             businesstypes = BusinessType.objects.filter(bustype = t._get_current_object())
@@ -269,13 +269,13 @@ def get_businesses(request):
     else:
         weights['vw'] = 1
 
-    #Tags to sort by
-    if 'tags' in request.GET:  
-        tags = request.get['tags']
+    #topics to sort by
+    if 'topics' in request.GET:  
+        topics = request.get['topics']
     else:
-        tags = None
+        topics = None
 
-    #Tags to sort by
+    #topics to sort by
     if 'text' in request.GET:  
         searchText = request.get['text']
     else:
@@ -289,7 +289,7 @@ def get_businesses(request):
         _, (lat, lng) = g.geocode("Princeton, NJ")  
     
         
-    businesses = perform_query_from_param(user, (lat, lng),weights,tags,searchText)
+    businesses = perform_query_from_param(user, (lat, lng),weights,topics,searchText)
     print('Performing serialization...')
     businesses = Business.objects.all()
     top_businesses = get_bus_data_ios(businesses ,user,detail=False)
@@ -298,11 +298,11 @@ def get_businesses(request):
 
 
 '''
-PRAGMA Code to handle business categories
+PRAGMA Code to handle business bustopics
 '''
 
 
-def get_business_categories(request,oid):
+def get_business_topics(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
@@ -314,95 +314,94 @@ def get_business_categories(request,oid):
     except: 
         return server_error('Business with id '+str(oid)+'not found')
         
-    categories = BusinessCategory.objects.filter(business=bus)
+    bustopics = BusinessTopic.objects.filter(business=bus)
     
-    data = serial.get_categories_data(categories,user)
+    data = serial.get_bustopics_data(bustopics,user)
     return server_data(data)
 
-'''Associates a tag with a business '''
-def get_business_category(request,oid):
+'''Associates a topic with a business '''
+def get_business_topic(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        category = BusinessCategory.objects.get(id=oid)
+        bustopic = BusinessTopic.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
     except: 
-        return server_error('Category with id '+str(oid)+'not found')
+        return server_error('bustopic with id '+str(oid)+'not found')
     
-    data = serial.get_category_data(category,user)
+    data = serial.get_bustopic_data(bustopic,user)
     return server_data(data)
 
-'''Rates a business' tag-business relationship '''
-def rate_business_category(request,oid):
+'''Rates a business' topic-business relationship '''
+def rate_business_topic(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
         rating = int(get_request_get_or_error('rating', request))
-        category = BusinessCategory.objects.get(id=oid)
+        bustopic = BusinessTopic.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
     except: 
-        return server_error('Category with id '+str(oid)+'not found')
+        return server_error('bustopic with id '+str(oid)+'not found')
     
-    if rating < 1:
-        rating = 1
-    elif rating > 4:
-        rating = 4
+    if rating < 0:
+        rating = 0.0
+    elif rating > 1:
+        rating = 1.0
     
-    #XXX TODO make sure rating is an int
     #remove existing rating
-    if CategoryRating.objects.filter(category=category,user=user).count() > 0:
-        CategoryRating.objects.filter(category=category,user=user).delete()
-    CategoryRating.objects.create(category=category, rating=rating,user=user) 
+    if BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).count() > 0:
+        BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).delete()
+    BusinessTopicRating.objects.create(businesstopic=bustopic, rating=rating,user=user) 
     
-    data = serial.get_category_data(category,user)
+    data = serial.get_bustopic_data(bustopic,user)
     return server_data(data)
 
 
-'''Associates a tag with a business '''
-def add_business_category(request,oid):
+'''Associates a topic with a business '''
+def add_business_topic(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
-        tagid = get_request_get_or_error('tagID', request)
+        topicid = get_request_get_or_error('topicID', request)
         bus = Business.objects.get(id=oid)
-        tag = Tag.objects.get(id=tagid)
+        topic = Topic.objects.get(id=topicid)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
     except: 
-        return server_error('Retrieving business and category failed (IDs: '+str(oid)+ ' and ' + str(tagid))
+        return server_error('Retrieving business and bustopic failed (IDs: '+str(oid)+ ' and ' + str(topicid))
     
-    if BusinessCategory.objects.filter(business=bus,tag=tag).count() > 0:
-        category = BusinessCategory.objects.get(business=bus, tag=tag)
+    if BusinessTopic.objects.filter(business=bus,topic=topic).count() > 0:
+        bustopic = BusinessTopic.objects.get(business=bus, topic=topic)
     else:
-        category = BusinessCategory.objects.create(business=bus,tag=tag,creator=user)
-        pg = Page(name=category.tag.descr,category=category)
+        bustopic = BusinessTopic.objects.create(business=bus,topic=topic,creator=user)
+        pg = Page(name=bustopic.topic.descr,bustopic=bustopic)
         pg.save()
-    data = serial.get_category_data(category,user)
-    return server_data(data,"businessCategory")
+    data = serial.get_bustopic_data(bustopic,user)
+    return server_data(data,"BusinessTopic")
 
-'''Disassociates a tag with a business '''
-def remove_business_category(request,oid):
+'''Disassociates a topic with a business '''
+def remove_business_topic(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "remove")
-        bc = BusinessCategory.objects.get(id=oid)
-        pg = Page.objects.get(category=bc)
+        bustopic = BusinessTopic.objects.get(id=oid)
+        pg = Page.objects.get(bustopic=bustopic)
         pg.delete()
-        bc.delete()
+        bustopic.delete()
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
     except:
-        return server_error('Category with id '+str(oid)+'not found')
+        return server_error('bustopic with id '+str(oid)+'not found')
     return server_data("Deletion successful","message")
 
 ''' 
@@ -432,7 +431,7 @@ def add_business_type(request,oid):
         auth.authorize_user(user, request, "add")
         typeid = get_request_get_or_error('typeID', request)
         bus = Business.objects.get(id=oid)
-        typeofbusiness = TypeOfBusiness.objects.get(id=typeid)
+        bustype = Type.objects.get(id=typeid)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -440,8 +439,8 @@ def add_business_type(request,oid):
     except: 
         return server_error('Retrieving business and type failed (IDs: '+str(oid)+ ' and ' + str(typeid))
     
-    if BusinessType.objects.filter(business=bus,typeofbusiness=typeofbusiness).count() == 0:
-        BusinessType.objects.create(business=bus,typeofbusiness=typeofbusiness,creator=user)
+    if BusinessType.objects.filter(business=bus,Type=bustype).count() == 0:
+        BusinessType.objects.create(business=bus,bustype=bustype,creator=user)
     
     bustypes = BusinessType.objects.filter(business=bus)
     data = serial.get_bustypes_data(bustypes,user)
@@ -462,31 +461,28 @@ def remove_business_type(request,oid):
     return server_data("Deletion successful","message")
 
 
-def get_tags(request):
+def get_topics(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
-    data = serial.get_tags_data(Tag.objects.all(),user)
-    return server_data(data,"tag")
+    data = serial.get_topics_data(Topic.objects.all(),user)
+    return server_data(data,"topic")
 
 
-def get_tag(request,oid):
+def get_topic(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        tag = Tag.objects.get(id=oid)
+        topic = Topic.objects.get(id=oid)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
-    except Tag.DoesNotExist:
-        return server_error("Tag with ID "+str(oid) + " not found")
+    except Topic.DoesNotExist:
+        return server_error("Topic with ID "+str(oid) + " not found")
      
-    data = serial.get_tag_data(tag,user)
-    return server_data(data,"tag")
-
-
-
+    data = serial.get_topic_data(topic,user)
+    return server_data(data,"topic")
 
 ''' Get types of business (e.g. sandwich, etc. '''
 def get_types(request):
@@ -495,7 +491,7 @@ def get_types(request):
         auth.authorize_user(user, request, "get")
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
-    data = serial.get_types_data(TypeOfBusiness.objects.all(),user)
+    data = serial.get_types_data(Type.objects.all(),user)
     return server_data(data,"type")
 
 
@@ -503,10 +499,10 @@ def get_type(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        typeofbusiness = TypeOfBusiness.objects.get(id=oid)
+        typeofbusiness = Type.objects.get(id=oid)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
-    except TypeOfBusiness.DoesNotExist:
+    except Type.DoesNotExist:
         return server_error("Type with ID "+str(oid) + " not found")
      
     data = serial.get_type_data(typeofbusiness)
@@ -516,11 +512,11 @@ def add_type(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
-        descr = get_request_post_or_error('tagDescr', request)
-        if TypeOfBusiness.objects.filter(descr=descr):
-            typeofbusiness = TypeOfBusiness.objects.get(descr=descr)
+        descr = get_request_post_or_error('topicDescr', request)
+        if Type.objects.filter(descr=descr):
+            typeofbusiness = Type.objects.get(descr=descr)
         else:
-            typeofbusiness = TypeOfBusiness.objects.create(descr=descr,creator=user)    
+            typeofbusiness = Type.objects.create(descr=descr,creator=user)    
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
     except:
@@ -531,39 +527,39 @@ def add_type(request,oid):
 
 
 
-def subscribe_tag(request,oid):
+def subscribe_topic(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "edit")
-        tag = Tag.objects.get(id=oid)
+        topic = Topic.objects.get(id=oid)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
-    except Tag.DoesNotExist:
-        return server_error("Tag with ID "+str(oid) + " not found")
+    except Topic.DoesNotExist:
+        return server_error("Topic with ID "+str(oid) + " not found")
      
     try:
-        UserSubscription.objects.create(user=user,tag=tag)
-    except UserSubscription.DoesNotExist:
+        UserTopic.objects.create(user=user,topic=topic)
+    except UserTopic.DoesNotExist:
         return server_error("Could not subscribe user. ")
-    data = serial.get_tag_data(tag,user)
+    data = serial.get_topic_data(topic,user)
     return server_data(data)
 
 
-def unsubscribe_tag(request,oid):
+def unsubscribe_topic(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "edit")
-        tag = Tag.objects.get(id=oid)
+        topic = Topic.objects.get(id=oid)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
-    except Tag.DoesNotExist:
-        return server_error("Tag with ID "+str(oid) + " not found")
+    except Topic.DoesNotExist:
+        return server_error("Topic with ID "+str(oid) + " not found")
      
     try:
-        UserSubscription.objects.filter(user=user,tag=tag).delete()
+        UserTopic.objects.filter(user=user,topic=topic).delete()
     except :
         return server_error("Error occurred. Could not unsubscribe user.")
-    data = serial.get_tag_data(tag,user)
+    data = serial.get_topic_data(topic,user)
     return server_data(data)
 
 '''
@@ -607,9 +603,9 @@ def rate_comment(request,oid):
         return server_error('Comment with id '+str(oid)+'not found')
 
     if rating < 0:
-        rating = 0
+        rating = 0.0
     elif rating > 1:
-        rating = 1
+        rating = 1.0
     
     #XXX TODO make sure rating is an int
     #remove existing rating
@@ -645,12 +641,12 @@ def add_comment(request):
         except:
             return server_error("Business with ID "+str(oid)+ " does not exist")
         comment = BusinessDiscussion.objects.create(user=user,reply_to=replyComment,content=content,business=bus)
-    elif commentType == 'category':
+    elif commentType == 'businesstopic':
         try:
-            btag = BusinessCategory.objects.get(id=oid)
+            btopic = BusinessTopic.objects.get(id=oid)
         except:
-            return server_error("Category with ID "+str(oid)+ " does not exist")
-        comment = CategoryDiscussion.objects.create(user=user,reply_to=replyComment,content=content,businesstag=btag)
+            return server_error("bustopic with ID "+str(oid)+ " does not exist")
+        comment = BusinessTopicDiscussion.objects.create(user=user,reply_to=replyComment,content=content,businesstopic=btopic)
     elif commentType == 'photo':
         try:
             photo = Photo.objects.get(id=oid)
@@ -672,7 +668,7 @@ def edit_comment(request,oid):
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
     
-    comment = CategoryDiscussion.objects.create(id=oid,content=content)
+    comment = BusinessTopicDiscussion.objects.create(id=oid,content=content)
     data = serial.get_comment_data(comment,user)
     return server_data(data)
     
@@ -786,9 +782,9 @@ def rate_photo(request,oid):
         return server_error('Photo with id '+str(oid)+' not found.')
     
     if rating < 0:
-        rating = 0
+        rating = 0.0
     elif rating > 1:
-        rating = 1
+        rating = 1.0
         
     #XXX TODO make sure rating is an int
     #remove existing rating
@@ -901,10 +897,10 @@ def get_query_base(request):
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
 
-    tags = serial.get_tags_data(Tag.objects.all(),user)
-    types = serial.get_types_data(TypeOfBusiness.objects.all(),user)
+    topics = serial.get_topics_data(Topic.objects.all(),user)
+    types = serial.get_types_data(Type.objects.all(),user)
     data = dict()
-    data['tags'] = tags;
+    data['topics'] = topics;
     data['types'] = types;
     return server_data(data,"query")
  
@@ -929,14 +925,14 @@ def add_query(request):
         query.deal = get_request_post_or_error('deal',request)
         query.is_default = False# get_json_or_error('deal',request)
         query.save()
-        if 'queryTags' not in request.POST:
-            return server_error("Categories did not provide a list")
-        categoryList = request.POST.getlist('queryCategories')
-        for c in categoryList:
-            if Tag.objects.filter(id=c).count() == 0:
-                return server_error("Invalid Category provided")
-            cat = Tag.objects.get(id=c)
-            QueryTag.objects.create(query=query,tag=cat)
+        if 'querytopics' not in request.POST:
+            return server_error("bustopics did not provide a list")
+        bustopicList = request.POST.getlist('queryBustopics')
+        for c in bustopicList:
+            if Topic.objects.filter(id=c).count() == 0:
+                return server_error("Invalid bustopic provided")
+            cat = Topic.objects.get(id=c)
+            QueryTopic.objects.create(query=query,topic=cat)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -969,13 +965,13 @@ def internal_populate_database():
     BusinessMeta.objects.all().delete()
     Page.objects.all().delete()
     Photo.objects.all().delete()
-    BusinessCategory.objects.all().delete()
-    Tag.objects.all().delete()
-    TypeOfBusiness.objects.all().delete()
+    BusinessTopic.objects.all().delete()
+    Topic.objects.all().delete()
+    Type.objects.all().delete()
     user = get_default_user()
     
     prepop.prepop_types(user)
-    prepop.prepop_sorts(user)
+    prepop.prepop_topics(user)
 
     prepop.prepop_businesses(user)
     prepop.prepop_queries(user)
@@ -998,12 +994,12 @@ def prepopulate_database(request):
         Business.objects.all().delete()
         Page.objects.all().delete()
         Photo.objects.all().delete()
-        BusinessCategory.objects.all().delete()
-        Tag.objects.all().delete()
-        TypeOfBusiness.objects.all().delete()
+        BusinessTopic.objects.all().delete()
+        Topic.objects.all().delete()
+        Type.objects.all().delete()
     
     prepop.prepop_types(user)
-    prepop.prepop_sorts(user)
+    prepop.prepop_topics(user)
     prepop.prepop_businesses(user)
     prepop.prepop_queries(user)
     

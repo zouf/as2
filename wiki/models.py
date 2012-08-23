@@ -1,4 +1,4 @@
-from api.models import BusinessCategory
+from api.models import BusinessTopic
 from django.db import models
 from templatetags.wiki import wikify
 
@@ -8,7 +8,7 @@ class Page(models.Model):
     name = models.CharField(max_length=255, unique=False)
     content = models.TextField()
     rendered = models.TextField()
-    category = models.ForeignKey(BusinessCategory)
+    bustopic = models.ForeignKey(BusinessTopic)
 
     class Meta:
         ordering = ('name', )

@@ -17,28 +17,28 @@ urlpatterns = patterns('api.views',
     (r'^business/rate/(?P<oid>\d+)/?$', 'rate_business'),
     
     #returns the categories associated  with a business
-    (r'^business/categories/(?P<oid>\d+)/?$', 'get_business_categories'),
-    (r'^business/category/(?P<oid>\d+)/?$', 'get_business_category'),
-    (r'^business/category/add/(?P<oid>\d+)/?$', 'add_business_category'),
-    (r'^business/category/remove/(?P<oid>\d+)/?$', 'remove_business_category'),
-    (r'^business/category/rate/(?P<oid>\d+)/?$', 'rate_business_category'),
+    (r'^business/topics/(?P<oid>\d+)/?$', 'get_business_topics'),
+    (r'^business/topic/(?P<oid>\d+)/?$', 'get_business_topic'),
+    (r'^business/topic/add/(?P<oid>\d+)/?$', 'add_business_topic'),
+    (r'^business/topic/remove/(?P<oid>\d+)/?$', 'remove_business_topic'),
+    (r'^business/topic/rate/(?P<oid>\d+)/?$', 'rate_business_topic'),
 
     (r'^business/types/(?P<oid>\d+)/?$', 'get_business_types'),
     (r'^business/type/add/(?P<oid>\d+)/?$', 'add_business_type'),
-    (r'^business/type/remove/(?P<oid>\d+)/?$', 'remove_business_category'),
+    (r'^business/type/remove/(?P<oid>\d+)/?$', 'remove_business_topic'),
     
     (r'^types/?', 'get_types'),
     (r'^type/add/?', 'add_type'),
     (r'^type/(?P<oid>\d+)/?', 'get_type'),
 
     
-    (r'^tags/?$', 'get_tags'),
-    (r'^tag/(?P<oid>\d+)/?$', 'get_tag'),
-    (r'^tag/subscribe/(?P<oid>\d+)/?$', 'subscribe_tag'),
-    (r'^tag/unsubscribe/(?P<oid>\d+)/?$', 'unsubscribe_tag'),
-    (r'^tags/?$', 'get_tags'),
-    (r'^tag/(?P<oid>\d+)/?$', 'get_tag'),
-    #(r'^tag/add/?$', 'add_tag'),
+    (r'^topics/?$', 'get_topics'),
+    (r'^topic/(?P<oid>\d+)/?$', 'get_topic'),
+    (r'^topic/subscribe/(?P<oid>\d+)/?$', 'subscribe_topic'),
+    (r'^topic/unsubscribe/(?P<oid>\d+)/?$', 'unsubscribe_topic'),
+    (r'^topics/?$', 'get_topics'),
+    (r'^topic/(?P<oid>\d+)/?$', 'get_topic'),
+    #(r'^topic/add/?$', 'add_topic'),
 
 
    #currently not designed / implemented    

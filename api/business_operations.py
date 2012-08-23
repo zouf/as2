@@ -3,8 +3,7 @@ Created on Aug 16, 2012
 
 @author: zouf
 '''
-from api.models import TypeOfBusiness, Business, BusinessType, BusinessCache, \
-    BusinessMeta
+from api.models import Type, Business, BusinessType, BusinessCache, BusinessMeta
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,13 +17,13 @@ def associate_business_type(b,t):
 def associate_business_with_types(bus,types):
     for tdescr in types:
         try:
-            t = TypeOfBusiness.objects.get(descr=tdescr) 
+            t = Type.objects.get(descr=tdescr) 
             associate_business_type(bus, t)  
-        except TypeOfBusiness.MultipleObjectsReturned:
+        except Type.MultipleObjectsReturned:
             logger.error("Multiple types returned")
-            t = TypeOfBusiness.objects.filter(descr=tdescr)[0] 
+            t = Type.objects.filter(descr=tdescr)[0] 
             pass
-        except TypeOfBusiness.DoesNotExist:
+        except Type.DoesNotExist:
             print("Does not exist")
             logger.error('Type does not exist")')
             pass

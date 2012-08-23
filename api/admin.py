@@ -4,9 +4,9 @@ Created on Aug 2, 2012
 @author: zouf
 '''
 from api.models import Business, Photo, AllsortzUser, Offer, BusinessAction, \
-    CategoryDiscussion, BusinessDiscussion, PhotoDiscussion, Device, ASUserOffer, \
-    ActionOption, ASUserCompletedAction, BusinessCategory, UserSubscription, \
-    UserFavorite, Tag, BusinessRating, CategoryRating, PhotoRating
+    BusinessTopicDiscussion, BusinessDiscussion, PhotoDiscussion, Device, \
+    ASUserOffer, ActionOption, ASUserCompletedAction, BusinessTopic, UserTopic, \
+    UserFavorite, Topic, BusinessRating, BusinessTopicRating, PhotoRating
 from django.contrib import admin
 
 
@@ -23,15 +23,15 @@ admin.site.register(Device)
 #admin.site.register(ASUserOffer)
 
 
-admin.site.register(CategoryDiscussion)
+admin.site.register(BusinessTopicDiscussion)
 admin.site.register(BusinessDiscussion)
 admin.site.register(PhotoDiscussion)
 
-admin.site.register(BusinessCategory)
-admin.site.register(Tag)
-admin.site.register(UserSubscription)
+admin.site.register(BusinessTopic)
+admin.site.register(Topic)
+admin.site.register(UserTopic)
 admin.site.register(UserFavorite)
 
 admin.site.register(BusinessRating)
-admin.site.register(CategoryRating)
+admin.site.register(BusinessTopicRating)
 admin.site.register(PhotoRating)

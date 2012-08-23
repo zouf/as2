@@ -4,7 +4,7 @@ Created on May 8, 2012
 @author: zouf
 '''
 from api.models import PhotoRating, DiscussionRating, BusinessRating, \
-    CategoryRating, Business
+    BusinessTopicRating, Business
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Sum, Count
 import logging

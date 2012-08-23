@@ -4,10 +4,10 @@ Created on Apr 2, 2012
 @author: Joey
 '''
 from api.business_operations import add_business_server
-from api.categories import get_master_summary_tag, add_tag_to_bus
-from api.models import Tag, Business, TypeOfBusiness, BusinessType, \
-    BusinessRating, BusinessMeta
+from api.models import Topic, Business, BusinessType, BusinessRating, \
+    BusinessMeta, Type
 from api.photos import add_photo_by_url
+from api.topic_operations import add_topic_to_bus, add_topic
 from as2 import settings
 from django.contrib.auth.models import User
 from numpy.oldnumeric.random_array import binomial
@@ -47,8 +47,8 @@ def create_user(username, uid):
     return u
 
 
-def prepop_sorts(user):
-    reader = csv.reader(open(settings.BASE_DIR+'/prepop/sorts.csv', 'U'), delimiter=',', quotechar='"')
+def prepop_topics(user):
+    reader = csv.reader(open(settings.BASE_DIR+'/prepop/topics.csv', 'U'), delimiter=',', quotechar='"')
     i = 0
     for row in reader:
         i+=1
@@ -57,13 +57,10 @@ def prepop_sorts(user):
        
         descr = row[0]
         icon = row[1]
-
-        tset = Tag.objects.filter(descr=descr)
-        if tset.count() > 0:
-            continue
-             
-        t = Tag(descr=descr,creator=user,icon=icon)
-        t.save()
+        parent = row[2]
+        print('Adding topic ' + str(descr) + ' parent is ' + str(parent))
+        add_topic(descr,parent,icon)
+    
         
 def prepop_types(user):
     reader = csv.reader(open(settings.BASE_DIR+'/prepop/types.csv', 'U'), delimiter=',', quotechar='"')
@@ -76,73 +73,16 @@ def prepop_types(user):
         descr = row[0]
         icon = row[1]
 
-        tset = TypeOfBusiness.objects.filter(descr=descr)
+        tset = Type.objects.filter(descr=descr)
         if tset.count() > 0:
             continue
-        t = TypeOfBusiness(descr=descr,creator=user,icon=icon)
+        t = Type(descr=descr,creator=user,icon=icon)
         t.save()
         
         
         
-#def prepop_traits(user):
-#    reader = csv.reader(open(settings.BASE_DIR+'/prepop/traits.csv', 'U'), delimiter=',', quotechar='"')
-#    i = 0
-#    for row in reader:
-#        i+=1
-#        if i == 1:
-#            continue
-#       
-#        name = row[0]
-#        descr = row[1]
-#
-#        print('Trait name: '+str(name))
-#        print('trait descr: '+str(descr))
-#        
-#        tset = Trait.objects.filter(name=name)
-#        if tset.count() > 0:
-#            continue
-#        
-#        t = Trait(name=name,descr=descr,creator=user)
-#        t.save()
-#
-#
-#            
-        
-        
 
-#def prepop_questions(user):
-#    reader = csv.reader(open(settings.BASE_DIR+'/prepop/questions.csv', 'U'), delimiter=',', quotechar='"')
-#    i = 0
-#    for row in reader:
-#        i+=1
-#        if i == 1:
-#            continue
-#       
-#        question = row[0]
-#        descr = row[1]
-#        tagtype = row[2]
-#        print('tag question: '+str(question))
-#        print('tag descr: '+str(descr))
-#        
-#        
-#        if tagtype == 'boolean':
-#            
-#            tset = HardTag.objects.filter(question=question)
-#            if tset.count() > 0:
-#                continue
-#            
-#            t = HardTag(descr=descr,question=question,creator=user)
-#            t.save()
-#        elif tagtype=='integer':
-#            tset = ValueTag.objects.filter(question=question)
-#            if tset.count() > 0:
-#                continue
-#            
-#            t = ValueTag(descr=descr,question=question,creator=user)
-#            t.save()
-#        
-#        
-        
+    
 
 def prepop_businesses(user):
     if user == None:
@@ -199,20 +139,21 @@ def prepop_businesses(user):
 
         for t in types.split(','):
             t = t.strip(None)
-            if TypeOfBusiness.objects.filter(descr=t).count() > 0:
-                typeofbus = TypeOfBusiness.objects.get(descr=t)
+            if Type.objects.filter(descr=t).count() > 0:
+                typeofbus = Type.objects.get(descr=t)
             else:
-                typeofbus = TypeOfBusiness.objects.create(descr=t,creator=get_default_user(),icon="blankicon.png")
+                typeofbus = Type.objects.create(descr=t,creator=get_default_user(),icon="blankicon.png")
             BusinessType.objects.create(business=b,bustype=typeofbus)    
         
           
-        for t,rindex in tag_indices.items():           
-            tg = Tag.objects.get(descr=t)
-            bustag = add_tag_to_bus(b, tg, user)
+        for t,rindex in tag_indices.items():    
+            print("Adding " + str(t) + " to business" )       
+            topic = Topic.objects.get(descr=t)
+            bustopic = add_topic_to_bus(b, topic, user)
             if row[rindex] != '':
                 print(t)
-                pg = Page.objects.get(category=bustag)
-                print('Populating page' + str(bustag.tag.descr))
+                pg = Page.objects.get(bustopic=bustopic)
+                print('Populating page' + str(bustopic.topic.descr))
                 pg.content = row[rindex]
                 pg.save()
                 print('Page done. ID is '+ str(pg.id))
@@ -226,23 +167,11 @@ def prepop_businesses(user):
       
 def prepop_queries(user):
     user = get_default_user()
-    for t in Tag.objects.all():
+    for t in Topic.objects.all():
         q = Query(name=t.descr,proximity=5,value=5,score=5,price=5,visited=False,deal=False,networked=False,text="",creator=user,is_default=True)
         q.save()
 
 
-def create_business(name, address, state, city, lat, lon):
-    bset = Business.objects.filter(name=name,address=address,state=state,city=city)
-    if bset.count() > 0:
-        return
-    
-    b = Business(name=name.encode("utf8"), city=city.encode("utf8"), state=state, address=address.encode("utf8"), lat=lat, lon=lon)
-    b.save()
-    
-    #setBusLatLng(b)
-    
-    add_tag_to_bus(b,get_master_summary_tag())
-    return b
 
 def prepop_ratings():
     print("prepop")

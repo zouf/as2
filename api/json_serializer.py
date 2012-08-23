@@ -4,8 +4,8 @@ Created on Jul 27, 2012
 @author: zouf
 '''
 
-from api.models import DiscussionRating, PhotoRating, UserSubscription
-from queries.models import QueryTag
+from api.models import DiscussionRating, PhotoRating, UserTopic
+from queries.models import QueryTopic
 from wiki.models import Page
 import api.ratings as ratings
 import logging
@@ -16,38 +16,38 @@ logger = logging.getLogger(__name__)
 
 
 
-def get_tags_data(tags,user):
+def get_topics_data(topics,user):
     data = []
-    for t in tags:
-        data.append(get_tag_data(t,user))
+    for t in topics:
+        data.append(get_topic_data(t,user))
     return data
 
-def get_tag_data(tag,user):
+def get_topic_data(topic,user):
     data = dict()
-    data['tagName'] = tag.descr
-    data['tagID'] = tag.id
-    data['tagIcon'] = tag.icon
+    data['topicName'] = topic.descr
+    data['topicID'] = topic.id
+    data['topicIcon'] = topic.icon
 
-    tagfilter = UserSubscription.objects.filter(user=user,tag=tag)
-    if tagfilter.count() > 0:
+    topicfilter = UserTopic.objects.filter(user=user,topic=topic)
+    if topicfilter.count() > 0:
         data['userIsSubscribed'] = True
     else:
         data['userIsSubscribed'] = False 
     return data
     
-def get_category_data(category,user,detail):
+def get_bustopic_data(bustopic,user,detail):
     data = dict()
-    avg = ratings.getCategoryRatings(category)
-    data['categoryRating'] = avg
-    data['tag'] = get_tag_data(category.tag, user)
+    avg = ratings.getBusTopicRatings(bustopic)
+    data['bustopicRating'] = avg
+    data['topic'] = get_topic_data(bustopic.topic, user)
 
     try:
-        pg = Page.objects.get(category=category)
+        pg = Page.objects.get(bustopic=bustopic)
     except Page.DoesNotExist:
-        pg = Page(name=category.tag.descr,category=category)
+        pg = Page(name=bustopic.topic.descr,bustopic=bustopic)
         pg.save()
     if detail:
-        data['categoryContent'] = pg.rendered
+        data['bustopicContent'] = pg.rendered
 
     return data
 
@@ -76,10 +76,10 @@ def get_bustypes_data(bustypes,user):
         data.append(get_bustype_data(bt,user))
     return data
 
-def get_categories_data(categories,user,detail):
+def get_bustopics_data(bustopics,user,detail):
     data = []
-    for cat in categories:
-        data.append(get_category_data(cat,user,detail))
+    for cat in bustopics:
+        data.append(get_bustopic_data(cat,user,detail))
     return data
     
 
@@ -157,10 +157,10 @@ def get_query_data(query,user):
     
     data['isCreatedByUs'] = query.is_default
     
-    queryTags = []
-    for qt in QueryTag.objects.filter(query=query):
-        queryTags.append(get_tag_data(qt.tag,user))
-    data['queryTags'] = queryTags
+    querytopics = []
+    for qt in QueryTopic.objects.filter(query=query):
+        querytopics.append(get_topic_data(qt.topic,user))
+    data['querytopics'] = querytopics
     
     return data
 
