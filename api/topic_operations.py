@@ -3,7 +3,7 @@ Created on Aug 1, 2012
 
 @author: zouf
 '''
-from api.models import Topic, BusinessTopic
+from api.models import Topic, BusinessTopic, Edge
 from django.contrib.auth.models import User
 from wiki.models import Page
 
@@ -42,13 +42,15 @@ def add_topic(descr,parenttopics,icon,user=get_default_user()):
         t = Topic(descr=descr,creator=user,icon=icon)
         t.save()
         for p in parenttopics:
-            print('Parent topic is '+str(p))
+            #print('Parent topic is '+str(p))
             pset = Topic.objects.filter(descr=p)
             if pset.count() == 0:
                 return None
             parent = pset[0]
-            t.parent_topics.add(parent)
-            print('add parent done')
+            Edge.objects.create(from_node=parent,to_node=t)
+            #t.parent_topics.add(parent)
+            print("add "+str(parent)+" as a parent of " + str(t))
+            #print('add parent done')
         
     else:
         print('creating parent topic')

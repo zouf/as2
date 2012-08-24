@@ -190,14 +190,14 @@ class  Photo(models.Model):
             
         #Save instance of Photo
         super(Photo, self).save()
-     
+    
+
+    
 ''' A topic. An attribute of a business as well as
 annotate a user's interests ''' 
 class Topic(models.Model):
     creator = models.ForeignKey(User)
     search = SphinxSearch()
-    parent_topics = models.ManyToManyField('self', related_name='parents', 
-        null=True, blank=True)
     date = models.DateTimeField(auto_now=True)
     descr = models.TextField(max_length=100)
     icon = models.TextField(max_length=100)
@@ -205,6 +205,16 @@ class Topic(models.Model):
         pass
     def __unicode__(self):
         return self.descr
+    
+class Edge(models.Model):
+    from_node= models.ForeignKey(Topic,related_name="children")
+    to_node = models.ForeignKey(Topic,related_name="parents")
+    
+    def __unicode__(self):
+        return 'Edge from ' + str(self.from_node.descr) + ' to ' + str(self.to_node.descr)
+    
+    class Admin:
+        pass
     
     
 ''' A topic. It's a way to categorize businesses as well as

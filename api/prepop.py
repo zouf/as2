@@ -47,7 +47,8 @@ def create_user(username, uid):
     return u
 
 
-def prepop_topics(user):
+def prepop_topics(user=get_default_user()):
+    Topic.objects.all().delete()
     reader = csv.reader(open(settings.BASE_DIR+'/prepop/topics.csv', 'U'), delimiter=',', quotechar='"')
     i = 0
     for row in reader:
@@ -61,7 +62,7 @@ def prepop_topics(user):
         parents = []
         for p in all_parents:
             parents.append(p.strip(None))
-        print('Adding topic ' + str(descr) + ' parent is ' + str(parents))
+        #print('Adding topic ' + str(descr) + ' parent is ' + str(parents))
         add_topic(descr,parents,icon)
     
         

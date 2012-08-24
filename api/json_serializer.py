@@ -4,7 +4,7 @@ Created on Jul 27, 2012
 @author: zouf
 '''
 
-from api.models import DiscussionRating, PhotoRating, UserTopic
+from api.models import DiscussionRating, PhotoRating, UserTopic, Topic, Edge
 from queries.models import QueryTopic
 from wiki.models import Page
 import api.ratings as ratings
@@ -27,6 +27,11 @@ def get_topic_data(topic,user):
     data['topicName'] = topic.descr
     data['topicID'] = topic.id
     data['topicIcon'] = topic.icon
+    data['children'] = []   
+    #print('children of ' + str(topic) + " are " + str(topic.children.all()))
+
+    for edge in topic.children.all():
+        data['children'].append(get_topic_data(edge.to_node,user))
 
     topicfilter = UserTopic.objects.filter(user=user,topic=topic)
     if topicfilter.count() > 0:

@@ -32,7 +32,8 @@ urlpatterns = patterns('api.views',
     (r'^type/(?P<oid>\d+)/?', 'get_type'),
 
     
-    (r'^topics/?$', 'get_topics'),
+    (r'^all_topics/?$', 'get_topics'),
+    (r'^topics/?$', 'get_topics_parent'),
     (r'^topic/(?P<oid>\d+)/?$', 'get_topic'),
     (r'^topic/subscribe/(?P<oid>\d+)/?$', 'subscribe_topic'),
     (r'^topic/unsubscribe/(?P<oid>\d+)/?$', 'unsubscribe_topic'),

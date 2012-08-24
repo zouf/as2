@@ -471,6 +471,21 @@ def get_topics(request):
     return server_data(data,"topic")
 
 
+def get_topics_parent(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+        parent_name = get_request_get_or_error('parent', request)
+        if parent_name!='':
+            parent_topic = Topic.objects.get(descr=parent_name)
+        else:
+            parent_topic = Topic.objects.get(descr='Main')
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    data = serial.get_topic_data(parent_topic,user)
+    return server_data(data,"topic")
+
+
 def get_topic(request,oid):
     try:
         user = auth.authenticate_api_request(request)
