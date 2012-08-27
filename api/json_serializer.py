@@ -24,20 +24,30 @@ def get_topics_data(topics,user):
 
 def get_topic_data(topic,user):
     data = dict()
-    data['topicName'] = topic.descr
-    data['topicID'] = topic.id
-    data['topicIcon'] = topic.icon
+    data['parentName'] = topic.descr
+    data['parentID'] = topic.id
+    data['parentIcon'] = topic.icon
     data['children'] = []   
     #print('children of ' + str(topic) + " are " + str(topic.children.all()))
 
     for edge in topic.children.all():
-        data['children'].append(get_topic_data(edge.to_node,user))
+        c = dict()
+        c['topicName'] = edge.to_node.descr
+        c['topicID'] = edge.to_node.id
+        c['topicIcon'] =edge.to_node.icon
+        if edge.to_node.children.all().count() > 0:
+            c['isLeaf']  = 0
+        else:
+            c['isLeaf'] = 1
+        topicfilter = UserTopic.objects.filter(user=user,topic=edge.to_node)
+        if topicfilter.count() > 0:
+            c['userWeight'] = topicfilter[0].importance
+        else:
+            c['userWeight'] = -1 
+        data['children'].append(c)
+        #data['children'].append(get_topic_data(edge.to_node,user))
 
-    topicfilter = UserTopic.objects.filter(user=user,topic=topic)
-    if topicfilter.count() > 0:
-        data['userIsSubscribed'] = True
-    else:
-        data['userIsSubscribed'] = False 
+
     return data
     
 def get_bustopic_data(bustopic,user,detail):

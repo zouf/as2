@@ -48,7 +48,7 @@ def server_error(msg):
     response_data['result'] = msg
     return HttpResponse(json.dumps(response_data), mimetype="application/json")    
 
-def server_data(data,requesttype=None):
+def server_data(data,requesttype="unspecified"):
     response_data = dict()
     response_data['success'] = True
     response_data['requestType'] = requesttype
@@ -475,9 +475,9 @@ def get_topics_parent(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        parent_name = get_request_get_or_error('parent', request)
-        if parent_name!='':
-            parent_topic = Topic.objects.get(descr=parent_name)
+        parent_id = get_request_get_or_error('parent', request)
+        if parent_id!='':
+            parent_topic = Topic.objects.get(id=parent_id)
         else:
             parent_topic = Topic.objects.get(descr='Main')
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -547,17 +547,27 @@ def subscribe_topic(request,oid):
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "edit")
         topic = Topic.objects.get(id=oid)
+        weight = get_request_get_or_error('importance', request)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
     except Topic.DoesNotExist:
         return server_error("Topic with ID "+str(oid) + " not found")
      
+    print('trying to subscribe')
     try:
-        UserTopic.objects.create(user=user,topic=topic)
+        print('Creating a user subscription with user' + str(user)+ " weight " + str(weight) + " to  the topic " + str(topic)) 
+        
+        if UserTopic.objects.filter(user=user,topic=topic).count() > 0:
+            UserTopic.objects.filter(user=user,topic=topic).delete()
+        UserTopic.objects.create(user=user,topic=topic,importance=weight)
     except UserTopic.DoesNotExist:
+        print('error could not subscribe')
         return server_error("Could not subscribe user. ")
+    except Exception as e:
+        print('exception')
+        print(e.value)
     data = serial.get_topic_data(topic,user)
-    return server_data(data)
+    return server_data(data, "subscription")
 
 
 def unsubscribe_topic(request,oid):
