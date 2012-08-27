@@ -1,5 +1,4 @@
-#from allsortz.search import get_all_nearby
-from api.business_operations import add_business_server, edit_business_server
+#from allsortz.search import get_all_nearbyfrom api.business_operations import add_business_server, edit_business_server
 from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
     get_request_get_or_error, get_request_post_or_error, get_bus_data_ios, \
     get_request_post_or_warn, get_request_postlist_or_warn
@@ -10,7 +9,6 @@ from api.models import Photo, PhotoRating, BusinessDiscussion, PhotoDiscussion, 
 from api.photos import add_photo_by_url
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from djangosphinx.models import SphinxSearch
 from geopy import geocoders
 from queries.models import Query, QueryTopic
 from queries.views import perform_query_from_param, perform_query_from_obj
@@ -189,15 +187,21 @@ def search_businesses(request):
     except:
         return server_error('Failure to authenticate')  
     searchText = get_request_post_or_warn('searchText', request)  
-    topics = get_request_post_or_warn('selectedTopics',request)
-    types = get_request_post_or_warn('selectedTypes', request)
+    #topics = get_request_post_or_warn('selectedTopics',request)
+    searchLocation = get_request_post_or_warn('searchLocation', request)
+    distanceWeight = get_request_post_or_warn('dw', request)
+    types = get_request_postlist_or_warn('selectedTypes', request)
+    print('searching with types ' + str(types))
+    print('searching with text' + str(searchText))
+    print('searching with search Location ' + str(searchLocation) + ' and a weight of ' + str(distanceWeight))
     
-    print('searching with' + str(searchText))
     if searchText == '':
+        print('is null')
         businesses = Business.objects.all()
     else:
         unique_businesses = dict()
-        qset = Business.search.query(searchText)
+        (lat,lng) = user.current_location
+        qset = Business.search.geoanchor('latit','lonit', lat,lng).query(searchText)
         logger.info("Searching for "+str(searchText))
         for b in qset:
             searchWeight = b._sphinx['weight']
@@ -225,9 +229,27 @@ def search_businesses(request):
         for (_,v) in unique_businesses.items():
             #print(v)
             businesses.append(v)
+    
+    unique_types = dict()
+    for tid in types:
+        unique_types[tid] =True
+    
+    
+    print('Searching for types ' + str(unique_types))
+    businesses_matching_type = []
+    for b in businesses:     
+        #print(b.businesstype_set)
+        btypes = b.businesstype_set.all()
+        for bt in btypes:
+            print(bt.bustype.id)
+            if bt.bustype.id in unique_types:
+                
+                businesses_matching_type.append(b)
 
+    
+    print('result is ' + str(businesses_matching_type))
     print('Performing serialization...')
-    serialized_businesses = get_bus_data_ios(businesses ,user,detail=False)
+    serialized_businesses = get_bus_data_ios(businesses_matching_type, user,detail=False)
     print('Serialization complete...')
     
     return server_data(serialized_businesses,"business")
@@ -922,8 +944,8 @@ def get_query_base(request):
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
 
-    topics = serial.get_topics_data(Topic.objects.all(),user)
-    types = serial.get_types_data(Type.objects.all(),user)
+    topics =dict()# serial.get_topics_data(Topic.objects.all(),user)
+    types = serial.get_types_data(Type.objects.all().order_by('descr'),user)
     data = dict()
     data['topics'] = topics;
     data['types'] = types;

@@ -7,6 +7,7 @@ from django.core.files.base import ContentFile
 from django.utils.encoding import smart_str
 from djangosphinx.models import SphinxSearch
 from geopy import distance
+from geopy.point import Point
 from os.path import basename
 import StringIO
 import datetime
@@ -25,6 +26,8 @@ class Business(models.Model):
     lat = models.FloatField()
     lon = models.FloatField()
     geom = models.PointField()
+    #point = models.PointField(geography=True)
+
 
     address = models.CharField(max_length=250)
     city = models.CharField(max_length=100)
@@ -90,11 +93,12 @@ class Business(models.Model):
             self.lat = lat
             self.lon = lng 
             self.geom = fromstr('POINT('+str(self.lon)+ ' '+str(self.lat)+')', srid=4326)
+            self.point = fromstr('POINT('+str(self.lon)+ ' '+str(self.lat)+')')
         else:
             self.lat = 0
             self.lon = 0 
             self.geom = fromstr('POINT('+str(self.lon)+ ' '+str(self.lat)+')', srid=4326)
-
+            self.point = fromstr('POINT('+str(self.lon)+ ' '+str(self.lat)+')')
         super(Business, self).save()
     class Admin:
         pass
