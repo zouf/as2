@@ -506,7 +506,7 @@ def get_types(request):
         auth.authorize_user(user, request, "get")
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
-    data = serial.get_types_data(Type.objects.all(),user)
+    data = serial.get_types_data(Type.objects.all().order_by('descr'),user)
     return server_data(data,"type")
 
 
