@@ -1,41 +1,43 @@
 #from celery.execute import send_task
+from api.authenticate import get_default_user
 from api.models import BusinessRating, Business, UserTopic, BusinessTopicRating, \
     BusinessTopic, Topic
 from api.ratings import getBusAverageRating
+from cProfile import runctx
+from django.contrib.auth.models import User
 from django.db.models.aggregates import Count, Sum
 from recommendation.models import UserFactor, BusinessFactor, Recommendation
 from recommendation.normalization import getNormFactors
 import logging
 import numpy as np
-from cProfile import runctx
 
 
 logger = logging.getLogger(__name__)
 
 def get_recommendation_by_topic(business,user):
     print('Getting recommendation for ' + str(business))
-#    try:
-#        r = Recommendation.objects.get(business=business,user=user)
-#        return r.recommendation
-#    except:
-    (runSum, runCt) = get_node_average(business,Topic.objects.get(descr='Main'))
-    if runCt > 0:
-        avg = float(runSum)/float(runCt)
-        print('avg for business ' + str(business) + ' is ' + str(avg))
+    try:
+        r = Recommendation.objects.get(business=business,user=user)
+        return r.recommendation
+    except:
+        (runSum, runCt) = get_node_average(business,Topic.objects.get(descr='Main'),user)
+        if runCt > 0:
+            avg = float(runSum)/float(runCt)
+            print('AVG for business ' + str(business) + ' is ' + str(avg))
+            
+            recFilter = Recommendation.objects.filter(user=user,business=business)
+            if recFilter.count() > 0:
+                recFilter.delete()
+            Recommendation.objects.create(user=user,business=business,recommendation=avg)
+            return avg
+        return 0
+            
         
-        recFilter = Recommendation.objects.filter(user=user,business=business)
-        if recFilter.count() > 0:
-            recFilter.delete()
-        Recommendation.objects.create(user=user,business=business,recommendation=avg)
-        return avg
-    return 0
-        
-    
     
 
 #get average over whole tree
 #We're treating the children and the parent with the same weight. This way leaves do not lose importance higher up in the tree
-def get_node_average(business,topic):
+def get_node_average(business,topic,user):
     btset = BusinessTopic.objects.filter(business=business,topic=topic)
     
     #for this node in the tree
@@ -58,7 +60,7 @@ def get_node_average(business,topic):
         
     #for all the children
     for edge in topic.children.all():
-        (childSum, childCount) = get_node_average(business,edge.to_node)
+        (childSum, childCount) = get_node_average(business,edge.to_node,user)
         #print(str(childSum) + ' : childSum')
         #print(str(childCount) + ' : childCount')
 
@@ -73,6 +75,14 @@ def get_node_average(business,topic):
     
     
        
+def build_recommendations_by_topic():
+    print('Deleting all predictions and rebuilding recommendations')
+    Recommendation.objects.all().delete()
+    for b in Business.objects.all():
+        u = get_default_user()
+        print('getting recommendationg for business ' + str(b) + ' for user ' + str(u))
+        logger.debug('getting recommendationg for business ' + str(b) + ' for user ' + str(u))
+        get_recommendation_by_topic(b,u)
     
 
 def get_best_current_recommendation(business, user):
