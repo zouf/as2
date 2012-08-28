@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from recommendation.views import val_nmf,build_pred_server
+from recommendation.views import val_nmf
 import os
 import sys
 

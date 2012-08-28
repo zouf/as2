@@ -10,7 +10,8 @@ from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
 from api.photos import get_photo_url, get_photo_id
 from api.ratings import getBusinessRatings
 from decimal import getcontext, Decimal
-from recommendation.recengine import get_best_current_recommendation
+from recommendation.recengine import get_best_current_recommendation, \
+    get_recommendation_by_topic
 import json
 import logging
 import time
@@ -105,9 +106,14 @@ def get_single_bus_data_ios(b, user,detail):
     if user and userRatingSet.count() > 0:
         #the user exists and has rated something
         d['ratingForCurrentUser'] = userRatingSet[0].rating
+        d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
+        
     else: 
         #the user hasn't rated it!
-        d['ratingRecommendation'] = get_best_current_recommendation(b, user)
+        print('get rec') 
+        d['ratingForCurrentUser'] = 0
+        d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
+        
 
         
     if hasattr(b, 'distance'):

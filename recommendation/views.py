@@ -78,6 +78,8 @@ def build_predictions():
 
 
 
+
+
 def find_categories_best_k(k):
     Steps = 5000
     Alpha = 0.05
