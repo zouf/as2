@@ -21,7 +21,7 @@ import api.photos as photos
 import api.prepop as prepop
 import logging
 import simplejson as json
-
+from django.contrib.gis.measure import D
 
 
 
@@ -202,10 +202,25 @@ def search_businesses(request):
         _, (lat, lng) = g.geocode(searchLocation)  
     else:
         (lat,lng) = user.current_location
+        
+    
+    if distanceWeight != '':
+        print(str(float(distanceWeight)))
+
+        if float(distanceWeight) > 0.67:
+            dist_limit = D(mi=0.5)
+        elif float(distanceWeight) > 0.33:
+            dist_limit = D(mi=2)
+        else:
+            dist_limit = D(mi=60)
+    else:
+        dist_limit = D(mi=2)
+    
     
     if searchText == '':
-        pnt = fromstr('POINT( '+str(lat)+' '+str(lng)+')')
-        businesses = Business.objects.distance(pnt).order_by('distance')
+        pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
+        businesses = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
+        print(businesses)
     else:
         unique_businesses = dict()
         (lat,lng) = user.current_location
@@ -222,15 +237,10 @@ def search_businesses(request):
         for (_,v) in unique_businesses.items():
             #print(v)
             businesses.append(v)
-    
-    
     if searchTypes != []:
-        print('in here')
         unique_types = dict()
         for tid in searchTypes:
             unique_types[tid] =True
-        
-        
         businesses_matching_type = []
         for b in businesses:     
             #print(b.businesstype_set)
@@ -238,7 +248,6 @@ def search_businesses(request):
             for bt in btypes:
                 print(bt.bustype.id)
                 if bt.bustype.id in unique_types:
-                    
                     businesses_matching_type.append(b)
         businesses = businesses_matching_type
     
