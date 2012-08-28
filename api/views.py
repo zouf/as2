@@ -10,8 +10,10 @@ from api.models import Photo, PhotoRating, BusinessDiscussion, PhotoDiscussion, 
 from api.photos import add_photo_by_url
 from django.contrib.auth.models import User
 from django.contrib.gis.geos.factory import fromstr
+from django.contrib.gis.measure import D
 from django.http import HttpResponse
 from geopy import geocoders
+from geopy.units import radians
 from queries.models import Query, QueryTopic
 from queries.views import perform_query_from_param, perform_query_from_obj
 from wiki.models import Page
@@ -21,7 +23,6 @@ import api.photos as photos
 import api.prepop as prepop
 import logging
 import simplejson as json
-from django.contrib.gis.measure import D
 
 
 
@@ -189,24 +190,22 @@ def search_businesses(request):
     except:
         return server_error('Failure to authenticate')  
     searchText = get_request_post_or_warn('searchText', request)  
-    #topics = get_request_post_or_warn('selectedTopics',request)
     searchLocation = get_request_post_or_warn('searchLocation', request)
     distanceWeight = get_request_post_or_warn('dw', request)
     searchTypes = get_request_postlist_or_warn('selectedTypes', request)
-    print('searching with types ' + str(searchTypes))
-    print('searching with text' + str(searchText))
-    print('searching with search Location ' + str(searchLocation) + ' and a weight of ' + str(distanceWeight))
-    
+
     if searchLocation != '':
         g =  g = geocoders.Google()
         _, (lat, lng) = g.geocode(searchLocation)  
     else:
         (lat,lng) = user.current_location
         
-    
+    searchQuery = "Search Term: "+str(searchText)+"\nLocation: "+str(searchLocation)+" \nWeight: "+str(distanceWeight)+"\nSearch Types: "+str(searchTypes)+"\nLat Lng = ("+str(lat)+","+str(lng)+")" 
+    logger.debug(searchQuery)
+    print(searchQuery)
+
     if distanceWeight != '':
         print(str(float(distanceWeight)))
-
         if float(distanceWeight) > 0.67:
             dist_limit = D(mi=0.5)
         elif float(distanceWeight) > 0.33:
@@ -216,44 +215,47 @@ def search_businesses(request):
     else:
         dist_limit = D(mi=2)
     
-    
+    businesses_filtered = []
     if searchText == '':
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-        businesses = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
-        print(businesses)
+        businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
     else:
-        unique_businesses = dict()
-        (lat,lng) = user.current_location
-        print('searching ' + str(lat) + ' long ' + str(lng))
-        qset = Business.search.geoanchor('latit','lonit', lat,lng).query(searchText).order_by('-@geodist')
-        logger.info("Searching for "+str(searchText))
+        #print('searching ' + str(lat) + ' long ' + str(lng))
+        qset = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
+        .filter(**{'@geodist__lt':dist_limit.m*1.0})\
+        .query(searchText).order_by('-@geodist')
+        businesses_filtered = []
         for b in qset:
             searchWeight = b._sphinx['weight']
-            print(b._sphinx)
-            print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
-            unique_businesses[b.id] = b._get_current_object()
-                
-        businesses = []
-        for (_,v) in unique_businesses.items():
-            #print(v)
-            businesses.append(v)
+            #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
+            businesses_filtered.append(b)
+        #for some reason, the qset is reversed when it's returned. The largest distances are in the front
+        # Reverse here
+        businesses_filtered.reverse()
+
     if searchTypes != []:
+        logger.debug("Potentially filtering businesses by type")
+        print("Filter businesses by type")
         unique_types = dict()
+        #quickly turn the array into a hash map for faster lookup
         for tid in searchTypes:
             unique_types[tid] =True
+            
         businesses_matching_type = []
-        for b in businesses:     
-            #print(b.businesstype_set)
+        for b in businesses_filtered:     
             btypes = b.businesstype_set.all()
             for bt in btypes:
-                print(bt.bustype.id)
+                #if this business has a type that is part of unique_types
                 if bt.bustype.id in unique_types:
                     businesses_matching_type.append(b)
-        businesses = businesses_matching_type
+            #print("Filtering businesses!")
+        #now reassign new list
+        businesses_filtered = businesses_matching_type
     
-    print('result is ' + str(businesses))
+    print('Search result is ' + str(businesses_filtered))
+    logger.debug("Search result is " + str(businesses_filtered))
     print('Performing serialization...')
-    serialized_businesses = get_bus_data_ios(businesses, user,detail=False)
+    serialized_businesses = get_bus_data_ios(businesses_filtered, user,detail=False)
     print('Serialization complete...')
     
     return server_data(serialized_businesses,"business")

@@ -25,7 +25,9 @@ def getCommentRatings(discussion):
 def getBusTopicRatings(bustopic):
     if BusinessTopicRating.objects.all().count() == 0:
         return 0
-    ratingFilter = BusinessTopicRating.objects.all().aggregate(Avg('rating'))
+    
+
+    ratingFilter = BusinessTopicRating.objects.filter(businesstopic=bustopic).aggregate(Avg('rating'))
     avg = ratingFilter['rating__avg']
     #numNeg = DiscussionRating.objects.filter(rating=0).count()
     return avg

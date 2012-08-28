@@ -5,7 +5,7 @@ Created on Apr 2, 2012
 '''
 from api.business_operations import add_business_server
 from api.models import Topic, Business, BusinessType, BusinessRating, \
-    BusinessMeta, Type
+    BusinessMeta, Type, BusinessTopicRating, BusinessTopic, UserTopic
 from api.photos import add_photo_by_url
 from api.topic_operations import add_topic_to_bus, add_topic
 from as2 import settings
@@ -176,6 +176,52 @@ def prepop_queries(user):
         q.save()
 
 
+def prepop_topic_ratings():
+    random.seed(666)
+    
+    BusinessTopicRating.objects.all().delete()
+    BusinessTopic.objects.all().delete()
+    UserTopic.objects.all().delete()
+    
+    NumBusiness = Business.objects.count()
+    NumTopics = Topic.objects.count()
+      
+    user = get_default_user()
+    print('User ' + str(user))
+    i = 0
+    center = random.randint(0, NumTopics-1)
+    
+    for t in Topic.objects.all():
+        for b in Business.objects.all():
+            print('Rating ' + str(b) + ' under the topic ' + str(t))
+            #norm_given_rat = stats.norm(center,rating_given_sd)  #gaussian distribution for giving a rating
+            prob_rat_given =  0.5 # norm_given_rat.pdf(i)  *  1/norm_given_rat.pdf(center)
+
+            rat_given_rv = binomial(1, prob_rat_given, 1) #1 if rated, 0 otherwise
+            if rat_given_rv[0] != 0:
+                #norm_pos_rat = stats.norm(center,pos_rating_sd) #create a normal distribution
+                prob_pos_rat =  0.8 #norm_pos_rat.pdf(i)  *  1/norm_pos_rat.pdf(center) #probability positive
+                
+                SIZE = 5
+                #We'll ge tan array that is of lenght SIZE and the probability of the event being '1' is prob_pos_rat
+                pos_rat_rv = binomial(1, prob_pos_rat, SIZE) #1 if positive, 0 negative
+                
+
+                #sum up the array and divide to get a rating between 0 and 1
+                rating_scaled = 0                    
+                SUM = 0.0
+                for r in pos_rat_rv:
+                    SUM += r
+                rating_scaled = float(SUM)/float(SIZE)
+                print('giving rating' + str(rating_scaled))
+                bt = BusinessTopic.objects.create(business=b,topic=t)
+                UserTopic.objects.create(user=user,topic=t,importance=1)
+                rat = BusinessTopicRating(businesstopic=bt, user=user, rating=float(rating_scaled))
+                rat.save()
+            #no rating        
+            i=i+1
+            
+
 
 def prepop_ratings():
     print("prepop")
@@ -185,6 +231,8 @@ def prepop_ratings():
     random.seed(666)
     
     NumBusiness = Business.objects.count()
+    
+    
     rating_given_sd = NumBusiness / 2
     pos_rating_sd = NumBusiness   / 4
     for user in User.objects.all():
@@ -220,6 +268,10 @@ def prepop_ratings():
                 rat.save()
             #no rating        
             i=i+1
+            
+
+            
+            
         
 def prepop_users():
     for i in xrange(1,20,1):

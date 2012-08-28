@@ -1,13 +1,79 @@
 #from celery.execute import send_task
-from api.models import BusinessRating, Business
+from api.models import BusinessRating, Business, UserTopic, BusinessTopicRating, \
+    BusinessTopic, Topic
 from api.ratings import getBusAverageRating
+from django.db.models.aggregates import Count, Sum
 from recommendation.models import UserFactor, BusinessFactor, Recommendation
 from recommendation.normalization import getNormFactors
 import logging
 import numpy as np
+from cProfile import runctx
 
 
 logger = logging.getLogger(__name__)
+
+def get_recommendation_by_topic(business,user):
+    print('Getting recommendation for ' + str(business))
+#    try:
+#        r = Recommendation.objects.get(business=business,user=user)
+#        return r.recommendation
+#    except:
+    (runSum, runCt) = get_node_average(business,Topic.objects.get(descr='Main'))
+    if runCt > 0:
+        avg = float(runSum)/float(runCt)
+        print('avg for business ' + str(business) + ' is ' + str(avg))
+        
+        recFilter = Recommendation.objects.filter(user=user,business=business)
+        if recFilter.count() > 0:
+            recFilter.delete()
+        Recommendation.objects.create(user=user,business=business,recommendation=avg)
+        return avg
+    return 0
+        
+    
+    
+
+#get average over whole tree
+#We're treating the children and the parent with the same weight. This way leaves do not lose importance higher up in the tree
+def get_node_average(business,topic):
+    btset = BusinessTopic.objects.filter(business=business,topic=topic)
+    
+    #for this node in the tree
+    thisAvg= 0
+    if btset.count()> 0:
+        ratingFilter = BusinessTopicRating.objects.filter(businesstopic=btset[0], rating__range=["0", "4"])
+        countFilter = ratingFilter.aggregate(Count('rating'))
+        sumFilter = ratingFilter.aggregate(Sum('rating'))
+        if countFilter['rating__count'] > 0:
+            thisAvg =  sumFilter['rating__sum'] / countFilter['rating__count']
+            #print('business' + str(business) + " topic " + str(topic)+ " average " + str(thisAvg))
+
+            thisCount = 1
+        else:
+            thisAvg = 0
+            thisCount = 0
+    else:
+        thisAvg = 0
+        thisCount = 0
+        
+    #for all the children
+    for edge in topic.children.all():
+        (childSum, childCount) = get_node_average(business,edge.to_node)
+        #print(str(childSum) + ' : childSum')
+        #print(str(childCount) + ' : childCount')
+
+        if childCount > 0:
+            childAverage = childSum / childCount
+            #print('Average for topic ' + str(edge.to_node) + ' is ' + str(childAverage))
+            thisAvg += childAverage
+            thisCount += 1
+        
+    return (thisAvg, thisCount)
+        
+    
+    
+       
+    
 
 def get_best_current_recommendation(business, user):
 
