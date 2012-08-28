@@ -80,7 +80,6 @@ def get_all_nearby(mylat,mylng,distance=1):
 #isSideBar is true if we're using small images
 def get_single_bus_data_ios(b, user,detail):
     try:
-        print('trying to load from database)')
         bstring = BusinessCache.objects.get(business=b).cachedata
         d = json.loads(bstring)
     except Exception as e:
@@ -110,13 +109,15 @@ def get_single_bus_data_ios(b, user,detail):
         #the user hasn't rated it!
         d['ratingRecommendation'] = get_best_current_recommendation(b, user)
 
-
-    if b.get_distance(user) is not None:
-        dec = Decimal(float(b.get_distance(user)))
-        getcontext().prec = 2
-        d['distanceFromCurrentUser'] = str(dec/Decimal(1))
+        
+    if hasattr(b, 'distance'):
+        d['distanceFromCurrentUser'] = "%.2f" % b.distance.mi
     else:
-        d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
+        dist = b.get_distance(user)
+        if dist is not None:
+            d['distanceFromCurrentUser'] =  "%.2f" % dist.miles
+        else:
+            d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
     if detail:
         print('detail is true!')
         d['businessCity'] = b.city

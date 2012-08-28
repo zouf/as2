@@ -106,7 +106,6 @@ def authenticate_api_request(request):
         g = geocoders.Google()
         _, (lat, lng) = g.geocode("Princeton, NJ") 
         user.current_location = (lat,lng) 
-        print(user.current_location)
         print("Centering user in Princeton, NJ by default")
         
         return user

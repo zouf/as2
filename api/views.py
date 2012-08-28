@@ -1,4 +1,5 @@
 #from allsortz.search import get_all_nearbyfrom api.business_operations import add_business_server, edit_business_server
+from api.business_operations import add_business_server, edit_business_server
 from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
     get_request_get_or_error, get_request_post_or_error, get_bus_data_ios, \
     get_request_post_or_warn, get_request_postlist_or_warn
@@ -8,6 +9,7 @@ from api.models import Photo, PhotoRating, BusinessDiscussion, PhotoDiscussion, 
     BusinessTopicRating, UserTopic
 from api.photos import add_photo_by_url
 from django.contrib.auth.models import User
+from django.contrib.gis.geos.factory import fromstr
 from django.http import HttpResponse
 from geopy import geocoders
 from queries.models import Query, QueryTopic
@@ -190,66 +192,59 @@ def search_businesses(request):
     #topics = get_request_post_or_warn('selectedTopics',request)
     searchLocation = get_request_post_or_warn('searchLocation', request)
     distanceWeight = get_request_post_or_warn('dw', request)
-    types = get_request_postlist_or_warn('selectedTypes', request)
-    print('searching with types ' + str(types))
+    searchTypes = get_request_postlist_or_warn('selectedTypes', request)
+    print('searching with types ' + str(searchTypes))
     print('searching with text' + str(searchText))
     print('searching with search Location ' + str(searchLocation) + ' and a weight of ' + str(distanceWeight))
     
+    if searchLocation != '':
+        g =  g = geocoders.Google()
+        _, (lat, lng) = g.geocode(searchLocation)  
+    else:
+        (lat,lng) = user.current_location
+    
     if searchText == '':
-        print('is null')
-        businesses = Business.objects.all()
+        pnt = fromstr('POINT( '+str(lat)+' '+str(lng)+')')
+        businesses = Business.objects.distance(pnt).order_by('distance')
     else:
         unique_businesses = dict()
         (lat,lng) = user.current_location
-        qset = Business.search.geoanchor('latit','lonit', lat,lng).query(searchText)
+        print('searching ' + str(lat) + ' long ' + str(lng))
+        qset = Business.search.geoanchor('latit','lonit', lat,lng).query(searchText).order_by('-@geodist')
         logger.info("Searching for "+str(searchText))
         for b in qset:
             searchWeight = b._sphinx['weight']
-            #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
+            print(b._sphinx)
+            print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
             unique_businesses[b.id] = b._get_current_object()
-        topics = Topic.search.query(searchText)
-        for t in topics:
-            searchWeight = t._sphinx['weight']
-            #print('tag ' + str(t) + ' has weight ' + str(searchWeight))
-            businesstopics = BusinessTopic.objects.filter(topic = t._get_current_object())
-            for bt in businesstopics:
-                #businesses.append(bt.business)
-                unique_businesses[bt.business.id] = bt.business
-
-        types = Type.search.query(searchText)
-        for t in types:
-            print('type ' + str(t) + ' has weight ' + str(searchWeight))
-            businesstypes = BusinessType.objects.filter(bustype = t._get_current_object())
-            for bt in businesstypes:
-                #businesses.append(bt.business)
-                #print('append ' + str(bt.business))
-                unique_businesses[bt.business.id] = bt.business
                 
         businesses = []
         for (_,v) in unique_businesses.items():
             #print(v)
             businesses.append(v)
     
-    unique_types = dict()
-    for tid in types:
-        unique_types[tid] =True
     
+    if searchTypes != []:
+        print('in here')
+        unique_types = dict()
+        for tid in searchTypes:
+            unique_types[tid] =True
+        
+        
+        businesses_matching_type = []
+        for b in businesses:     
+            #print(b.businesstype_set)
+            btypes = b.businesstype_set.all()
+            for bt in btypes:
+                print(bt.bustype.id)
+                if bt.bustype.id in unique_types:
+                    
+                    businesses_matching_type.append(b)
+        businesses = businesses_matching_type
     
-    print('Searching for types ' + str(unique_types))
-    businesses_matching_type = []
-    for b in businesses:     
-        #print(b.businesstype_set)
-        btypes = b.businesstype_set.all()
-        for bt in btypes:
-            print(bt.bustype.id)
-            if bt.bustype.id in unique_types:
-                
-                businesses_matching_type.append(b)
-
-    
-    print('result is ' + str(businesses_matching_type))
+    print('result is ' + str(businesses))
     print('Performing serialization...')
-    serialized_businesses = get_bus_data_ios(businesses_matching_type, user,detail=False)
+    serialized_businesses = get_bus_data_ios(businesses, user,detail=False)
     print('Serialization complete...')
     
     return server_data(serialized_businesses,"business")
@@ -308,12 +303,12 @@ def get_businesses(request):
         lng = request.GET['lng']
     else:
         g = geocoders.Google()
-        _, (lat, lng) = g.geocode("Princeton, NJ")  
+        (lat, lng) = user.current_location
     
         
-    businesses = perform_query_from_param(user, (lat, lng),weights,topics,searchText)
-    print('Performing serialization...')
-    businesses = Business.objects.all()
+    #businesses = perform_query_from_param(user, (lat, lng),weights,topics,searchText)
+    pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
+    businesses = Business.objects.distance(pnt).order_by('distance')
     top_businesses = get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
     return server_data(top_businesses,"business")

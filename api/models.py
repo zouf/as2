@@ -46,7 +46,7 @@ class Business(models.Model):
     #gets distance between this business and a user
     def get_distance(self,user):
         if user.current_location:
-            return distance.distance(user.current_location,(self.lat,self.lon)).miles
+            return distance.distance(user.current_location,(self.lat,self.lon))
         else:
             return None
         
