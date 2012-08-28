@@ -196,7 +196,13 @@ def search_businesses(request):
 
     if searchLocation != '':
         g =  g = geocoders.Google()
-        _, (lat, lng) = g.geocode(searchLocation)  
+        try:
+            _, (lat, lng) = g.geocode(searchLocation)  
+        except:
+            logger.error('Someone searched for something that was not found: ' + str(searchLocation))
+            pass
+        (lat,lng) = user.current_location
+            
     else:
         (lat,lng) = user.current_location
         
