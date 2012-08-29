@@ -5,3 +5,8 @@
 logs/*.log
 logs/allsortz_ratings.log
 .DS_STORE
+build/*
+build
+logs
+static
+django-sphinx

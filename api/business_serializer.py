@@ -90,6 +90,9 @@ def get_single_bus_data_ios(b, user,detail):
         d['businessID'] = b.id
         d['businessHours'] = b.hours()  #TODO Set hours
         d['averagePrice'] = b.average_price()  #TODO Set hours
+        
+        d['latitutde'] = b.lat
+        d['longitude'] = b.lon
 
         bustypes = BusinessType.objects.filter(business=b)  
         d['types'] = get_bustypes_data(bustypes,user)
@@ -130,9 +133,6 @@ def get_single_bus_data_ios(b, user,detail):
         d['businessState'] = b.state
         d['streetAddr'] = b.address
         d['zipcode'] = b.zipcode
-    
-        d['latitude'] = b.lat
-        d['longitude'] = b.lon
    
             
         d['businessPhone'] = b.phone
