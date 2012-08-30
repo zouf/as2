@@ -94,9 +94,8 @@ def authenticate_api_request(request):
         try:
             device = Device.objects.get(deviceID=deviceID)
         except Device.DoesNotExist:
-            print('dev does not exist')
             device = create_device(request)
-            print('dev created' + str(device))  
+            print('device created' + str(device))  
             
         print('here')
         try:
@@ -106,7 +105,7 @@ def authenticate_api_request(request):
             maxid = User.objects.all().order_by("-id")[0]
             try:
                 print('creating a fake user')
-                genuser = User.objects.create(username="gen"+str(maxid))
+                genuser = User.objects.create(username="gen"+str(maxid.id))
                 genuser.set_password("generated_password")
                 genuser.save()
             except:
