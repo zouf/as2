@@ -112,14 +112,10 @@ def authenticate_api_request(request):
             except:
                 
                 logger.error('Error in generating a new user!')
-            print('yoyo')
-            asuser = AllsortzUser.objects.create(user=genuser,device=device,metric=False,distance_threshold=DISTANCE)
-        
-        
-            
-        
+            asuser = AllsortzUser.objects.create(user=genuser,device=device,metric=False,distance_threshold=DISTANCE,registered=False)
         
         print("An AllSortz user with device ID "+str(device.deviceID))
+        print("Fake user is : "+str(asuser.user))
         newuser = authenticate(username=asuser.user, password="generated_password")
         login(request, newuser)
         

@@ -332,6 +332,9 @@ class AllsortzUser(models.Model):
     
     '''Device (if owned) '''
     device = models.ForeignKey(Device)
+    
+    registered = models.BooleanField()
+    
     class Admin:
         pass
     def __unicode__(self):
