@@ -301,7 +301,7 @@ class Device(models.Model):
     os = models.IntegerField(choices=OS_TYPES)
     model = models.IntegerField(choices=MODEL_TYPES)
     manufacturer =  models.IntegerField(choices=MANUFACTURER_TYPES)
-    deviceID = models.IntegerField()
+    deviceID = models.CharField(max_length=100)
     def get_os_name(self):
         return OS_TYPES[self.os][1] 
     
