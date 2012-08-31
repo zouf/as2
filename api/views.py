@@ -925,6 +925,7 @@ def update_user(request):
         uname = get_request_post_or_error('userName', request)
         password = get_request_post_or_error('userPassword', request)
         email = get_request_post_or_error('userEmail', request)
+        deviceID=get_request_get_or_error('deviceID', request)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(str(e))
     
@@ -936,30 +937,11 @@ def update_user(request):
         if User.objects.get(email=email) != user:
             return server_error('Email ' +str(email) + ' already in use')
     
-    asuser = AllsortzUser.objects.get(user=user)
-
-    if password != '':
-        user.set_password(password)
-    else:
-        return server_error('Password should not be blank')
+    try:
+        auth.register_asuser(user=user,newUname=uname,password=password,email=email,deviceID=deviceID)
+    except  auth.RegistrationFailed as e:
+        return server_error(str(e))
     
-    if not asuser.register: 
-        if uname != '':
-            user.username = uname
-        else:
-            return server_error('Username should not be blank.')
-    else:
-        return server_error('Please dont change username')
-    
-    if email != '':
-        user.email = email
-    else:
-        return server_error('Email should not be blank!')
-    user.save()
-    
-    asuser.registered = True
-    asuser.save()
-        
     return server_data(serial.get_user_details(user),"userDetails")
 
 '''

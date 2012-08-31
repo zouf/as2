@@ -62,6 +62,12 @@ class AuthorizationError(Exception):
     def __str__(self):
         return repr(self.value)
 
+class RegistrationFailed(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
 
 
 
@@ -104,7 +110,35 @@ def create_asuser(user,device):
         AllsortzUser.objects.filter(device=device).delete()
     asuser =  AllsortzUser.objects.create(user=user,device=device,metric=False,distance_threshold=DISTANCE,registered=False)    
     return asuser
-        
+
+
+def register_asuser(user, newUname, password, email, deviceID):
+    asuser = AllsortzUser.objects.get(user=user)
+    device = Device.objects.get(deviceID=deviceID)
+    
+    if password != '':
+        user.set_password(password)
+    else:
+        raise RegistrationFailed('Password should not be blank')
+    
+    if not asuser.registered: 
+        if newUname != '':
+            user.username = newUname
+        else:
+            raise RegistrationFailed('Username should not be blank.')
+    else:
+        raise RegistrationFailed('Please dont change username')
+    
+    if email != '':
+        user.email = email
+    else:
+        raise RegistrationFailed('Email should not be blank!')
+    user.save()
+    
+    asuser.registered = True
+    asuser.save()
+    return user
+
 def authenticate_api_request(request):
     print('auth')
     if 'uname' not in request.GET or 'password' not in request.GET or 'deviceID' not in request.GET:
@@ -113,16 +147,16 @@ def authenticate_api_request(request):
     else:
         uname = request.GET['uname']
         password = request.GET['password']
+        deviceID = request.GET['deviceID']
     
     
     print('uname is ' + str(uname) + ' password is ' + str(password))
-    if 'deviceID' in request.GET:   #using only the device ID
-        deviceID = request.GET['deviceID']
-        try:
-            device = Device.objects.get(deviceID=deviceID)
-        except Device.DoesNotExist:
-            device = create_device(request)
-            print('device created' + str(device))  
+    #using only the device ID
+    try:
+        device = Device.objects.get(deviceID=deviceID)
+    except Device.DoesNotExist:
+        device = create_device(request)
+        print('device created' + str(device))  
     
     print("device is " + str(device))
     if uname != 'none':
