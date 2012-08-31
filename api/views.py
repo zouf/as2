@@ -270,8 +270,8 @@ def get_businesses(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-    except:
-        return server_error('Failure to authenticate')
+    except Exception as e:
+        return server_error(str(e))
     
     
     
