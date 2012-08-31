@@ -97,6 +97,7 @@ def create_fake_user():
     except: 
         logger.error('Error in generating a fake user!')  
         raise('Error in generating a fake user!')
+    return genuser
         
 def create_asuser(user,device):
     if AllsortzUser.objects.filter(device=device).count() > 0:
@@ -141,11 +142,11 @@ def authenticate_api_request(request):
 
     #auth the user by device alone   
     else:            
-        if AllsortzUser.objects.get(device=device).count() == 0:
+        if AllsortzUser.objects.filter(device=device).count() == 0:
             print('creating an ASUSER')
             logger.debug('Creating a new AllSortz User')
             genuser = create_fake_user()  
-            create_asuser(genuser, device)
+            asuser = create_asuser(genuser, device)
                 
         else:
             asuser = AllsortzUser.objects.get(device=device) 
