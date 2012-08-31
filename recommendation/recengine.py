@@ -16,21 +16,21 @@ logger = logging.getLogger(__name__)
 
 def get_recommendation_by_topic(business,user):
     print('Getting recommendation for ' + str(business))
-#    try:
-#        r = Recommendation.objects.get(business=business,user=user)
-#        return r.recommendation
-#    except:
-    (runSum, runCt) = get_node_average(business,Topic.objects.get(descr='Main'),user)
-    if runCt > 0:
-        avg = float(runSum)/float(runCt)
-        print('AVG for business ' + str(business) + ' is ' + str(avg))
-        
-        recFilter = Recommendation.objects.filter(user=user,business=business)
-        if recFilter.count() > 0:
-            recFilter.delete()
-        Recommendation.objects.create(user=user,business=business,recommendation=avg)
-        return avg
-    return 0
+    try:
+        r = Recommendation.objects.get(business=business,user=user)
+        return r.recommendation
+    except:
+        (runSum, runCt) = get_node_average(business,Topic.objects.get(descr='Main'),user)
+        if runCt > 0:
+            avg = float(runSum)/float(runCt)
+            print('AVG for business ' + str(business) + ' is ' + str(avg))
+            
+            recFilter = Recommendation.objects.filter(user=user,business=business)
+            if recFilter.count() > 0:
+                recFilter.delete()
+            Recommendation.objects.create(user=user,business=business,recommendation=avg)
+            return avg
+        return 0
             
         
     

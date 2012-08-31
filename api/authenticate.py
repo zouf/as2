@@ -23,7 +23,7 @@ def set_user_location(user,request):
         print(str(user.current_location))
     else:
         g = geocoders.Google()
-        _, (lat, lng) = g.geocode("Princeton, NJ") 
+        _, (lat, lng) = g.geocode("08540",exactly_one=False)[0] 
         user.current_location = (lat,lng) 
         print("Centering user in Princeton, NJ by default")
     return user
