@@ -160,6 +160,7 @@ def prepop_businesses(user):
                 print('Populating page' + str(bustopic.topic.descr))
                 pg.content = row[rindex]
                 pg.save()
+                print('PAGE CONTENT IS ' + str(pg.content))
                 print('Page done. ID is '+ str(pg.id))
                 print('content should be ' + str(row[rindex]))
         
@@ -223,52 +224,52 @@ def prepop_topic_ratings():
             
 
 
-def prepop_ratings():
-    print("prepop")
-    BusinessRating.objects.all().delete()
-    
-    
-    random.seed(666)
-    
-    NumBusiness = Business.objects.count()
-    
-    
-    rating_given_sd = NumBusiness / 2
-    pos_rating_sd = NumBusiness   / 4
-    for user in User.objects.all():
-        print('User ' + str(user))
-        i = 0
-        center = random.randint(0, NumBusiness-1)
-        
-        for business in Business.objects.all():
-            print('Rating ' + str(business))
-            #norm_given_rat = stats.norm(center,rating_given_sd)  #gaussian distribution for giving a rating
-            prob_rat_given =  0.5 # norm_given_rat.pdf(i)  *  1/norm_given_rat.pdf(center)
-            
-            # print('\n')
-            # print("Mu is " + str(center))
-            # print("pos_rating_stdev is " + str(rating_given_sd))
-            # print("x is " + str(i))
-            # print("Prob LHS " + str(prob_lhs))
-            # print("Prob RHS " + str(prob_rhs))
-            # print("result is " + str(prob_sel))
-            
-            rat_given_rv = binomial(1, prob_rat_given, 1) #1 if rated, 0 otherwise
-            if rat_given_rv[0] != 0:
-                #norm_pos_rat = stats.norm(center,pos_rating_sd) #create a normal distribution
-                prob_pos_rat =  0.7 #norm_pos_rat.pdf(i)  *  1/norm_pos_rat.pdf(center) #probability positive
-                pos_rat_rv = binomial(1, prob_pos_rat, 1) #1 if positive, 0 negative
-                rating_scaled = 0
-                
-                if pos_rat_rv[0] == 1:
-                    rating_scaled = random.randint(3,4)  #3,4 = POSITIVE
-                else:
-                    rating_scaled = random.randint(1,2)  #1,2, = NEGATIVE
-                rat = BusinessRating(business=business, user=user, rating=int(rating_scaled))
-                rat.save()
-            #no rating        
-            i=i+1
-            
+#def prepop_ratings():
+#    print("prepop")
+#    BusinessRating.objects.all().delete()
+#    
+#    
+#    random.seed(666)
+#    
+#    NumBusiness = Business.objects.count()
+#    
+#    
+#    rating_given_sd = NumBusiness / 2
+#    pos_rating_sd = NumBusiness   / 4
+#    for user in User.objects.all():
+#        print('User ' + str(user))
+#        i = 0
+#        center = random.randint(0, NumBusiness-1)
+#        
+#        for business in Business.objects.all():
+#            print('Rating ' + str(business))
+#            #norm_given_rat = stats.norm(center,rating_given_sd)  #gaussian distribution for giving a rating
+#            prob_rat_given =  0.5 # norm_given_rat.pdf(i)  *  1/norm_given_rat.pdf(center)
+#            
+#            # print('\n')
+#            # print("Mu is " + str(center))
+#            # print("pos_rating_stdev is " + str(rating_given_sd))
+#            # print("x is " + str(i))
+#            # print("Prob LHS " + str(prob_lhs))
+#            # print("Prob RHS " + str(prob_rhs))
+#            # print("result is " + str(prob_sel))
+#            
+#            rat_given_rv = binomial(1, prob_rat_given, 1) #1 if rated, 0 otherwise
+#            if rat_given_rv[0] != 0:
+#                #norm_pos_rat = stats.norm(center,pos_rating_sd) #create a normal distribution
+#                prob_pos_rat =  0.7 #norm_pos_rat.pdf(i)  *  1/norm_pos_rat.pdf(center) #probability positive
+#                pos_rat_rv = binomial(1, prob_pos_rat, 1) #1 if positive, 0 negative
+#                rating_scaled = 0
+#                
+#                if pos_rat_rv[0] == 1:
+#                    rating_scaled = random.randint(3,4)  #3,4 = POSITIVE
+#                else:
+#                    rating_scaled = random.randint(1,2)  #1,2, = NEGATIVE
+#                rat = BusinessRating(business=business, user=user, rating=int(rating_scaled))
+#                rat.save()
+#            #no rating        
+#            i=i+1
+#            
 
             
             

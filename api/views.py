@@ -6,7 +6,7 @@ from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
 from api.models import Photo, PhotoRating, BusinessDiscussion, PhotoDiscussion, \
     Discussion, Business, Topic, DiscussionRating, BusinessRating, Type, \
     BusinessType, Rating, BusinessMeta, BusinessTopic, BusinessTopicDiscussion, \
-    BusinessTopicRating, UserTopic
+    BusinessTopicRating, UserTopic, AllsortzUser
 from api.photos import add_photo_by_url
 from django.contrib.auth.models import User
 from django.contrib.gis.geos.factory import fromstr
@@ -40,8 +40,6 @@ def get_default_user():
     return user
 
 
-def get_user(request):
-    return get_default_user()
 
 def server_error(msg):
     response_data = dict()
@@ -906,6 +904,63 @@ def remove_photo(request,oid):
 
 
 
+''' 
+PRAGMA Code to handle social
+'''
+
+def get_user(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(str(e))
+    user_data = serial.get_user_details(user)
+    return server_data(user_data,"userDetails")
+
+
+def update_user(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+        uname = get_request_post_or_error('userName', request)
+        password = get_request_post_or_error('userPassword', request)
+        email = get_request_post_or_error('userEmail', request)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(str(e))
+    
+    
+    if User.objects.filter(username=uname).count()> 0:
+        if User.objects.get(username=uname) != user:
+            return server_error('Username ' + str(uname) + ' taken')
+    if User.objects.filter(email=email).count() > 0:
+        if User.objects.get(email=email) != user:
+            return server_error('Email ' +str(email) + ' already in use')
+    
+    asuser = AllsortzUser.objects.get(user=user)
+
+    if password != '':
+        user.set_password(password)
+    else:
+        return server_error('Password should not be blank')
+    
+    if not asuser.register: 
+        if uname != '':
+            user.username = uname
+        else:
+            return server_error('Username should not be blank.')
+    else:
+        return server_error('Please dont change username')
+    
+    if email != '':
+        user.email = email
+    else:
+        return server_error('Email should not be blank!')
+    user.save()
+    
+    asuser.registered = True
+    asuser.save()
+        
+    return server_data(serial.get_user_details(user),"userDetails")
 
 '''
 PRAGMA Code to handle queries
@@ -919,7 +974,7 @@ def get_queries(request):
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-        return server_error(e.value)
+        return server_error(str(e))
       
     if querytype=='yours':
         queries = Query.objects.filter(creator=user)
@@ -1036,7 +1091,8 @@ def internal_populate_database():
     prepop.prepop_queries(user)
     
     prepop.prepop_users()
-    prepop.prepop_ratings()
+#    prepop.prepop_business_ratings()
+    prepop.prepop_topic_ratings()
  
 def prepopulate_database(request):
     try:
@@ -1063,7 +1119,9 @@ def prepopulate_database(request):
     prepop.prepop_queries(user)
     
     prepop.prepop_users()
-    prepop.prepop_ratings()
+#    prepop.prepop_business_ratings()
+    prepop.prepop_topic_ratings()
+
     
     return server_data('Prepop successful')
 

@@ -63,8 +63,12 @@ urlpatterns = patterns('api.views',
     (r'^query/(?P<oid>\d+)/?$', 'get_query'),
     (r'^query/remove/(?P<oid>\d+)/?$', 'get_query'),
     (r'^query/add/?$', 'add_query'),
-    (r'^query/edit/(?P<oid>\d+)/?$', 'edit_query')
+    (r'^query/edit/(?P<oid>\d+)/?$', 'edit_query'), 
 
+
+
+    (r'^user/?$', 'get_user'),
+    (r'^user/update/?$', 'update_user')
 
 
 

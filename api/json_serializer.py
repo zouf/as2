@@ -4,7 +4,8 @@ Created on Jul 27, 2012
 @author: zouf
 '''
 
-from api.models import DiscussionRating, PhotoRating, UserTopic, Topic, Edge
+from api.models import DiscussionRating, PhotoRating, UserTopic, Topic, Edge,\
+    AllsortzUser
 from queries.models import QueryTopic
 from wiki.models import Page
 import api.ratings as ratings
@@ -49,7 +50,22 @@ def get_topic_data(topic,user):
 
 
     return data
+   
+
+def get_user_details(user):
+    data = dict()
+    data['userName'] = user.username
+    data['userEmail'] = user.email
     
+    asuser = AllsortzUser.objects.get(user=user)
+    if asuser.registered:
+        data['registered'] = True
+    else:
+        data['registered'] = False
+    
+    
+    return data
+ 
 def get_bustopic_data(bustopic,user,detail):
     data = dict()
     avg = ratings.getBusTopicRatings(bustopic)

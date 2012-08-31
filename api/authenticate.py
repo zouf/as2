@@ -20,6 +20,7 @@ def set_user_location(user,request):
         lat = request.GET['lat']
         lon = request.GET['lon']
         user.current_location = (lat,lon) 
+        print(str(user.current_location))
     else:
         g = geocoders.Google()
         _, (lat, lng) = g.geocode("Princeton, NJ") 
@@ -86,9 +87,34 @@ def authorize_user(user, request, request_type):
         return True
     else:
         raise AuthorizationError("Invalid request type")
+   
+def create_fake_user():  
+    maxid = User.objects.all().order_by("-id")[0]
+    try:
+        genuser = User.objects.create(username="gen"+str(maxid.id))
+        genuser.set_password("generated_password")
+        genuser.save()
+    except: 
+        logger.error('Error in generating a fake user!')  
+        raise('Error in generating a fake user!')
+        
+def create_asuser(user,device):
+    if AllsortzUser.objects.filter(device=device).count() > 0:
+        AllsortzUser.objects.filter(device=device).delete()
+    asuser =  AllsortzUser.objects.create(user=user,device=device,metric=False,distance_threshold=DISTANCE,registered=False)    
+    return asuser
         
 def authenticate_api_request(request):
     print('auth')
+    if 'uname' not in request.GET or 'password' not in request.GET or 'deviceID' not in request.GET:
+        logger.error("Username and password not specified in request URL")
+        raise AuthenticationFailed("Username and password not specified in request URL")
+    else:
+        uname = request.GET['uname']
+        password = request.GET['password']
+    
+    
+    print('uname is ' + str(uname) + ' password is ' + str(password))
     if 'deviceID' in request.GET:   #using only the device ID
         deviceID = request.GET['deviceID']
         try:
@@ -96,33 +122,43 @@ def authenticate_api_request(request):
         except Device.DoesNotExist:
             device = create_device(request)
             print('device created' + str(device))  
-            
-        print('here')
+    
+    print("device is " + str(device))
+    if uname != 'none':
         try:
-            asuser = AllsortzUser.objects.get(device=device)                 
-        except AllsortzUser.DoesNotExist:
+            user = User.objects.get(username=uname)      
+            if AllsortzUser.objects.filter(device=device).count() == 0:
+                asuser = create_asuser(user,device)
+            else:
+                asuser = AllsortzUser.objects.get(device=device)
+                asuser.user = user
+                asuser.save()
+        except User.DoesNotExist:
+            msg = 'user with username ' + str(uname) + ' str not found'
+            logger.error(msg)   
+            raise AuthenticationFailed(msg)
+
+
+    #auth the user by device alone   
+    else:            
+        if AllsortzUser.objects.get(device=device).count() == 0:
+            print('creating an ASUSER')
             logger.debug('Creating a new AllSortz User')
-            maxid = User.objects.all().order_by("-id")[0]
-            try:
-                print('creating a fake user')
-                genuser = User.objects.create(username="gen"+str(maxid.id))
-                genuser.set_password("generated_password")
-                genuser.save()
-            except:
+            genuser = create_fake_user()  
+            create_asuser(genuser, device)
                 
-                logger.error('Error in generating a new user!')
-            asuser = AllsortzUser.objects.create(user=genuser,device=device,metric=False,distance_threshold=DISTANCE,registered=False)
-        
-        print("An AllSortz user with device ID "+str(device.deviceID))
-        print("Fake user is : "+str(asuser.user))
-        newuser = authenticate(username=asuser.user, password="generated_password")
-        login(request, newuser)
-        
-        user = newuser
-    else:
-        user = get_default_user()
-        
-    user = set_user_location(user, request)
+        else:
+            asuser = AllsortzUser.objects.get(device=device) 
+    
+    
+    print('authenticate user ' + str(asuser.user))
+    user = authenticate(username=asuser.user, password=password)
+    if not  user:
+        raise AuthenticationFailed('Incorrect username password combination')
+    
+    login(request, user)
+    set_user_location(user, request)
+    logger.info('Authenticate as ' + str(user.current_location))
     return user
         
 
