@@ -48,7 +48,6 @@ def create_user(username, uid):
 
 
 def prepop_topics(user=get_default_user()):
-    Topic.objects.all().delete()
     reader = csv.reader(open(settings.BASE_DIR+'/prepop/topics.csv', 'U'), delimiter=',', quotechar='"')
     i = 0
     for row in reader:
@@ -88,7 +87,7 @@ def prepop_types(user):
 
     
 
-def prepop_businesses(user):
+def prepop_businesses(user=get_default_user()):
     if user == None:
         user = get_default_user()
     reader = csv.reader(open(settings.BASE_DIR+'/prepop/businesses.csv', 'U'), delimiter=',', quotechar='"')
@@ -179,10 +178,6 @@ def prepop_queries(user):
 
 def prepop_topic_ratings():
     random.seed(666)
-    
-    BusinessTopicRating.objects.all().delete()
-    BusinessTopic.objects.all().delete()
-    UserTopic.objects.all().delete()
     
     NumBusiness = Business.objects.count()
     NumTopics = Topic.objects.count()

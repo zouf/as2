@@ -1049,6 +1049,7 @@ def internal_populate_database():
     Topic.objects.all().delete()
     Type.objects.all().delete()
     user = get_default_user()
+        
     
     prepop.prepop_types(user)
     prepop.prepop_topics(user)
@@ -1073,7 +1074,7 @@ def prepopulate_database(request):
     if 'clear' in request.GET:
         Rating.objects.all().delete()
         Business.objects.all().delete()
-        Page.objects.all().delete()
+        #Page.objects.all().delete()
         Photo.objects.all().delete()
         BusinessTopic.objects.all().delete()
         Topic.objects.all().delete()
