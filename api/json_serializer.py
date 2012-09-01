@@ -77,8 +77,12 @@ def get_bustopic_data(bustopic,user,detail):
     except Page.DoesNotExist:
         pg = Page(name=bustopic.topic.descr,bustopic=bustopic)
         pg.save()
+        
+        
     if detail:
         data['bustopicContent'] = pg.rendered
+        if pg.content == '':
+            return None
 
     return data
 
@@ -110,7 +114,10 @@ def get_bustypes_data(bustypes,user):
 def get_bustopics_data(bustopics,user,detail):
     data = []
     for cat in bustopics:
-        data.append(get_bustopic_data(cat,user,detail))
+        res = get_bustopic_data(cat,user,detail)
+        #ignore blank ones
+        if res:
+            data.append(res)
     return data
     
 
