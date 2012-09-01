@@ -9,7 +9,9 @@ from api.models import Photo, PhotoRating, BusinessDiscussion, PhotoDiscussion, 
     BusinessTopicRating, UserTopic, AllsortzUser
 from api.photos import add_photo_by_url
 from django.contrib.auth.models import User
+from django.contrib.gis.db.models.fields import PolygonField
 from django.contrib.gis.geos.factory import fromstr
+from django.contrib.gis.geos.polygon import Polygon
 from django.contrib.gis.measure import D
 from django.http import HttpResponse
 from geopy import geocoders
@@ -265,7 +267,31 @@ def search_businesses(request):
     return server_data(serialized_businesses,"business")
 
  
+
  
+ 
+def get_businesses_map(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+    except Exception as e:
+        return server_error(str(e))
+    
+    
+
+      
+    minx = float(get_request_get_or_error('min_y', request))
+    miny = float(get_request_get_or_error('min_x', request))
+    maxx =float( get_request_get_or_error('max_y', request))
+    maxy = float(get_request_get_or_error('max_x', request))
+
+    poly = Polygon( ((minx, miny), (minx, maxy), (maxx, maxy), (maxx, miny), (minx, miny)) )    
+    #(lat, lng) = user.current_location
+    #pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
+    businesses = Business.objects.filter(geom__within=poly)
+    top_businesses = get_bus_data_ios(businesses ,user,detail=False)
+    print('Serialization complete...')
+    return server_data(top_businesses,"business") 
 def get_businesses(request):
     try:
         user = auth.authenticate_api_request(request)
@@ -274,56 +300,14 @@ def get_businesses(request):
         return server_error(str(e))
     
     
-    
-    weights = dict()
-    #Weights for sorting. 
-    #score weight
-    if 'sw' in request.GET:
-        weights['sw'] = request.GET['sw']
-    else:
-        weights['sw'] = 1
-    
-    #distance weight
-    if 'dw' in request.GET:
-        weights['sdw'] = request.GET['dw']
-    else:
-        weights['dw'] = 1
-        
-    #price weight
-    if 'pw' in request.GET:
-        weights['pw'] = request.GET['pw']
-    else:
-        weights['pw'] = 1
-        
-    #value weight
-    if 'vw' in request.GET:
-        weights['vw'] = request.GET['vw']
-    else:
-        weights['vw'] = 1
 
-    #topics to sort by
-    if 'topics' in request.GET:  
-        topics = request.get['topics']
-    else:
-        topics = None
-
-    #topics to sort by
-    if 'text' in request.GET:  
-        searchText = request.get['text']
-    else:
-        searchText = None
-
-    if 'lat' in request.GET and 'lng' in request.GET:
-        lat = request.GET['lat']
-        lng = request.GET['lng']
-    else:
-        g = geocoders.Google()
-        (lat, lng) = user.current_location
-    
-        
-    #businesses = perform_query_from_param(user, (lat, lng),weights,topics,searchText)
+      
+    low = get_request_get_or_error('bus_low', request)
+    high = get_request_get_or_error('bus_high', request)
+   
+    (lat, lng) = user.current_location
     pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-    businesses = Business.objects.distance(pnt).order_by('distance')
+    businesses = Business.objects.distance(pnt).order_by('distance')[low:high]
     top_businesses = get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
     return server_data(top_businesses,"business")
