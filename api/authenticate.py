@@ -17,14 +17,14 @@ logger= logging.getLogger(__name__)
 
 def set_user_location(user,request):
     if 'lat' in request.GET and 'lon' in request.GET:
-        lat = request.GET['lat']
-        lon = request.GET['lon']
+        lat = float(request.GET['lat'])
+        lon = float(request.GET['lon'])
         user.current_location = (lat,lon) 
         print(str(user.current_location))
     else:
         g = geocoders.Google()
         _, (lat, lng) = g.geocode("08540",exactly_one=False)[0] 
-        user.current_location = (lat,lng) 
+        user.current_location = (float(lat),float(lng)) 
         print("Centering user in Princeton, NJ by default")
     return user
 

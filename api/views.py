@@ -18,6 +18,7 @@ from geopy import geocoders
 from geopy.units import radians
 from queries.models import Query, QueryTopic
 from queries.views import perform_query_from_param, perform_query_from_obj
+from recommendation.models import Recommendation
 from wiki.models import Page
 import api.authenticate as auth
 import api.json_serializer as serial
@@ -221,20 +222,24 @@ def search_businesses(request):
     else:
         dist_limit = D(mi=2)
     
+    print('DIST LIMIT IS ' + str(dist_limit.m))
     businesses_filtered = []
     if searchText == '':
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
+        print(str(pnt))
         businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
     else:
         #print('searching ' + str(lat) + ' long ' + str(lng))
         qset = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
         .filter(**{'@geodist__lt':dist_limit.m*1.0})\
         .query(searchText).order_by('-@geodist')
+        
         businesses_filtered = []
         for b in qset:
             searchWeight = b._sphinx['weight']
             #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
             businesses_filtered.append(b)
+            print(str(b))
         #for some reason, the qset is reversed when it's returned. The largest distances are in the front
         # Reverse here
         businesses_filtered.reverse()
@@ -245,6 +250,7 @@ def search_businesses(request):
         unique_types = dict()
         #quickly turn the array into a hash map for faster lookup
         for tid in searchTypes:
+            print(tid)
             unique_types[tid] =True
             
         businesses_matching_type = []
@@ -324,7 +330,7 @@ def get_business_topics(request,oid):
         auth.authorize_user(user, request, "get")
         bus = Business.objects.get(id=oid)
     except ReadJSONError as e:
-        return server_error(e.value)
+        return server_error(str(e))
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
     except: 
@@ -1049,6 +1055,8 @@ def internal_populate_database():
     Topic.objects.all().delete()
     Type.objects.all().delete()
     user = get_default_user()
+    Recommendation.objects.all().delete()
+
         
     
     prepop.prepop_types(user)

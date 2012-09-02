@@ -16,6 +16,7 @@ from wiki.models import Page
 import csv
 import logging
 import random
+from recommendation.models import Recommendation
 
 
 
@@ -179,6 +180,7 @@ def prepop_queries(user):
 def prepop_topic_ratings():
     random.seed(666)
     
+    
     NumBusiness = Business.objects.count()
     NumTopics = Topic.objects.count()
       
@@ -191,7 +193,7 @@ def prepop_topic_ratings():
         for b in Business.objects.all():
             print('Rating ' + str(b) + ' under the topic ' + str(t))
             #norm_given_rat = stats.norm(center,rating_given_sd)  #gaussian distribution for giving a rating
-            prob_rat_given =  0.5 # norm_given_rat.pdf(i)  *  1/norm_given_rat.pdf(center)
+            prob_rat_given =  1 # norm_given_rat.pdf(i)  *  1/norm_given_rat.pdf(center)
 
             rat_given_rv = binomial(1, prob_rat_given, 1) #1 if rated, 0 otherwise
             if rat_given_rv[0] != 0:

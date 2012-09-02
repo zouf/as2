@@ -55,10 +55,10 @@ def get_request_postlist_or_warn(key,request):
             types = request.POST[key]
             return (json.loads(types))
         except Exception as e:
-            print(e.value)
+            print(str(e))
     logger.debug("WARNING: could not get post list with key "+ str(key));
     print('WARNING: could not get post list with key ' + str(key))
-    return ''
+    return []
 
 
 def get_request_get_or_error(key,request):
