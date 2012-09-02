@@ -212,8 +212,9 @@ def prepop_topic_ratings():
                     SUM += r
                 rating_scaled = float(SUM)/float(SIZE)
                 print('giving rating' + str(rating_scaled))
-                bt = BusinessTopic.objects.create(business=b,topic=t)
-                UserTopic.objects.create(user=user,topic=t,importance=1)
+                bt = BusinessTopic.objects.get(business=b,topic=t)
+                BusinessTopicRating.objects.filter(businesstopic=bt,user=user).delete()
+                #UserTopic.objects.create(user=user,topic=t,importance=1)
                 rat = BusinessTopicRating(businesstopic=bt, user=user, rating=float(rating_scaled))
                 rat.save()
             #no rating        
