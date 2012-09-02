@@ -17,7 +17,9 @@ def get_default_user():
         
     return user
 
-def add_topic_to_bus(b,topic,user=get_default_user()):    
+def add_topic_to_bus(b,topic,user=get_default_user()):  
+    print("Adding " + str(topic) + " to business " + str(b) )       
+  
     try: 
         bustopic = BusinessTopic.objects.get(topic=topic,business=b)
     except:

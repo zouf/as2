@@ -151,18 +151,13 @@ def prepop_businesses(user=get_default_user()):
         
           
         for t,rindex in tag_indices.items():    
-            print("Adding " + str(t) + " to business" )       
             topic = Topic.objects.get(descr=t)
-            bustopic = add_topic_to_bus(b, topic, user)
             if row[rindex] != '':
-                print(t)
+                bustopic = add_topic_to_bus(b, topic, user)
                 pg = Page.objects.get(bustopic=bustopic)
-                print('Populating page' + str(bustopic.topic.descr))
                 pg.content = row[rindex]
                 pg.save()
-                print('PAGE CONTENT IS ' + str(pg.content))
-                print('Page done. ID is '+ str(pg.id))
-                print('content should be ' + str(row[rindex]))
+                print('Page content: ' + str(pg.content))
         
         
 
