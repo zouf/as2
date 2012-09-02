@@ -1056,13 +1056,14 @@ def internal_populate_database():
     Type.objects.all().delete()
     user = get_default_user()
     Recommendation.objects.all().delete()
-
-        
+    BusinessTopicRating.objects.all().delete()
     
     prepop.prepop_types(user)
     prepop.prepop_topics(user)
 
+    print('before prepop businesses' + str(BusinessTopic.objects.all().count()))
     prepop.prepop_businesses(user)
+    print('after prepop businesses' + str(BusinessTopic.objects.all().count()))
     prepop.prepop_queries(user)
     
     prepop.prepop_users()
