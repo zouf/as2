@@ -286,17 +286,17 @@ def format_inspdata(inspdate):
     if len(splitDate) > 0:
         month = splitDate[0]
     else:
-        month = '1'
+        month = ''
     
     if len(splitDate) > 1:
         day = splitDate[1]
     else:
-        day='1'
+        day=''
     
     if len(splitDate) > 2:
         year = splitDate[2]
     else:
-        year='2012'
+        year=''
 
     return ('{0}-{1}-{2}'.format(year,month,day))
     
