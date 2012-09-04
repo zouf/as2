@@ -80,8 +80,8 @@ def authorize_user(user, request, request_type):
     elif request_type == "get":
         return True
     elif request_type == "edit":
-        if not user.is_superuser:
-            raise AuthorizationError("User not authorized to delete")
+        #if not user.is_superuser:
+        #    raise AuthorizationError("User not authorized to edit")
         return True
     elif request_type == "add":
         return True
