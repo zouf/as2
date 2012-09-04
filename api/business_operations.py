@@ -81,6 +81,7 @@ def add_business_server(name,addr,city,state,phone,url,types,hours='',average_pr
             bus = Business(name=name,address=addr,city=city,state=state,phone=phone,url=url)
             bus.save()
         else:
+            print('getting existing business')
             bus = Business.objects.get(name=name,address=addr,city=city,state=state)
   
         bmset = BusinessMeta.objects.filter(business=bus).filter()
