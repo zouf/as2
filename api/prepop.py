@@ -304,7 +304,6 @@ def prepop_nyc_doh_ratings():
     
     fp = open(settings.DOH_DATASET_LOCATION)
 
-    print(fp)
     
     data = json.load(fp)
     #pprint(objs)
@@ -334,30 +333,31 @@ def prepop_nyc_doh_ratings():
         lng = data['lng'][pos]
         restaurant_type= str(cuisineDict[data['cuisine'][pos]])
         grade = str(data['grade'][pos])
-        print('\n----------')
-        print(nm)
+        if pos % 400 == 0:
+	  print('\n----------')
+          print(nm)
 
         all_violations= ''
         violationIDs = data['violations'][pos]
         for vid in violationIDs:
-            if vid != '':
+            if vid != '' and vid in violationDesc:
                 all_violations = all_violations + str(violationDesc[vid])
                 all_violations = all_violations + "\n"
         violationPoints = data['score'][pos]
         
         inspdate = format_inspdata(str(data['inspdate'][pos]))
         
-        print(inspdate)
         
         (street, borough, zipcode, phone) = parseAddress(data['address'][pos])
-        print('Orig type ID ' + str(data['cuisine'][pos]))
-        print(restaurant_type)
-        print(all_violations)
-        print(str(grade))
-        print(str(violationPoints))
-        print(str( (street, borough, zipcode, phone)))
-        print(inspdate)
-        print('---------------\n')
+        if pos %400 == 0:
+          print('Orig type ID ' + str(data['cuisine'][pos]))
+          print(restaurant_type)
+          print(all_violations)
+          print(str(grade))
+          print(str(violationPoints))
+          print(str( (street, borough, zipcode, phone)))
+          print(inspdate)
+          print('---------------\n')
         b = add_business_server(name=nm,addr=street,state='NY',city=borough,phone=phone,
                     types=[restaurant_type], hours='',wifi=None,serves=None, url='', 
                     average_price=-1,health_letter_code=grade,health_violation_text=all_violations,health_points=int(violationPoints),inspdate=inspdate)
