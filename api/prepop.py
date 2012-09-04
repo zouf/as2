@@ -266,7 +266,6 @@ def parseAddress(address):
     elif borough == "4":
         borough = "Queens,";
     elif borough == "5":
-        print("CHECK FOR SI!")
         borough = "Staten Island"
 #    elif borough == "5":  # check to see if this is true
 #        borough == "Staten Island"
@@ -328,13 +327,17 @@ def prepop_nyc_doh_ratings():
     pos = 0
     for name in data['name']:
         nm = name
+        print(nm)
         lat = data['lat'][pos]
         lng = data['lng'][pos]
-        restaurant_type= str(cuisineDict[data['cuisine'][pos]])
+        if data['cuisine'][pos] in cuisineDict:
+            restaurant_type= str(cuisineDict[data['cuisine'][pos]])
+        else:
+            restaurant_type = ''
         grade = str(data['grade'][pos])
         if pos % 400 == 0:
-	  print('\n----------')
-          print(nm)
+            print('\n----------')
+            print(nm)
 
         all_violations= ''
         violationIDs = data['violations'][pos]
@@ -349,14 +352,14 @@ def prepop_nyc_doh_ratings():
         
         (street, borough, zipcode, phone) = parseAddress(data['address'][pos])
         if pos %400 == 0:
-          print('Orig type ID ' + str(data['cuisine'][pos]))
-          print(restaurant_type)
-          print(all_violations)
-          print(str(grade))
-          print(str(violationPoints))
-          print(str( (street, borough, zipcode, phone)))
-          print(inspdate)
-          print('---------------\n')
+            print('Orig type ID ' + str(data['cuisine'][pos]))
+            print(restaurant_type)
+            print(all_violations)
+            print(str(grade))
+            print(str(violationPoints))
+            print(str( (street, borough, zipcode, phone)))
+            print(inspdate)
+            print('---------------\n')
         b = add_business_server(name=nm,addr=street,state='NY',city=borough,phone=phone,
                     types=[restaurant_type], hours='',wifi=None,serves=None, url='', 
                     average_price=-1,health_letter_code=grade,health_violation_text=all_violations,health_points=int(violationPoints),inspdate=inspdate)
