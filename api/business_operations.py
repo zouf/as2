@@ -62,7 +62,7 @@ def edit_business_server(bus,name,addr,city,state,phone,url,types):
     return bus
 
 def add_business_server(name,addr,city,state,phone,url,types,hours='',average_price=-1,serves=None,wifi=None,\
-                        health_points=-1,health_violation_text='',health_letter_code='',inspdate=''):
+                        health_points=-1,health_violation_text='',health_letter_code='',inspdate='2000-1-1'):
 #    print("Creating business!\n")
 #    print(name)
 #    print(addr)
@@ -90,7 +90,7 @@ def add_business_server(name,addr,city,state,phone,url,types,hours='',average_pr
                             health_violation_text=health_violation_text,   health_letter_code = health_letter_code,inspdate=inspdate)
         bm.save()
         associate_business_with_types(bus,types)
-        print('Creating ' + str(bus.name) + ' Done')
+        #print('Creating ' + str(bus.name) + ' Done')
         return bus
     except Exception as e:
         logger.error("error creating businesses " + str(e))

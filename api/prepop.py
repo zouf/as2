@@ -19,7 +19,6 @@ import csv
 import json
 import logging
 import random
-import simplejson
 
 
 
@@ -306,7 +305,7 @@ def prepop_nyc_doh_ratings():
 
     print(fp)
     
-    data = json.load(fp)
+    data = json.load(fp,encoding="utf-8")
     #pprint(objs)
     for key in data:
         print(key)

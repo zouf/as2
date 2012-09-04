@@ -4,8 +4,8 @@ Created on Jul 27, 2012
 @author: zouf
 '''
 
-from api.models import DiscussionRating, PhotoRating, UserTopic, Topic, Edge,\
-    AllsortzUser
+from api.models import DiscussionRating, PhotoRating, UserTopic, Topic, Edge, \
+    AllsortzUser, BusinessMeta
 from queries.models import QueryTopic
 from wiki.models import Page
 import api.ratings as ratings
@@ -206,5 +206,15 @@ def get_queries_data(queries,user):
     data = []
     for q in queries:
         data.append(get_query_data(q,user))
+    return data
+    
+    
+def get_health_info(b):
+    bm = BusinessMeta.objects.get(business=b)
+    data = dict()
+    data['health_grade'] = str(bm.health_letter_code)
+    data['health_points'] = str(bm.health_points)
+    data['health_violation_text'] = str(bm.health_violation_text)
+    data['inspdate'] = str(bm.inspdate)
     return data
     

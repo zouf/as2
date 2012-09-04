@@ -1061,14 +1061,12 @@ def internal_populate_database():
     prepop.prepop_types(user)
     prepop.prepop_topics(user)
 
-    print('before prepop businesses' + str(BusinessTopic.objects.all().count()))
     prepop.prepop_businesses(user)
-    print('after prepop businesses' + str(BusinessTopic.objects.all().count()))
     prepop.prepop_queries(user)
     
-    prepop.prepop_users()
+    #prepop.prepop_users()
 #    prepop.prepop_business_ratings()
-    prepop.prepop_topic_ratings()
+    #prepop.prepop_topic_ratings()
  
 def prepopulate_database(request):
     try:
