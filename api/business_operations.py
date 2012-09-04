@@ -3,6 +3,7 @@ Created on Aug 16, 2012
 
 @author: zouf
 '''
+from api.authenticate import get_default_user
 from api.models import Type, Business, BusinessType, BusinessCache, BusinessMeta
 import logging
 
@@ -18,15 +19,18 @@ def associate_business_with_types(bus,types):
     for tdescr in types:
         try:
             t = Type.objects.get(descr=tdescr) 
-            associate_business_type(bus, t)  
         except Type.MultipleObjectsReturned:
             logger.error("Multiple types returned")
             t = Type.objects.filter(descr=tdescr)[0] 
             pass
         except Type.DoesNotExist:
-            print("Does not exist")
-            logger.error('Type does not exist")')
+            print("Type " + str(tdescr) + " does not exist")
+            t = Type(descr=tdescr,creator=get_default_user(),icon='none.png')
+            t.save()
+            #logger.error('Type does not exist")')
             pass
+        associate_business_type(bus, t)  
+
 
 def edit_business_server(bus,name,addr,city,state,phone,url,types):
     print("Editing business!\n")
@@ -57,7 +61,8 @@ def edit_business_server(bus,name,addr,city,state,phone,url,types):
     bus.save()
     return bus
 
-def add_business_server(name,addr,city,state,phone,url,types,hours='',average_price=-1,serves=None,wifi=None):
+def add_business_server(name,addr,city,state,phone,url,types,hours='',average_price=-1,serves=None,wifi=None,\
+                        health_points=-1,health_violation_text='',health_letter_code=''):
 #    print("Creating business!\n")
 #    print(name)
 #    print(addr)
@@ -81,7 +86,8 @@ def add_business_server(name,addr,city,state,phone,url,types,hours='',average_pr
         bmset = BusinessMeta.objects.filter(business=bus).filter()
         if bmset.count() > 0:
             bmset.delete()
-        bm = BusinessMeta(business=bus,hours=hours,average_price=average_price,serves=serves,wifi=wifi)
+        bm = BusinessMeta(business=bus,hours=hours,average_price=average_price,serves=serves,wifi=wifi,health_points=health_points,
+                            health_violation_text=health_violation_text,   health_letter_code = health_letter_code)
         bm.save()
         associate_business_with_types(bus,types)
         print('Creating ' + str(bus.name) + ' Done')

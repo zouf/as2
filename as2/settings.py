@@ -10,8 +10,13 @@ SPHINX_SERVER='db.allsortz.com'
 
 
 
+
+
 TEMPLATE_DEBUG = DEBUG
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))+'/..'
+
+#Dataset locations
+DOH_DATASET_LOCATION=BASE_DIR+'/'+'prepop/grades_raw.json'
 
 #add your admin name heres
 ADMINS = (

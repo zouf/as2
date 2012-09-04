@@ -65,29 +65,37 @@ class Business(models.Model):
     
     
     def save(self):
-        loc = self.address + " " + self.city + ", " + self.state        
-        location = urllib.quote_plus(smart_str(loc))
-        dd = urllib2.urlopen("http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false" % location).read() 
-        ft = simplejson.loads(dd)
-        zipcode = None
-        lat = None
-        lng = None
-        if ft["status"] == 'OK':
-            lat = str(ft["results"][0]['geometry']['location']['lat']) 
-            lng = str(ft["results"][0]['geometry']['location']['lng'])
+        
+        #dont redo this if lat and lng is set
+        if not self.lat and not self.lon:
+            
+            loc = self.address + " " + self.city + ", " + self.state        
+            location = urllib.quote_plus(smart_str(loc))
+            dd = urllib2.urlopen("http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false" % location).read() 
+            ft = simplejson.loads(dd)
             zipcode = None
-            for jsonStr in ft["results"][0]['address_components']:
-#                print jsonStr
-                if 'types' in jsonStr:
-                    for tp in jsonStr['types']:
-                        if tp == "postal_code":
-                            zipcode = jsonStr['long_name']
-                            break
-       
-        if zipcode is not None:
-            self.zipcode  = zipcode
+            lat = None
+            lng = None
+            if ft["status"] == 'OK':
+                lat = str(ft["results"][0]['geometry']['location']['lat']) 
+                lng = str(ft["results"][0]['geometry']['location']['lng'])
+                zipcode = None
+                for jsonStr in ft["results"][0]['address_components']:
+    #                print jsonStr
+                    if 'types' in jsonStr:
+                        for tp in jsonStr['types']:
+                            if tp == "postal_code":
+                                zipcode = jsonStr['long_name']
+                                break
+           
+            if zipcode is not None:
+                self.zipcode  = zipcode
+            else:
+                self.zipcode = ''
         else:
-            self.zipcode = ''
+            #use existing lat lng
+            lat = self.lat
+            lng = self.lon
             
         if lat and lng:
             self.lat = lat
@@ -109,12 +117,19 @@ class BusinessCache(models.Model):
     business = models.ForeignKey(Business)
     cachedata = models.CharField(max_length=1500)
     
+    
+class HealthGrade(models.Model):
+
+    business = models.ForeignKey(Business)
+    
 class BusinessMeta(models.Model):
     average_price = models.IntegerField()
     wifi = models.NullBooleanField()
     serves = models.NullBooleanField()
     hours = models.CharField(max_length=100)
-
+    health_points = models.IntegerField()
+    health_violation_text = models.TextField()
+    health_letter_code = models.CharField(max_length=10)
     business = models.ForeignKey(Business)
 
 
