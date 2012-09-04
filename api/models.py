@@ -67,7 +67,7 @@ class Business(models.Model):
     def save(self):
         
         #dont redo this if lat and lng is set
-        if not self.lat and not self.lon:
+        if (not self.lat and not self.lon) or (self.lat == 0 and self.lon==0):
             
             loc = self.address + " " + self.city + ", " + self.state        
             location = urllib.quote_plus(smart_str(loc))

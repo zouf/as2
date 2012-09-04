@@ -4,7 +4,8 @@ Created on Jul 19, 2012
 @author: zouf
 '''
 #from photos.models import BusinessPhoto
-from api.json_serializer import get_bustypes_data, get_bustopics_data
+from api.json_serializer import get_bustypes_data, get_bustopics_data, \
+    get_health_info
 from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
     BusinessCache
 from api.photos import get_photo_url, get_photo_id
