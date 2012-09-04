@@ -44,7 +44,7 @@ def get_topic_data(topic,user):
         if topicfilter.count() > 0:
             c['userWeight'] = topicfilter[0].importance
         else:
-            c['userWeight'] = -1 
+            c['userWeight'] = 0
         data['children'].append(c)
         #data['children'].append(get_topic_data(edge.to_node,user))
 
