@@ -130,6 +130,7 @@ class BusinessMeta(models.Model):
     health_points = models.IntegerField()
     health_violation_text = models.TextField()
     health_letter_code = models.CharField(max_length=10)
+    inspdate=models.DateField()
     business = models.ForeignKey(Business)
 
 

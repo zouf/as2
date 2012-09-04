@@ -62,7 +62,7 @@ def edit_business_server(bus,name,addr,city,state,phone,url,types):
     return bus
 
 def add_business_server(name,addr,city,state,phone,url,types,hours='',average_price=-1,serves=None,wifi=None,\
-                        health_points=-1,health_violation_text='',health_letter_code=''):
+                        health_points=-1,health_violation_text='',health_letter_code='',inspdate=''):
 #    print("Creating business!\n")
 #    print(name)
 #    print(addr)
@@ -87,7 +87,7 @@ def add_business_server(name,addr,city,state,phone,url,types,hours='',average_pr
         if bmset.count() > 0:
             bmset.delete()
         bm = BusinessMeta(business=bus,hours=hours,average_price=average_price,serves=serves,wifi=wifi,health_points=health_points,
-                            health_violation_text=health_violation_text,   health_letter_code = health_letter_code)
+                            health_violation_text=health_violation_text,   health_letter_code = health_letter_code,inspdate=inspdate)
         bm.save()
         associate_business_with_types(bus,types)
         print('Creating ' + str(bus.name) + ' Done')

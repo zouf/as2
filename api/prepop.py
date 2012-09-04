@@ -10,16 +10,16 @@ from api.photos import add_photo_by_url
 from api.topic_operations import add_topic_to_bus, add_topic
 from as2 import settings
 from django.contrib.auth.models import User
+from gettext import lngettext
 from numpy.oldnumeric.random_array import binomial
 from queries.models import Query
 from recommendation.models import Recommendation
 from wiki.models import Page
 import csv
 import json
-import simplejson
 import logging
 import random
-from gettext import lngettext
+import simplejson
 
 
 
@@ -281,8 +281,27 @@ def parseAddress(address):
     return (street, borough, zipcode, phone)
     
 
+def format_inspdata(inspdate):
+    splitDate = inspdate.split('|')
+    if len(splitDate) > 0:
+        month = splitDate[0]
+    else:
+        month = '1'
+    
+    if len(splitDate) > 1:
+        day = splitDate[1]
+    else:
+        day='1'
+    
+    if len(splitDate) > 2:
+        year = splitDate[2]
+    else:
+        year='2012'
 
+    return ('{0}-{1}-{2}'.format(year,month,day))
+    
 def prepop_nyc_doh_ratings():
+    
     fp = open(settings.DOH_DATASET_LOCATION)
 
     print(fp)
@@ -315,26 +334,33 @@ def prepop_nyc_doh_ratings():
         lng = data['lng'][pos]
         restaurant_type= str(cuisineDict[data['cuisine'][pos]])
         grade = str(data['grade'][pos])
+        print('\n----------')
+        print(nm)
+
         all_violations= ''
         violationIDs = data['violations'][pos]
         for vid in violationIDs:
-            all_violations = all_violations + str(violationDesc[vid])
-            all_violations = all_violations + "\n"
+            if vid != '':
+                all_violations = all_violations + str(violationDesc[vid])
+                all_violations = all_violations + "\n"
         violationPoints = data['score'][pos]
         
+        inspdate = format_inspdata(str(data['inspdate'][pos]))
+        
+        print(inspdate)
         
         (street, borough, zipcode, phone) = parseAddress(data['address'][pos])
-        print(nm)
         print('Orig type ID ' + str(data['cuisine'][pos]))
         print(restaurant_type)
         print(all_violations)
         print(str(grade))
         print(str(violationPoints))
         print(str( (street, borough, zipcode, phone)))
+        print(inspdate)
         print('---------------\n')
         b = add_business_server(name=nm,addr=street,state='NY',city=borough,phone=phone,
                     types=[restaurant_type], hours='',wifi=None,serves=None, url='', 
-                    average_price=-1,health_letter_code=grade,health_violation_text=all_violations,health_points=int(violationPoints))
+                    average_price=-1,health_letter_code=grade,health_violation_text=all_violations,health_points=int(violationPoints),inspdate=inspdate)
         #override with the loc data from DOH
         b.lat = lat
         b.lon = lng
