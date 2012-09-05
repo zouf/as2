@@ -232,7 +232,7 @@ def search_businesses(request):
         #print('searching ' + str(lat) + ' long ' + str(lng))
         qset = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
         .filter(**{'@geodist__lt':dist_limit.m*1.0})\
-        .query(searchText).order_by('-@geodist')
+        .query(searchText).order_by('-@geodist')[0:10]
         
         businesses_filtered = []
         for b in qset:
@@ -294,7 +294,7 @@ def get_businesses_map(request):
     poly = Polygon( ((minx, miny), (minx, maxy), (maxx, maxy), (maxx, miny), (minx, miny)) )    
     #(lat, lng) = user.current_location
     #pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-    businesses = Business.objects.filter(geom__within=poly)
+    businesses = Business.objects.filter(geom__within=poly)[0:10]
     top_businesses = get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
     return server_data(top_businesses,"business") 

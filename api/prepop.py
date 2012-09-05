@@ -325,6 +325,8 @@ def prepop_nyc_doh_ratings():
         pos += 1
     
     pos = 0
+    print(len(data['name']))
+    #15287
     for name in data['name']:
         nm = name
         print(nm)
