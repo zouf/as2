@@ -175,8 +175,7 @@ MEDIA_URL = ''
 STATIC_ROOT = BASE_DIR+'/static/'
 
 
-LOG_FILE = STATIC_ROOT+'/log.txt'
-
+LOG_BASE = '/var/log/django/'
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 
@@ -314,7 +313,7 @@ LOGGING = {
         'default': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR+'/logs/mylog.log',
+            'filename': LOG_BASE+'/mylog.log',
             'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
             'formatter':'standard',
@@ -322,7 +321,7 @@ LOGGING = {
         'allsortz_handler': {
                 'level':'DEBUG',
                 'class':'logging.handlers.RotatingFileHandler',
-                'filename': BASE_DIR+'/logs/allsortz_ratings.log',
+                'filename': LOG_BASE+'/allsortz_ratings.log',
                 'maxBytes': 1024*1024*5, # 5 MB
                 'backupCount': 5,
                 'formatter':'standard',
@@ -330,7 +329,7 @@ LOGGING = {
         'request_handler': {
                 'level':'DEBUG',
                 'class':'logging.handlers.RotatingFileHandler',
-                'filename': BASE_DIR+'/logs/django_request.log',
+                'filename': LOG_BASE+'/django_request.log',
                 'maxBytes': 1024*1024*5, # 5 MB
                 'backupCount': 5,
                 'formatter':'standard',
@@ -346,7 +345,7 @@ LOGGING = {
             'class' : 'logging.handlers.RotatingFileHandler',
             'backupCount' : 5,
             'maxBytes': 1024*1024*5, # 5 MB,
-            'filename':  BASE_DIR+'/logs/django-db.log'
+            'filename':  LOG_BASE+'/django-db.log'
             },
     },
     'loggers': {
