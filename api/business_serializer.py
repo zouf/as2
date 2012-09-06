@@ -10,7 +10,6 @@ from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
     BusinessCache, Type
 from api.photos import get_photo_id, get_photo_url_medium, get_photo_url_large
 from api.ratings import getBusinessRatings, getBusAverageRating
-from api.views import get_types
 from decimal import getcontext, Decimal
 from recommendation.recengine import get_best_current_recommendation, \
     get_recommendation_by_topic
