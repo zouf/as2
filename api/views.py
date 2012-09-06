@@ -377,7 +377,8 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         businesses_filtered = businesses_matching_type
     
     businesses = businesses_filtered
-    print('Search result is ' + str(businesses))
+    logger.debug('Search result is ' + str(businesses))
+    return businesses
 
 def get_businesses(request):
     try:
