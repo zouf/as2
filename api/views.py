@@ -385,8 +385,8 @@ def get_businesses(request):
         auth.authorize_user(user, request, "get")
     except Exception as e:
         return server_error(str(e))  
-    low = get_request_get_or_error('bus_low', request)
-    high = get_request_get_or_error('bus_high', request)
+    low = int(get_request_get_or_error('bus_low', request))
+    high = int(get_request_get_or_error('bus_high', request))
    
     searchText = get_request_post_or_warn('searchText', request)  
     searchLocation = get_request_post_or_warn('searchLocation', request)
