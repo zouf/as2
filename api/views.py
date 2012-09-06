@@ -2,12 +2,15 @@
 from api.business_operations import add_business_server, edit_business_server
 from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
     get_request_get_or_error, get_request_post_or_error, get_bus_data_ios, \
-    get_request_post_or_warn, get_request_postlist_or_warn
+    get_request_post_or_warn, get_request_postlist_or_warn, \
+    get_request_postlist_or_error
 from api.models import Photo, PhotoRating, BusinessDiscussion, PhotoDiscussion, \
     Discussion, Business, Topic, DiscussionRating, BusinessRating, Type, \
     BusinessType, Rating, BusinessMeta, BusinessTopic, BusinessTopicDiscussion, \
     BusinessTopicRating, UserTopic, AllsortzUser
 from api.photos import add_photo_by_url
+from api.topic_operations import add_topic_to_bus, \
+    add_discussion_to_businesstopic, get_discussions_data, get_discussion_data
 from django.contrib.auth.models import User
 from django.contrib.gis.db.models.fields import PolygonField
 from django.contrib.gis.geos.factory import fromstr
@@ -1016,8 +1019,65 @@ def remove_photo(request,oid):
         return server_error('Photo with id '+str(oid)+' not found. Deletion failed')
     return server_data("Deletion of photo id= " +str(oid)+ " successful")
 
+''' 
+PRAMGA Code to handle discussions 
+'''
+#the discussions are the "reviews". Discussions with no parent are eligible to the be
+# top review for a topic and will be displayed on the business details page
+def get_discussions(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+        bustopicID = get_request_get_or_error('bustopicID',request)
+        bustopic = BusinessTopic.objects.get(id=bustopicID)
+    except Exception as e:
+        return server_error(str(e))
+    
+    discussions = BusinessTopicDiscussion.objects.filter(businesstopic =bustopic)
+    
+    data = dict()
+    data['discussions'] = get_discussions_data(discussions)
+    return server_data(data,"discussions")
 
 
+def get_discussion(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+        discussion = BusinessTopicDiscussion.objects.get(id=oid)
+    except Exception as e:
+        return server_error(str(e))
+    
+    data = dict()
+    data['discussion'] = get_discussion_data(discussion)
+    return server_data(data,"discussion")
+
+def add_discussion(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "add")
+        topicIDs = get_request_postlist_or_error('topicIDs', request)
+        businessID = get_request_get_or_error('businessID', request)   
+        topics = Topic.objects.get(id__in=topicIDs)
+        business = Business.objects.get(id=businessID) 
+        review = get_request_post_or_error('review', request)
+    except Exception as e:
+        return server_error(str(e))
+    except Exception as e:
+        return server_error(str(e))
+    
+    print("Add a discussion to " + str(business) + " for the topics " + str(topics))
+    print('Review is ' + str(review))
+    try:
+        for t in topics:
+            bt = add_topic_to_bus(business,t,user)
+            add_discussion_to_businesstopic(bt,user)
+    except Exception as e:
+        return server_error(str(e))
+    
+    return server_data("success","msg")
+
+    
 ''' 
 PRAGMA Code to handle social
 '''

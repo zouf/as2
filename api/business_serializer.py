@@ -67,7 +67,14 @@ def get_request_get_or_error(key,request):
         return request.GET[key]
     raise ReadJSONError("GET Key: '" + str(key) + "' not found in request " + str(request.path))
 
-
+def get_request_postlist_or_error(key,request):
+    if key in request.POST:
+        print('in request.postlist')
+        print('trying to get list for ' + str(key))
+        print(request.POST[key])  
+        types = request.POST[key]
+        return (json.loads(types))
+    raise ReadJSONError("POST Key for list: " + str(key) + " not found in request " + str(request.path))
 
 def get_all_nearby(mylat,mylng,distance=1):
 

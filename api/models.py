@@ -486,6 +486,9 @@ class BusinessTopicDiscussion(Discussion):
     businesstopic = models.ForeignKey(BusinessTopic)
     class Admin:
         pass
+    def __unicode__(self):
+        return str(self.user) + " for businesstopic " + str(self.businesstopic) ;
+    
     
 class BusinessDiscussion(Discussion):
     business = models.ForeignKey(Business)
@@ -528,6 +531,14 @@ class BusinessTopicRating(Rating):
         pass
     def __unicode__(self):
         return str(self.rating) + " : " + str(self.businesstopic) + " - " + str(self.user) 
+    
+    
+class BusinessTopicDiscussionRating(Rating):
+    busTopicDiscussion = models.ForeignKey(BusinessTopicDiscussion)
+    class Admin:
+        pass
+    def __unicode__(self):
+        return str(self.rating) + " : " + str(self.busTopicDiscussion) + " - " + str(self.user) 
     
 class BusinessRating(Rating):
     business = models.ForeignKey(Business)

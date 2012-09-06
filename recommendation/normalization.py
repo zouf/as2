@@ -4,7 +4,8 @@ Created on May 8, 2012
 @author: zouf
 '''
 from api.models import PhotoRating, DiscussionRating, BusinessRating, \
-    BusinessTopicRating, Business
+    BusinessTopicRating, Business, BusinessDiscussion, BusinessTopicDiscussion, \
+    BusinessTopicDiscussionRating
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Sum, Count
 import logging
@@ -208,6 +209,11 @@ def getNormFactors(uid, bid):
     fct = (usr + bus - glb)
     return(fct)
 
+
+def getBusinessTopicDiscussionRatings(discussion):
+    numNeg = BusinessTopicDiscussionRating.objects.filter(rating__lt=0.0)
+    numPos  = BusinessTopicDiscussionRating.objects.filter(rating__gt=0.0)
+    return (numPos, numNeg)
 
 def getNumRatings(bid):
     ratingFilter = BusinessRating.objects.filter(business=Business.objects.get(id=bid)).aggregate(Sum('rating'), Count('rating'))

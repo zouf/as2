@@ -3,8 +3,11 @@ Created on Aug 1, 2012
 
 @author: zouf
 '''
-from api.models import Topic, BusinessTopic, Edge
+from api.json_serializer import get_bustopic_data, get_user_details
+from api.models import Topic, BusinessTopic, Edge, BusinessTopicDiscussion
 from django.contrib.auth.models import User
+from recommendation.normalization import getNumRatings, \
+    getBusinessTopicDiscussionRatings
 from wiki.models import Page
 
 def get_default_user():
@@ -16,6 +19,31 @@ def get_default_user():
         user.save()
         
     return user
+
+def get_discussion_data(discussion,user):
+    data = dict()
+    data['content'] = str(discussion.content)
+    data['discussionID'] = str(discussion.id)
+    (numPos, numNeg) = getBusinessTopicDiscussionRatings(discussion)
+    data['posRatings'] = numPos
+    data['negRatings'] = numNeg
+    data['creator'] = get_user_details(user)
+    return data;
+    
+    
+
+
+def get_discussions_data(discussions,user):
+    data = []
+    for d in discussions:
+        data.append(get_discussion_data(d, user))
+    return data
+
+def add_discussion_to_businesstopic(bt,review,user):
+    print("Adding review " + str(review) + " to business topic " + str(bt))
+    btd = BusinessTopicDiscussion.objects.create(bsuinesstopic=bt,content=review,user=user,reply_to=None)
+    return btd
+    
 
 def add_topic_to_bus(b,topic,user=get_default_user()):  
     print("Adding " + str(topic) + " to business " + str(b) )       
@@ -61,5 +89,6 @@ def add_topic(descr,parenttopics,icon,user=get_default_user()):
         t = Topic(descr=descr,creator=user,icon=icon)
         t.save()
     return t
+
 
 

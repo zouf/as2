@@ -7,7 +7,7 @@ from api.business_operations import add_business_server
 from api.models import Topic, Business, BusinessType, BusinessRating, \
     BusinessMeta, Type, BusinessTopicRating, BusinessTopic, UserTopic
 from api.photos import add_photo_by_url
-from api.topic_operations import add_topic_to_bus, add_topic
+from api.topic_operations import add_topic, add_topic_to_bus
 from as2 import settings
 from django.contrib.auth.models import User
 from gettext import lngettext
