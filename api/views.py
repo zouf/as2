@@ -34,7 +34,8 @@ import simplejson as json
 logger = logging.getLogger(__name__)
             
             
-MAX_MAP_RESULTS = 25
+MAX_MAP_RESULTS = 5
+MAX_SEARCH_LIMIT = 1000
 def get_default_user():
     try:
         user = User.objects.get(username='matt')
@@ -318,18 +319,26 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
     if searchText == '':
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
         print(str(pnt))
-        businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
+        businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')[low:high]
     else:
         #print('searching ' + str(lat) + ' long ' + str(lng))
         qset = []
         if polygon_search_bound:
             print('searching with map')
             print(polygon_search_bound)
-            with_text = Business.search.query(searchText)
+            results = Business.search.query(searchText)
             geom_within = []
-            for b in with_text:
-                if b.geom.within(polygon_search_bound):
-                    geom_within.append(b)
+            if results.count() < MAX_SEARCH_LIMIT:
+                limit = results.count()
+            else:
+                limit = MAX_SEARCH_LIMIT
+                logger.error("received " + str(results.count()) + " search results for " + str(searchText))
+            logger.debug("Limit for search " + str(searchText) + " is " + str(limit))
+            for result in results[0:limit]:
+                if result.geom.within(polygon_search_bound):
+                    geom_within.append(result)
+    
+
             print(geom_within)
             qset = geom_within 
         else:
@@ -397,7 +406,7 @@ def get_businesses_map(request):
     
     #perform search
     if searchText != '' or searchTypes != []:  
-        businesses = search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,polygon_search_bound=poly)
+        businesses = search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low=0,high=MAX_MAP_RESULTS,polygon_search_bound=poly)
     else:
         print(poly)
         businesses = Business.objects.filter(geom__within=poly)[0:MAX_MAP_RESULTS]
