@@ -186,17 +186,127 @@ def query_businesses(request,oid):
     data = perform_query_from_obj(user,user.current_location,q)
     return server_data(data,"business") #server_data(top_businesses)
    
-def search_businesses(request):
+   
+#rolled into get_businesses funcitonality for simplicity
+#def search_businesses(request):
+#    try:
+#        user = auth.authenticate_api_request(request)
+#        auth.authorize_user(user, request, "get")
+#    except:
+#        return server_error('Failure to authenticate')  
+#    searchText = get_request_post_or_warn('searchText', request)  
+#    searchLocation = get_request_post_or_warn('searchLocation', request)
+#    distanceWeight = get_request_post_or_warn('dw', request)
+#    searchTypes = get_request_postlist_or_warn('selectedTypes', request)
+#
+#    if searchLocation != '':
+#        g =  g = geocoders.Google()
+#        try:
+#            _, (lat, lng) = g.geocode(searchLocation)  
+#        except:
+#            logger.error('Someone searched for something that was not found: ' + str(searchLocation))
+#            pass
+#        (lat,lng) = user.current_location
+#            
+#    else:
+#        (lat,lng) = user.current_location
+#        
+#          
+#    low = get_request_get_or_error('bus_low', request)
+#    high = get_request_get_or_error('bus_high', request)
+#   
+#    searchQuery = "Search Term: "+str(searchText)+"\nLocation: "+str(searchLocation)+" \nWeight: "+str(distanceWeight)+"\nSearch Types: "+str(searchTypes)+"\nLat Lng = ("+str(lat)+","+str(lng)+")" 
+#    print('between ' + str(low) + ' and ' + str(high))
+#    logger.debug(searchQuery)
+#
+#    if distanceWeight != '':
+#        print(str(float(distanceWeight)))
+#        if float(distanceWeight) > 0.67:
+#            dist_limit = D(mi=0.5)
+#        elif float(distanceWeight) > 0.33:
+#            dist_limit = D(mi=2)
+#        else:
+#            dist_limit = D(mi=60)
+#    else:
+#        dist_limit = D(mi=2)
+#    
+#    businesses_filtered = []
+#    if searchText == '':
+#        pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
+#        print(str(pnt))
+#        businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
+#    else:
+#        #print('searching ' + str(lat) + ' long ' + str(lng))
+#        qset = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
+#        .filter(**{'@geodist__lt':dist_limit.m*1.0})\
+#        .query(searchText).order_by('-@geodist')[low:high]
+#        
+#        businesses_filtered = []
+#        for b in qset:
+#            searchWeight = b._sphinx['weight']
+#            #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
+#            businesses_filtered.append(b)
+#            print(str(b))
+#        #for some reason, the qset is reversed when it's returned. The largest distances are in the front
+#        # Reverse here
+#        businesses_filtered.reverse()
+#
+#    if searchTypes != []:
+#        logger.debug("Potentially filtering businesses by type")
+#        print("Filter businesses by type")
+#        unique_types = dict()
+#        #quickly turn the array into a hash map for faster lookup
+#        for tid in searchTypes:
+#            print(tid)
+#            unique_types[tid] =True
+#            
+#        businesses_matching_type = []
+#        for b in businesses_filtered:     
+#            btypes = b.businesstype_set.all()
+#            for bt in btypes:
+#                #if this business has a type that is part of unique_types
+#                if bt.bustype.id in unique_types:
+#                    businesses_matching_type.append(b)
+#            #print("Filtering businesses!")
+#        #now reassign new list
+#        businesses_filtered = businesses_matching_type
+#    
+#    print('Search result is ' + str(businesses_filtered))
+#    logger.debug("Search result is " + str(businesses_filtered))
+#    print('Performing serialization...')
+#    serialized_businesses = get_bus_data_ios(businesses_filtered, user,detail=False)
+#    print('Serialization complete...')
+#    
+#    return server_data(serialized_businesses,"business")
+#
+# 
+
+ 
+ 
+def get_businesses_map(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-    except:
-        return server_error('Failure to authenticate')  
-    searchText = get_request_post_or_warn('searchText', request)  
-    searchLocation = get_request_post_or_warn('searchLocation', request)
-    distanceWeight = get_request_post_or_warn('dw', request)
-    searchTypes = get_request_postlist_or_warn('selectedTypes', request)
+    except Exception as e:
+        return server_error(str(e))
+    
+    
 
+      
+    minx = float(get_request_get_or_error('min_y', request))
+    miny = float(get_request_get_or_error('min_x', request))
+    maxx =float( get_request_get_or_error('max_y', request))
+    maxy = float(get_request_get_or_error('max_x', request))
+
+    poly = Polygon( ((minx, miny), (minx, maxy), (maxx, maxy), (maxx, miny), (minx, miny)) )    
+    #(lat, lng) = user.current_location
+    #pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
+    businesses = Business.objects.filter(geom__within=poly)[0:MAP_MAX_RESULTS]
+    top_businesses = get_bus_data_ios(businesses ,user,detail=False)
+    print('Serialization complete...')
+    return server_data(top_businesses,"business") 
+
+def search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low,high):
     if searchLocation != '':
         g =  g = geocoders.Google()
         try:
@@ -209,14 +319,11 @@ def search_businesses(request):
     else:
         (lat,lng) = user.current_location
         
-          
-    low = get_request_get_or_error('bus_low', request)
-    high = get_request_get_or_error('bus_high', request)
-   
+        
     searchQuery = "Search Term: "+str(searchText)+"\nLocation: "+str(searchLocation)+" \nWeight: "+str(distanceWeight)+"\nSearch Types: "+str(searchTypes)+"\nLat Lng = ("+str(lat)+","+str(lng)+")" 
     print('between ' + str(low) + ' and ' + str(high))
     logger.debug(searchQuery)
-
+    
     if distanceWeight != '':
         print(str(float(distanceWeight)))
         if float(distanceWeight) > 0.67:
@@ -248,7 +355,7 @@ def search_businesses(request):
         #for some reason, the qset is reversed when it's returned. The largest distances are in the front
         # Reverse here
         businesses_filtered.reverse()
-
+    
     if searchTypes != []:
         logger.debug("Potentially filtering businesses by type")
         print("Filter businesses by type")
@@ -269,59 +376,36 @@ def search_businesses(request):
         #now reassign new list
         businesses_filtered = businesses_matching_type
     
-    print('Search result is ' + str(businesses_filtered))
-    logger.debug("Search result is " + str(businesses_filtered))
-    print('Performing serialization...')
-    serialized_businesses = get_bus_data_ios(businesses_filtered, user,detail=False)
-    print('Serialization complete...')
-    
-    return server_data(serialized_businesses,"business")
+    businesses = businesses_filtered
+    print('Search result is ' + str(businesses))
 
- 
-
- 
- 
-def get_businesses_map(request):
-    try:
-        user = auth.authenticate_api_request(request)
-        auth.authorize_user(user, request, "get")
-    except Exception as e:
-        return server_error(str(e))
-    
-    
-
-      
-    minx = float(get_request_get_or_error('min_y', request))
-    miny = float(get_request_get_or_error('min_x', request))
-    maxx =float( get_request_get_or_error('max_y', request))
-    maxy = float(get_request_get_or_error('max_x', request))
-
-    poly = Polygon( ((minx, miny), (minx, maxy), (maxx, maxy), (maxx, miny), (minx, miny)) )    
-    #(lat, lng) = user.current_location
-    #pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-    businesses = Business.objects.filter(geom__within=poly)[0:MAP_MAX_RESULTS]
-    top_businesses = get_bus_data_ios(businesses ,user,detail=False)
-    print('Serialization complete...')
-    return server_data(top_businesses,"business") 
 def get_businesses(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
     except Exception as e:
-        return server_error(str(e))
-    
-    
-
-      
+        return server_error(str(e))  
     low = get_request_get_or_error('bus_low', request)
     high = get_request_get_or_error('bus_high', request)
    
-    (lat, lng) = user.current_location
-    pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-    businesses = Business.objects.distance(pnt).order_by('distance')[low:high]
-    top_businesses = get_bus_data_ios(businesses ,user,detail=False)
+    searchText = get_request_post_or_warn('searchText', request)  
+    searchLocation = get_request_post_or_warn('searchLocation', request)
+    distanceWeight = get_request_post_or_warn('dw', request)
+    searchTypes = get_request_postlist_or_warn('selectedTypes', request)
+    businesses = []
+    
+    #perform search
+    if searchText != '' or searchTypes != []:     
+        businesses = search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low,high)
+    else:  # DEFAULT FRONT PAGE (i.e. no search params)
+        (lat, lng) = user.current_location
+        pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
+        businesses = Business.objects.distance(pnt).order_by('distance')[low:high]
+        
+    print('Performing serialization...')
+    serialized = get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
-    return server_data(top_businesses,"business")
+    return server_data(serialized,"business")
 
 
 '''
