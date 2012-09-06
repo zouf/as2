@@ -351,9 +351,6 @@ class AllsortzUser(models.Model):
     
     registered = models.BooleanField()
   
-    ''' Default user location '''  
-    default_location = models.PointField()
-    
     class Admin:
         pass
     def __unicode__(self):
