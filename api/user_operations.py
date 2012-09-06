@@ -35,3 +35,4 @@ def register_allsortz_user(user,uname,password,email):
         asuser.registered = True
         
     return view.server_data(serial.get_user_details(user))
+

@@ -350,6 +350,9 @@ class AllsortzUser(models.Model):
     device = models.ForeignKey(Device)
     
     registered = models.BooleanField()
+  
+    ''' Default user location '''  
+    default_location = models.PointField()
     
     class Admin:
         pass

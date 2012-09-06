@@ -34,7 +34,7 @@ import simplejson as json
 logger = logging.getLogger(__name__)
             
             
-MAX_MAP_RESULTS = 5
+MAX_MAP_RESULTS = 50
 MAX_SEARCH_LIMIT = 1000
 def get_default_user():
     try:
