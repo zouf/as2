@@ -16,11 +16,18 @@ Created on Jul 27, 2012
 DEFAULT_IMAGE = 'https://s3.amazonaws.com/allsortz/icon.png'
 
 #CODE NEEDS TO BE REFACTORED
-def get_photo_url(b):
+def get_photo_url_medium(b):
     qset  = Photo.objects.filter(business=b)
     if qset.count() < 1:
         return DEFAULT_IMAGE
     ph = qset[0].image_medium
+    return ph.url
+
+def get_photo_url_large(b):
+    qset  = Photo.objects.filter(business=b)
+    if qset.count() < 1:
+        return DEFAULT_IMAGE
+    ph = qset[0].image
     return ph.url
 
 def get_photo_id(b):

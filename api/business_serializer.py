@@ -5,11 +5,12 @@ Created on Jul 19, 2012
 '''
 #from photos.models import BusinessPhoto
 from api.json_serializer import get_bustypes_data, get_bustopics_data, \
-    get_health_info
+    get_health_info, get_types_data
 from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
-    BusinessCache
-from api.photos import get_photo_url, get_photo_id
-from api.ratings import getBusinessRatings
+    BusinessCache, Type
+from api.photos import get_photo_id, get_photo_url_medium, get_photo_url_large
+from api.ratings import getBusinessRatings, getBusAverageRating
+from api.views import get_types
 from decimal import getcontext, Decimal
 from recommendation.recengine import get_best_current_recommendation, \
     get_recommendation_by_topic
@@ -105,7 +106,10 @@ def get_single_bus_data_ios(b, user,detail):
             BusinessCache.objects.filter(business=b).delete()      
         BusinessCache.objects.create(business=b,cachedata=json.dumps(d))
         pass
-    d['photoURL'] = get_photo_url(b)
+    if detail:
+        d['photoURL'] = get_photo_url_medium(b)
+    else:
+        d['photoURL'] = get_photo_url_large(b)
     userRatingSet = BusinessRating.objects.filter(user=user, business=b)
     if user and userRatingSet.count() > 0:
         #the user exists and has rated something
@@ -114,22 +118,21 @@ def get_single_bus_data_ios(b, user,detail):
         
     else: 
         #the user hasn't rated it!
-        print('get rec') 
         d['ratingForCurrentUser'] = 0
         d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
         
 
-        
+    # if the business has this attribute et (from some other calculation) then use it
     if hasattr(b, 'distance'):
         d['distanceFromCurrentUser'] = "%.2f" % b.distance.mi
     else:
+        #calculate it
         dist = b.get_distance(user)
         if dist is not None:
             d['distanceFromCurrentUser'] =  "%.2f" % dist.miles
         else:
             d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
     if detail:
-        print('detail is true!')
         d['businessCity'] = b.city
         d['businessState'] = b.state
         d['streetAddr'] = b.address
@@ -143,13 +146,10 @@ def get_single_bus_data_ios(b, user,detail):
 
         d['photo'] = get_photo_id(b)
         
-        [hates,neutrals,likes,loves,avg] = getBusinessRatings(b)
-        d['ratingOverAllUsers']  = avg
-        d['numberOfRatings'] = hates+neutrals+likes+loves
-        d['numberOfLoves'] = loves
-        d['numberOfLikes'] =likes
-        d['numberOfNeutrals'] = neutrals
-        d['numberOfHates'] = hates   
+        #[hates,neutrals,likes,loves,avg] = getBusinessRatings(b)
+        d['ratingOverAllUsers']  = getBusAverageRating(b)
+
+        d['allTypes'] = get_types_data(Type.objects.all())
         bustags = BusinessTopic.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
         d['categories'] = get_bustopics_data(bustags,user,detail)
         d['health_info'] = get_health_info(b)

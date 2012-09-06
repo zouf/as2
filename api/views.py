@@ -32,6 +32,8 @@ import simplejson as json
 
 logger = logging.getLogger(__name__)
             
+            
+MAP_MAX_RESULTS = 25
 def get_default_user():
     try:
         user = User.objects.get(username='matt')
@@ -207,9 +209,13 @@ def search_businesses(request):
     else:
         (lat,lng) = user.current_location
         
+          
+    low = get_request_get_or_error('bus_low', request)
+    high = get_request_get_or_error('bus_high', request)
+   
     searchQuery = "Search Term: "+str(searchText)+"\nLocation: "+str(searchLocation)+" \nWeight: "+str(distanceWeight)+"\nSearch Types: "+str(searchTypes)+"\nLat Lng = ("+str(lat)+","+str(lng)+")" 
+    print('between ' + str(low) + ' and ' + str(high))
     logger.debug(searchQuery)
-    print(searchQuery)
 
     if distanceWeight != '':
         print(str(float(distanceWeight)))
@@ -222,7 +228,6 @@ def search_businesses(request):
     else:
         dist_limit = D(mi=2)
     
-    print('DIST LIMIT IS ' + str(dist_limit.m))
     businesses_filtered = []
     if searchText == '':
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
@@ -232,7 +237,7 @@ def search_businesses(request):
         #print('searching ' + str(lat) + ' long ' + str(lng))
         qset = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
         .filter(**{'@geodist__lt':dist_limit.m*1.0})\
-        .query(searchText).order_by('-@geodist')[0:10]
+        .query(searchText).order_by('-@geodist')[low:high]
         
         businesses_filtered = []
         for b in qset:
@@ -294,7 +299,7 @@ def get_businesses_map(request):
     poly = Polygon( ((minx, miny), (minx, maxy), (maxx, maxy), (maxx, miny), (minx, miny)) )    
     #(lat, lng) = user.current_location
     #pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-    businesses = Business.objects.filter(geom__within=poly)[0:10]
+    businesses = Business.objects.filter(geom__within=poly)[0:MAP_MAX_RESULTS]
     top_businesses = get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
     return server_data(top_businesses,"business") 
