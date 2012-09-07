@@ -37,7 +37,7 @@ import simplejson as json
 logger = logging.getLogger(__name__)
             
             
-MAX_MAP_RESULTS = 20
+MAX_MAP_RESULTS = 25
 MAX_SEARCH_LIMIT = 1000
 def get_default_user():
     try:
@@ -320,11 +320,13 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
     
     businesses_filtered = []
     if searchText == '':
+	print('no search text')
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
         print(str(pnt))
-        businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')[low:high]
+        businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
     else:
-        #print('searching ' + str(lat) + ' long ' + str(lng))
+        print('searching with text' + str(searchText))
+	#print('searching ' + str(lat) + ' long ' + str(lng))
         qset = []
         if polygon_search_bound:
             print('searching with map')
@@ -344,9 +346,16 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         else:
             print('searching without map')
             print('between ' + str(low) + ' and ' + str(high))
-            qset = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
+            results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
             .filter(**{'@geodist__lt':dist_limit.m*1.0})\
-            .query(searchText).order_by('-@geodist')[low:high]
+            .query(searchText).order_by('-@geodist')
+            if results.count() < MAX_SEARCH_LIMIT:
+                limit = results.count()
+            else:
+                limit = MAX_SEARCH_LIMIT 
+	    qset = []
+	    for result in results[0:limit]:
+		qset.append(result)
         
         businesses_filtered = []
         for b in qset:
@@ -356,6 +365,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             print(str(b))
         #for some reason, the sphinx query set is reversed when it's returned. The largest distances are in the front
         # Reverse here
+	print(len(businesses_filtered))
         businesses_filtered.reverse()
         businesses_filtered = businesses_filtered[low:high]
     
