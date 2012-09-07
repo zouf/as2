@@ -340,9 +340,6 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             for result in results[0:limit]:
                 if result.geom.within(polygon_search_bound):
                     geom_within.append(result)
-    
-
-            print(geom_within)
             qset = geom_within 
         else:
             print('searching without map')
@@ -357,9 +354,10 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
             businesses_filtered.append(Business.objects.get(id=b.id))
             print(str(b))
-        #for some reason, the qset is reversed when it's returned. The largest distances are in the front
+        #for some reason, the sphinx query set is reversed when it's returned. The largest distances are in the front
         # Reverse here
         businesses_filtered.reverse()
+        businesses_filtered = businesses_filtered[low:high]
     
     if searchTypes != []:
         logger.debug("Potentially filtering businesses by type")
