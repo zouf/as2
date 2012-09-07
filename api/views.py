@@ -37,7 +37,7 @@ import simplejson as json
 logger = logging.getLogger(__name__)
             
             
-MAX_MAP_RESULTS = 50
+MAX_MAP_RESULTS = 20
 MAX_SEARCH_LIMIT = 1000
 def get_default_user():
     try:
@@ -355,7 +355,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         for b in qset:
             searchWeight = b._sphinx['weight']
             #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
-            businesses_filtered.append(b)
+            businesses_filtered.append(Business.objects.get(id=b.id))
             print(str(b))
         #for some reason, the qset is reversed when it's returned. The largest distances are in the front
         # Reverse here

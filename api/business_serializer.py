@@ -88,6 +88,8 @@ def get_all_nearby(mylat,mylng,distance=1):
 
 #isSideBar is true if we're using small images
 def get_single_bus_data_ios(b, user,detail):
+    
+    
     try:
         bstring = BusinessCache.objects.get(business=b).cachedata
         d = json.loads(bstring)
