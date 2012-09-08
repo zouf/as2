@@ -3,7 +3,7 @@
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 import os.path
 import socket
-DEBUG = False #True
+DEBUG = True
 
 SPHINX_API_VERSION = 0x116
 SPHINX_SERVER='db.allsortz.com'
