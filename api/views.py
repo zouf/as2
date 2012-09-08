@@ -293,15 +293,18 @@ def query_businesses(request,oid):
 
 def search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low=0,high=0,polygon_search_bound=None):
     if searchLocation != '':
+        logger.debug('Search location not nil ')
         g =  g = geocoders.Google()
         try:
             _, (lat, lng) = g.geocode(searchLocation)  
-        except:
+            print('geocoded location to ' + str(lat,lng))
+        except Exception as e:
             logger.error('Someone searched for something that was not found: ' + str(searchLocation))
             pass
         (lat,lng) = user.current_location
             
     else:
+        logger.debug(' location was nil')
         (lat,lng) = user.current_location
         
         
@@ -310,15 +313,16 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
     logger.debug(searchQuery)
     
     if distanceWeight != '':
-        print(str(float(distanceWeight)))
         if float(distanceWeight) > 0.67:
-            dist_limit = D(mi=0.5)
+            dist_limit = D(mi=20)
         elif float(distanceWeight) > 0.33:
-            dist_limit = D(mi=2)
+            dist_limit = D(mi=60)
         else:
             dist_limit = D(mi=60)
     else:
         dist_limit = D(mi=2)
+        
+        
     
     businesses_filtered = []
     if searchText == '':
@@ -342,7 +346,6 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             logger.debug("Limit for search " + str(searchText) + " is " + str(limit))
             for result in results[0:limit]:
                 if result.geom.within(polygon_search_bound):
-                    logger.debug("within")
                     geom_within.append(result)
             qset = geom_within 
         else:
@@ -364,10 +367,8 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             searchWeight = b._sphinx['weight']
             #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
             businesses_filtered.append(Business.objects.get(id=b.id))
-            print(str(b))
         #for some reason, the sphinx query set is reversed when it's returned. The largest distances are in the front
         # Reverse here
-        print(len(businesses_filtered))
         businesses_filtered.reverse()
         businesses_filtered = businesses_filtered[low:high]
     
@@ -421,7 +422,6 @@ def get_businesses_map(request):
     if searchText != '' or searchTypes != []:  
         businesses = search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low=0,high=MAX_MAP_RESULTS,polygon_search_bound=poly)
     else:
-        print(poly)
         businesses = Business.objects.filter(geom__within=poly)[0:MAX_MAP_RESULTS]
     top_businesses = get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
