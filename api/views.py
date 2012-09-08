@@ -148,8 +148,10 @@ def edit_business(request,oid):
         state = get_request_post_or_warn('businessState', request)
         phone =  get_request_post_or_warn('businessPhone', request)
         url =  get_request_post_or_warn('businessURL', request)
+        hours =  get_request_post_or_warn('businessHours', request)
+
         types = get_request_postlist_or_warn('selectedTypes',request)
-        bus = edit_business_server(bus=bus,name=name,addr=addr,city=city,state=state,phone=phone,url=url,types=types)
+        bus = edit_business_server(bus=bus,name=name,addr=addr,city=city,state=state,phone=phone,url=url,types=types,hours=hours)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -340,6 +342,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             logger.debug("Limit for search " + str(searchText) + " is " + str(limit))
             for result in results[0:limit]:
                 if result.geom.within(polygon_search_bound):
+                    logger.debug("within")
                     geom_within.append(result)
             qset = geom_within 
         else:

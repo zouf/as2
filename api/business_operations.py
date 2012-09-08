@@ -32,7 +32,7 @@ def associate_business_with_types(bus,types):
         associate_business_type(bus, t)  
 
 
-def edit_business_server(bus,name,addr,city,state,phone,url,types):
+def edit_business_server(bus,name,addr,city,state,phone,url,types,hours):
     print("Editing business!\n")
     print(name)
     print(addr)
@@ -41,6 +41,7 @@ def edit_business_server(bus,name,addr,city,state,phone,url,types):
     print(phone)
     print(url)
     print(types)
+    print(hours)
     if name != '':
         bus.name = name
     if addr != '':
@@ -54,6 +55,13 @@ def edit_business_server(bus,name,addr,city,state,phone,url,types):
     if bus.url != '':
         bus.url = url
         
+        
+    bm  = BusinessMeta.objects.get(business=bus)
+    if hours != '':
+        bm.hours = hours
+    bm.save()
+    
+    
     if types != '': 
         associate_business_with_types(bus,types)   
         
