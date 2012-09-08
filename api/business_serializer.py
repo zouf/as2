@@ -88,8 +88,6 @@ def get_all_nearby(mylat,mylng,distance=1):
 
 #isSideBar is true if we're using small images
 def get_single_bus_data_ios(b, user,detail):
-    
-    
     try:
         bstring = BusinessCache.objects.get(business=b).cachedata
         d = json.loads(bstring)
@@ -122,22 +120,22 @@ def get_single_bus_data_ios(b, user,detail):
     if user and userRatingSet.count() > 0:
         #the user exists and has rated something
         d['ratingForCurrentUser'] = userRatingSet[0].rating
-        d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
+        d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)
         
     else: 
         #the user hasn't rated it!
         d['ratingForCurrentUser'] = 0
-        d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
+        d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)
         
 
     # if the business has this attribute et (from some other calculation) then use it
     if hasattr(b, 'distance'):
-        d['distanceFromCurrentUser'] = "%.2f" % b.distance.mi
+        d['distanceFromCurrentUser'] = "%.2f" % .5 #b.distance.mi
     else:
         #calculate it
         dist = b.get_distance(user)
         if dist is not None:
-            d['distanceFromCurrentUser'] =  "%.2f" % dist.miles
+            d['distanceFromCurrentUser'] =  "%.2f" % .5 #dist.miles
         else:
             d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
     if detail:
