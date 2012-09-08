@@ -342,7 +342,6 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             logger.debug("Limit for search " + str(searchText) + " is " + str(limit))
             for result in results[0:limit]:
                 if result.geom.within(polygon_search_bound):
-                    logger.debug("within")
                     geom_within.append(result)
             qset = geom_within 
         else:
@@ -364,7 +363,6 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             searchWeight = b._sphinx['weight']
             #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
             businesses_filtered.append(Business.objects.get(id=b.id))
-            print(str(b))
         #for some reason, the sphinx query set is reversed when it's returned. The largest distances are in the front
         # Reverse here
         print(len(businesses_filtered))
@@ -373,11 +371,9 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
     
     if searchTypes != []:
         logger.debug("Potentially filtering businesses by type")
-        print("Filter businesses by type")
         unique_types = dict()
         #quickly turn the array into a hash map for faster lookup
         for tid in searchTypes:
-            print(tid)
             unique_types[tid] =True
             
         businesses_matching_type = []
