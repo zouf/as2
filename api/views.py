@@ -296,10 +296,10 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         logger.debug('Search location not nil ')
         g = geocoders.Google()
         try:
-            _, (lat, lng) = g.geocode(searchLocation)  
-            print('geocoded location to ' + str(lat,lng))
-        except:
-            logger.error('Someone searched for something that was not geocoded properly: ' + str(searchLocation))
+            _, (lat, lng) = g.geocode(str(searchLocation))  
+            logger.debug('geocoded location to ' + str(lat,lng))
+        except Exception as e:
+            logger.error('Error in geocoding' + str(e))
          
     else:
         logger.debug(' location was nil')
