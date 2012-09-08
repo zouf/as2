@@ -374,11 +374,9 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
     
     if searchTypes != []:
         logger.debug("Potentially filtering businesses by type")
-        print("Filter businesses by type")
         unique_types = dict()
         #quickly turn the array into a hash map for faster lookup
         for tid in searchTypes:
-            print(tid)
             unique_types[tid] =True
             
         businesses_matching_type = []
