@@ -294,11 +294,12 @@ def query_businesses(request,oid):
 def search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low=0,high=0,polygon_search_bound=None):
     if searchLocation != '':
         logger.debug('Search location not nil ')
-        g =  g = geocoders.Google()
+        g = geocoders.Google()
         try:
             _, (lat, lng) = g.geocode(searchLocation)  
             print('geocoded location to ' + str(lat,lng))
         except Exception as e:
+            print(str(e))
             logger.error('Someone searched for something that was not found: ' + str(searchLocation))
             pass
         (lat,lng) = user.current_location
