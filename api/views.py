@@ -299,11 +299,9 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             _, (lat, lng) = g.geocode(searchLocation)  
             print('geocoded location to ' + str(lat,lng))
         except Exception as e:
-            print(str(e))
+            (lat,lng) = user.current_location
             logger.error('Someone searched for something that was not found: ' + str(searchLocation))
             pass
-        (lat,lng) = user.current_location
-            
     else:
         logger.debug(' location was nil')
         (lat,lng) = user.current_location
