@@ -37,7 +37,7 @@ import simplejson as json
 logger = logging.getLogger(__name__)
             
             
-MAX_MAP_RESULTS = 25
+MAX_MAP_RESULTS = 40
 MAX_SEARCH_LIMIT = 1000
 def get_default_user():
     try:
@@ -355,9 +355,9 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
                 limit = results.count()
             else:
                 limit = MAX_SEARCH_LIMIT 
-        qset = []
-        for result in results[0:limit]:
-            qset.append(result)
+            qset = []
+            for result in results[0:limit]:
+                qset.append(result)
         
         businesses_filtered = []
         for b in qset:
