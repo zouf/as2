@@ -258,13 +258,13 @@ def parseAddress(address):
         zipcode = ''
 
     if borough == "1":
-        borough = "Manhattan,";
+        borough = "Manhattan";
     elif borough == "2":
-        borough = "Bronx,";
+        borough = "Bronx";
     elif borough == "3":
-        borough = "Brooklyn,";
+        borough = "Brooklyn";
     elif borough == "4":
-        borough = "Queens,";
+        borough = "Queens";
     elif borough == "5":
         borough = "Staten Island"
 #    elif borough == "5":  # check to see if this is true

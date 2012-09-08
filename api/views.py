@@ -320,13 +320,12 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
     
     businesses_filtered = []
     if searchText == '':
-	print('no search text')
+        print('no search text')
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
         print(str(pnt))
         businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
     else:
         print('searching with text' + str(searchText))
-	#print('searching ' + str(lat) + ' long ' + str(lng))
         qset = []
         if polygon_search_bound:
             print('searching with map')
@@ -353,9 +352,9 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
                 limit = results.count()
             else:
                 limit = MAX_SEARCH_LIMIT 
-	    qset = []
-	    for result in results[0:limit]:
-		qset.append(result)
+        qset = []
+        for result in results[0:limit]:
+            qset.append(result)
         
         businesses_filtered = []
         for b in qset:
@@ -365,7 +364,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             print(str(b))
         #for some reason, the sphinx query set is reversed when it's returned. The largest distances are in the front
         # Reverse here
-	print(len(businesses_filtered))
+        print(len(businesses_filtered))
         businesses_filtered.reverse()
         businesses_filtered = businesses_filtered[low:high]
     
