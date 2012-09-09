@@ -115,7 +115,7 @@ class Business(models.Model):
 
 class BusinessCache(models.Model):
     business = models.ForeignKey(Business)
-    cachedata = models.CharField(max_length=10000)
+    cachedata = models.CharField(max_length=1000000)
     
     
 class HealthGrade(models.Model):
