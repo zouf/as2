@@ -70,7 +70,7 @@ BROKER_PASSWORD = "guest"
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_ACCESS_KEY_ID='AKIAJNT6HH4SMZYBZJKQ'
 AWS_SECRET_ACCESS_KEY='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'
-AWS_STORAGE_BUCKET_NAME='allsortz-deploy'
+AWS_STORAGE_BUCKET_NAME='allsortz-test'
 
 #AWS_CALLING_FORMAT=CallingFormat.SUBDOMAIN
 STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
@@ -228,6 +228,7 @@ MIDDLEWARE_CLASSES = (
     #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'api.middle_profile.ProfilerMiddleware',
 #    'privatebeta.middleware.PrivateBetaMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',

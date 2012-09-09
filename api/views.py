@@ -30,8 +30,9 @@ import api.photos as photos
 import api.prepop as prepop
 import logging
 import simplejson as json
+import cProfile
 
-
+import api.business_serializer as busserial
 
 
 logger = logging.getLogger(__name__)
@@ -422,7 +423,8 @@ def get_businesses_map(request):
     print('Serialization complete...')
     return server_data(top_businesses,"business") 
 
-def get_businesses(request):
+
+def get_businesses_internal(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
@@ -446,10 +448,15 @@ def get_businesses(request):
         businesses = Business.objects.distance(pnt).order_by('distance')[low:high]
         
     print('Performing serialization...')
-    serialized = get_bus_data_ios(businesses ,user,detail=False)
+    serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')
     return server_data(serialized,"business")
 
+
+def get_businesses(request):
+    return get_businesses_internal(request)
+
+ 
 
 '''
 PRAGMA Code to handle business bustopics

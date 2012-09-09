@@ -107,38 +107,7 @@ def get_single_bus_data_ios(b, user,detail):
 
         logger.debug('Creating cache for bus ' + str(b))
             
-
-        if BusinessCache.objects.filter(business=b).count() > 0:
-            BusinessCache.objects.filter(business=b).delete()      
-        BusinessCache.objects.create(business=b,cachedata=json.dumps(d))
-        pass
-    if detail:
-        d['photoURL'] = get_photo_url_medium(b)
-    else:
-        d['photoURL'] = get_photo_url_large(b)
-    userRatingSet = BusinessRating.objects.filter(user=user, business=b)
-    if user and userRatingSet.count() > 0:
-        #the user exists and has rated something
-        d['ratingForCurrentUser'] = userRatingSet[0].rating
-        d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)
-        
-    else: 
-        #the user hasn't rated it!
-        d['ratingForCurrentUser'] = 0
-        d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)
-        
-
-    # if the business has this attribute et (from some other calculation) then use it
-    if hasattr(b, 'distance'):
-        d['distanceFromCurrentUser'] = "%.2f" % .5 #b.distance.mi
-    else:
-        #calculate it
-        dist = b.get_distance(user)
-        if dist is not None:
-            d['distanceFromCurrentUser'] =  "%.2f" % .5 #dist.miles
-        else:
-            d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
-    if detail:
+            
         d['businessCity'] = b.city
         d['businessState'] = b.state
         d['streetAddr'] = b.address
@@ -159,4 +128,68 @@ def get_single_bus_data_ios(b, user,detail):
         bustags = BusinessTopic.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
         d['categories'] = get_bustopics_data(bustags,user,detail)
         d['health_info'] = get_health_info(b)
+        
+        d['photoMedURL'] = get_photo_url_medium(b)
+
+        d['photoLargeURL'] = get_photo_url_large(b)
+
+        if BusinessCache.objects.filter(business=b).count() > 0:
+            BusinessCache.objects.filter(business=b).delete()      
+        BusinessCache.objects.create(business=b,cachedata=json.dumps(d))
+        pass
+
+
+
+#REALLY SLOW!
+#    if detail:
+#        d['photoMedURL'] = get_photo_url_medium(b)
+#    else:
+#        d['photoLargeURL'] = get_photo_url_large(b)
+    userRatingSet = BusinessRating.objects.filter(user=user, business=b)
+    if user and userRatingSet.count() > 0:
+        #the user exists and has rated something
+        d['ratingForCurrentUser'] = userRatingSet[0].rating
+        d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)       
+    else: 
+        #the user hasn't rated it!
+        d['ratingForCurrentUser'] = 0
+        d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
+##### TODO REMOVE ABOVE BECAUSE SLOW ###E#        
+
+    # if the business has this attribute et (from some other calculation) then use it
+    if hasattr(b, 'distance'):
+        d['distanceFromCurrentUser'] = "%.2f" % b.distance.mi
+    else:
+        #calculate it
+        dist = b.get_distance(user)
+        #dist = None
+        if dist is not None:
+            d['distanceFromCurrentUser'] =  "%.2f" % dist.miles
+        else:
+            d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
+
+
+
+
+#    if detail:
+#        d['businessCity'] = b.city
+#        d['businessState'] = b.state
+#        d['streetAddr'] = b.address
+#        d['zipcode'] = b.zipcode
+#   
+#            
+#        d['businessPhone'] = b.phone
+#        d['servesAlcohol'] = b.serves_alcohol()  #TODO Set hours
+#        d['hasWiFi'] = b.has_wifi()  #TODO Set hours
+#        d['businessURL'] = b.url #TODO Set URL
+#
+#        d['photo'] = get_photo_id(b)
+#        
+#        #[hates,neutrals,likes,loves,avg] = getBusinessRatings(b)
+#        d['ratingOverAllUsers']  = getBusAverageRating(b)
+#
+#        d['allTypes'] = get_types_data(Type.objects.all(),user)
+#        bustags = BusinessTopic.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
+#        d['categories'] = get_bustopics_data(bustags,user,detail)
+#        d['health_info'] = get_health_info(b)
     return d
