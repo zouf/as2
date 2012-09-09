@@ -297,7 +297,6 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         g = geocoders.Google()
         try:
             _, (lat, lng) = g.geocode(str(searchLocation))  
-            logger.debug('geocoded location to ' + str(lat,lng))
         except Exception as e:
             logger.error('Error in geocoding' + str(e))
          
