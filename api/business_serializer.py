@@ -89,8 +89,7 @@ def get_all_nearby(mylat,mylng,distance=1):
 #isSideBar is true if we're using small images
 def get_single_bus_data_ios(b, user,detail):
     try:
-        bstring = BusinessCache.objects.get(business=b).cachedata
-        d = json.loads(bstring)
+        d = json.loads(b.businesscache_set.all()[0].cachedata)
     except Exception as e:
         d = dict()
         d['businessID'] = b.id
@@ -140,21 +139,17 @@ def get_single_bus_data_ios(b, user,detail):
 
 
 
-#REALLY SLOW!
-#    if detail:
-#        d['photoMedURL'] = get_photo_url_medium(b)
-#    else:
-#        d['photoLargeURL'] = get_photo_url_large(b)
     userRatingSet = BusinessRating.objects.filter(user=user, business=b)
     if user and userRatingSet.count() > 0:
         #the user exists and has rated something
         d['ratingForCurrentUser'] = userRatingSet[0].rating
-        d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)       
+        d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)       
     else: 
         #the user hasn't rated it!
         d['ratingForCurrentUser'] = 0
-        d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
-##### TODO REMOVE ABOVE BECAUSE SLOW ###E#        
+        d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)
+
+
 
     # if the business has this attribute et (from some other calculation) then use it
     if hasattr(b, 'distance'):
