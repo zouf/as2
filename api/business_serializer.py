@@ -124,8 +124,10 @@ def get_single_bus_data_ios(b, user,detail):
         d['ratingOverAllUsers']  = getBusAverageRating(b)
 
         d['allTypes'] = get_types_data(Type.objects.all(),user)
-        bustags = BusinessTopic.objects.select_related('topic').filter(business=b)   #.exclude(tag=get_master_summary_tag())
-        d['categories'] = get_bustopics_data(bustags,user,detail=True)
+        #bustags = BusinessTopic.objects.select_related('topic').filter(business=b)   #.exclude(tag=get_master_summary_tag())
+        
+        btset = b.businesstopic_set.prefetch.all()
+        d['categories'] = get_bustopics_data(btset,user,detail=True)
         d['health_info'] = get_health_info(b)
         
         d['photoMedURL'] = get_photo_url_medium(b)
