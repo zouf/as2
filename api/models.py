@@ -114,13 +114,13 @@ class Business(models.Model):
 
 
 class BusinessCache(models.Model):
-    business = models.ForeignKey(Business)
+    business = models.ForeignKey(Business,db_index=True)
     cachedata = models.CharField(max_length=1000000)
     
     
 class HealthGrade(models.Model):
 
-    business = models.ForeignKey(Business)
+    business = models.ForeignKey(Business,db_index=True)
     
 class BusinessMeta(models.Model):
     average_price = models.IntegerField()
@@ -131,13 +131,13 @@ class BusinessMeta(models.Model):
     health_violation_text = models.TextField()
     health_letter_code = models.CharField(max_length=10)
     inspdate=models.DateField()
-    business = models.ForeignKey(Business)
+    business = models.ForeignKey(Business,db_index=True)
 
 
 ''' A photo. To be associated with a business or a user '''
 class  Photo(models.Model):
-    user = models.ForeignKey(User) 
-    business = models.ForeignKey(Business)   
+    user = models.ForeignKey(User,db_index=True) 
+    business = models.ForeignKey(Business,db_index=True)   
     is_default = models.BooleanField()
 
     def image_upload_to_profile(self, filename):
@@ -216,7 +216,7 @@ class  Photo(models.Model):
 ''' A topic. An attribute of a business as well as
 annotate a user's interests ''' 
 class Topic(models.Model):
-    creator = models.ForeignKey(User)
+    creator = models.ForeignKey(User,db_index=True)
     search = SphinxSearch()
     date = models.DateTimeField(auto_now=True)
     descr = models.TextField(max_length=100)
@@ -227,8 +227,8 @@ class Topic(models.Model):
         return self.descr
     
 class Edge(models.Model):
-    from_node= models.ForeignKey(Topic,related_name="children")
-    to_node = models.ForeignKey(Topic,related_name="parents")
+    from_node= models.ForeignKey(Topic,related_name="children",db_index=True)
+    to_node = models.ForeignKey(Topic,related_name="parents",db_index=True)
     
     def __unicode__(self):
         return 'Edge from ' + str(self.from_node.descr) + ' to ' + str(self.to_node.descr)
@@ -253,7 +253,7 @@ class Type(models.Model):
 ''' It's a topic / way to categorize businesses as well as
 annotate a user's interests ''' 
 class BusinessType(models.Model):
-    business = models.ForeignKey(Business)
+    business = models.ForeignKey(Business,db_index=True)
     bustype = models.ForeignKey(Type)
     def __unicode__(self):
         return str(self.business) + ": " + str(self.bustype)
@@ -263,7 +263,7 @@ class BusinessType(models.Model):
 ''' A relationship between business and topic 
 These are the business' sorts '''
 class BusinessTopic(models.Model):
-    business = models.ForeignKey(Business)
+    business = models.ForeignKey(Business,db_index=True)
     topic = models.ForeignKey(Topic)
     def __unicode__(self):
         return str(self.business) + ": " + str(self.topic)
@@ -271,14 +271,14 @@ class BusinessTopic(models.Model):
     
 ''' A user's subscription to a particular  topic '''
 class UserTopic(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User,db_index=True)
     topic = models.ForeignKey(Topic)
     importance = models.FloatField()
 
 
 ''' A user's favorite business '''
 class UserFavorite(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User,db_index=True)
     business = models.ForeignKey(Business)
 
 #Describes a device that a user owns. Right now, the only type of device shouldbe iphones
@@ -317,7 +317,7 @@ class Device(models.Model):
     os = models.IntegerField(choices=OS_TYPES)
     model = models.IntegerField(choices=MODEL_TYPES)
     manufacturer =  models.IntegerField(choices=MANUFACTURER_TYPES)
-    deviceID = models.CharField(max_length=100)
+    deviceID = models.CharField(max_length=100,db_index=True)
     def get_os_name(self):
         return OS_TYPES[self.os][1] 
     
@@ -341,13 +341,13 @@ class AllsortzUser(models.Model):
     distance_threshold = models.IntegerField()
     
     '''Map to Django user'''
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User,db_index=True)
 
     ''' Use metric of standard '''
     metric = models.BooleanField(default=False)
     
     '''Device (if owned) '''
-    device = models.ForeignKey(Device)
+    device = models.ForeignKey(Device,db_index=True)
     
     registered = models.BooleanField()
   
@@ -474,7 +474,7 @@ class ASUserCompletedAction(models.Model):
 ''' types of discussions '''
 #discussion-related items
 class Discussion(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User,db_index=True)
     date = models.DateTimeField(auto_now=True)
     reply_to = models.ForeignKey('self', related_name='replies', 
         null=True, blank=True)
@@ -483,7 +483,7 @@ class Discussion(models.Model):
         pass
     
 class BusinessTopicDiscussion(Discussion):
-    businesstopic = models.ForeignKey(BusinessTopic)
+    businesstopic = models.ForeignKey(BusinessTopic,db_index=True)
     class Admin:
         pass
     def __unicode__(self):
@@ -491,12 +491,12 @@ class BusinessTopicDiscussion(Discussion):
     
     
 class BusinessDiscussion(Discussion):
-    business = models.ForeignKey(Business)
+    business = models.ForeignKey(Business,db_index=True)
     class Admin:
         pass
     
 class PhotoDiscussion(Discussion):
-    photo = models.ForeignKey(Photo)
+    photo = models.ForeignKey(Photo,db_index=True)
     class Admin:
         pass
     
@@ -505,18 +505,18 @@ class PhotoDiscussion(Discussion):
 
 '''   Types of ratings  '''
 class Rating(models.Model):
-    user = models.ForeignKey(User)
-    rating = models.FloatField()
+    user = models.ForeignKey(User,db_index=True)
+    rating = models.FloatField(db_index=True)
     class Admin:
         pass
     
 class DiscussionRating(Rating):
-    discussion = models.ForeignKey(Discussion)
+    discussion = models.ForeignKey(Discussion,db_index=True)
     class Admin:
         pass
     
 class PhotoRating(Rating):
-    photo = models.ForeignKey(Photo)
+    photo = models.ForeignKey(Photo,db_index=True)
     class Admin:
         pass
     def __unicode__(self):
@@ -526,7 +526,7 @@ class PhotoRating(Rating):
     
     
 class BusinessTopicRating(Rating):
-    businesstopic = models.ForeignKey(BusinessTopic)
+    businesstopic = models.ForeignKey(BusinessTopic,db_index=True)
     class Admin:
         pass
     def __unicode__(self):
@@ -534,14 +534,14 @@ class BusinessTopicRating(Rating):
     
     
 class BusinessTopicDiscussionRating(Rating):
-    busTopicDiscussion = models.ForeignKey(BusinessTopicDiscussion)
+    busTopicDiscussion = models.ForeignKey(BusinessTopicDiscussion,db_index=True)
     class Admin:
         pass
     def __unicode__(self):
         return str(self.rating) + " : " + str(self.busTopicDiscussion) + " - " + str(self.user) 
     
 class BusinessRating(Rating):
-    business = models.ForeignKey(Business)
+    business = models.ForeignKey(Business,db_index=True)
     class Admin:
         pass
     def __unicode__(self):

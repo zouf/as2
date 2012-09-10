@@ -11,7 +11,6 @@ SPHINX_SERVER='db.allsortz.com'
 
 
 
-
 TEMPLATE_DEBUG = DEBUG
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))+'/..'
 
@@ -177,6 +176,7 @@ MEDIA_URL = ''
 #dont use AWS for debug
 
 STATIC_ROOT = BASE_DIR+'/static/'
+FIXTURE_DIRS = BASE_DIR='/fixtures/'
 
 
 LOG_BASE = '/var/log/django/'
