@@ -88,57 +88,42 @@ def get_all_nearby(mylat,mylng,distance=1):
 
 #isSideBar is true if we're using small images
 def get_single_bus_data_ios(b, user,detail):
-#    try:
-#        d = json.loads(b.businesscache_set.all()[0].cachedata)
-#    except Exception as e:
-     d = dict()
-     bustypes = b.businesstype_set.select_related().all()
-     bustopics = b.businesstopic_set.select_related().all()
+    
+    d = dict()
+    bustypes = b.businesstype_set.select_related().all()
+    bustopics = b.businesstopic_set.select_related().all()
+    
+    d['businessID'] = b.id
+    d['businessName'] = b.name
 
-     
-     
-     
-     d['businessID'] = b.id
-     d['businessName'] = b.name
-     d['businessID'] = b.id
-     d['businessHours'] = b.metadata.hour  #TODO Set hours
-     d['averagePrice'] = b.metadata.average_price  #TODO Set hours
-     
-     d['latitude'] = b.lat
-     d['longitude'] = b.lon
+    d['latitude'] = b.lat
+    d['longitude'] = b.lon
+    
 
-     d['types'] = get_bustypes_data(bustypes,user)
-
-     logger.debug('Creating cache for bus ' + str(b))
-         
-         
-     d['businessCity'] = b.city
-     d['businessState'] = b.state
-     d['streetAddr'] = b.address
-     d['zipcode'] = b.zipcode
-
-         
-     d['businessPhone'] = b.phone
-     d['servesAlcohol'] = b.metadata.serves  #TODO Set hours
-     d['hasWiFi'] = b.metadata.wifi  #TODO Set hours
-     d['businessURL'] = b.metadata.url #TODO Set URL
-
-     d['photo'] = get_photo_id(b)
-     
-     d['ratingOverAllUsers']  = getBusAverageRating(b)
-
-     d['categories'] = get_bustopics_data(bustopics,user,detail=True)
-     d['health_info'] = get_health_info(b)
-     
-     d['photoMedURL'] = get_photo_url_medium(b)
-
-     d['photoLargeURL'] = get_photo_url_large(b)
-#
-#        if BusinessCache.objects.filter(business=b).count() > 0:
-#            BusinessCache.objects.filter(business=b).delete()      
-#        BusinessCache.objects.create(business=b,cachedata=json.dumps(d))
-#        pass
-
+    d['businessCity'] = b.city
+    d['businessState'] = b.state
+    d['streetAddr'] = b.address
+    d['zipcode'] = b.zipcode
+    d['businessPhone'] = b.phone
+    
+    d['businessHours'] = b.metadata.hour  #TODO Set hours
+    d['averagePrice'] = b.metadata.average_price  #TODO Set hours
+    d['servesAlcohol'] = b.metadata.serves  #TODO Set hours
+    d['hasWiFi'] = b.metadata.wifi  #TODO Set hours
+    d['businessURL'] = b.metadata.url #TODO Set URL
+    
+    d['photo'] = get_photo_id(b)
+    
+    d['ratingOverAllUsers']  = getBusAverageRating(b)
+    
+    d['types'] = get_bustypes_data(bustypes,user)
+    d['categories'] = get_bustopics_data(bustopics,user,detail=True)
+    
+    d['health_info'] = get_health_info(b)
+    
+    d['photoMedURL'] = get_photo_url_medium(b)
+    
+    d['photoLargeURL'] = get_photo_url_large(b)
 
 
     try:
@@ -168,29 +153,4 @@ def get_single_bus_data_ios(b, user,detail):
             d['distanceFromCurrentUser'] =  "%.2f" % dist.miles
         else:
             d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
-
-
-
-
-#    if detail:
-#        d['businessCity'] = b.city
-#        d['businessState'] = b.state
-#        d['streetAddr'] = b.address
-#        d['zipcode'] = b.zipcode
-#   
-#            
-#        d['businessPhone'] = b.phone
-#        d['servesAlcohol'] = b.serves_alcohol()  #TODO Set hours
-#        d['hasWiFi'] = b.has_wifi()  #TODO Set hours
-#        d['businessURL'] = b.url #TODO Set URL
-#
-#        d['photo'] = get_photo_id(b)
-#        
-#        #[hates,neutrals,likes,loves,avg] = getBusinessRatings(b)
-#        d['ratingOverAllUsers']  = getBusAverageRating(b)
-#
-#        d['allTypes'] = get_types_data(Type.objects.all(),user)
-#        bustags = BusinessTopic.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
-#        d['categories'] = get_bustopics_data(bustags,user,detail)
-#        d['health_info'] = get_health_info(b)
     return d
