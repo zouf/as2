@@ -143,13 +143,13 @@ def get_single_bus_data_ios(b, user,detail):
         if user:
             userRatingSet = BusinessRating.objects.get(user=user, business=b)
             d['ratingForCurrentUser'] = userRatingSet.rating
-            d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)    
+            d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)    
         else:
             d['ratingForCurrentUser'] = 0
-            d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)
+            d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
     except:
         d['ratingForCurrentUser'] = 0
-        d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)
+        d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
 
 
 
