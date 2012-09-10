@@ -73,6 +73,13 @@ AWS_SECRET_ACCESS_KEY='vtG7kHIPy9cldqtIgaD6aGpCR9O1JwR7dik70hH8'
 AWS_STORAGE_BUCKET_NAME='allsortz-test'
 
 #AWS_CALLING_FORMAT=CallingFormat.SUBDOMAIN
+
+from datetime import date, timedelta
+tenyrs = date.today() + timedelta(days=365*10)
+# Expires 10 years in the future at 8PM GMT
+AWS_HEADERS = {
+    'Expires': tenyrs.strftime('%a, %d %b %Y 20:00:00 GMT')
+}
 STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 #import djcelery
 
