@@ -33,7 +33,7 @@ class Business(models.Model):
     city = models.CharField(max_length=100)
     url = models.URLField()
     
-    metadata = models.ForeignKey('BusinessMeta',related_name='metadata')
+    metadata = models.ForeignKey('BusinessMeta',related_name='metadata',blank=True)
     
     
     # Right now: America centric 
