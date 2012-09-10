@@ -101,7 +101,7 @@ def get_single_bus_data_ios(b, user,detail):
         d['latitude'] = b.lat
         d['longitude'] = b.lon
 
-        bustypes = BusinessType.objects.filter(business=b)  
+        bustypes = BusinessType.objects.select_related('bustype').filter(business=b)  
         d['types'] = get_bustypes_data(bustypes,user)
 
         logger.debug('Creating cache for bus ' + str(b))
@@ -124,7 +124,7 @@ def get_single_bus_data_ios(b, user,detail):
         d['ratingOverAllUsers']  = getBusAverageRating(b)
 
         d['allTypes'] = get_types_data(Type.objects.all(),user)
-        bustags = BusinessTopic.objects.filter(business=b)   #.exclude(tag=get_master_summary_tag())
+        bustags = BusinessTopic.objects.select_related('topic').filter(business=b)   #.exclude(tag=get_master_summary_tag())
         d['categories'] = get_bustopics_data(bustags,user,detail=True)
         d['health_info'] = get_health_info(b)
         
@@ -139,15 +139,18 @@ def get_single_bus_data_ios(b, user,detail):
 
 
 
-    userRatingSet = BusinessRating.objects.filter(user=user, business=b)
-    if user and userRatingSet.count() > 0:
-        #the user exists and has rated something
-        d['ratingForCurrentUser'] = userRatingSet[0].rating
-        d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)       
-    else: 
-        #the user hasn't rated it!
+    try:
+        if user:
+            userRatingSet = BusinessRating.objects.get(user=user, business=b)
+            d['ratingForCurrentUser'] = userRatingSet.rating
+            d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)    
+        else:
+            d['ratingForCurrentUser'] = 0
+            d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)
+    except:
         d['ratingForCurrentUser'] = 0
         d['ratingRecommendation'] = "%.2f" % .5 #get_recommendation_by_topic(b, user)
+
 
 
 

@@ -29,8 +29,6 @@ def getBusTopicRatings(bustopic):
     print('here for ' +  str(bustopic.topic.descr))
     ratingFilter = BusinessTopicRating.objects.filter(businesstopic=bustopic).aggregate(Avg('rating'))
     avg = ratingFilter['rating__avg']
-    print(avg)
-    print(BusinessTopicRating.objects.filter(businesstopic=bustopic).all().count())
     #numNeg = DiscussionRating.objects.filter(rating=0).count()
     return avg
 

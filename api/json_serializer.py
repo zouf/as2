@@ -31,7 +31,7 @@ def get_topic_data(topic,user):
     data['children'] = []   
     #print('children of ' + str(topic) + " are " + str(topic.children.all()))
 
-    for edge in topic.children.all():
+    for edge in topic.children.select_related().all():
         c = dict()
         c['topicName'] = edge.to_node.descr
         c['topicID'] = edge.to_node.id
@@ -196,7 +196,7 @@ def get_query_data(query,user):
     data['isCreatedByUs'] = query.is_default
     
     querytopics = []
-    for qt in QueryTopic.objects.filter(query=query):
+    for qt in QueryTopic.objects.select_related('topic').filter(query=query):
         querytopics.append(get_topic_data(qt.topic,user))
     data['querytopics'] = querytopics
     
