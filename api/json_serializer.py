@@ -59,9 +59,9 @@ def get_user_details(user):
     
     asuser = AllsortzUser.objects.get(user=user)
     if asuser.registered:
-        data['registered'] = True
+        data['registered'] = "true"
     else:
-        data['registered'] = False
+        data['registered'] = "false"
     
     
     return data
