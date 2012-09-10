@@ -46,7 +46,7 @@ def get_node_average(business,topic,user):
     thisAvg= 0
     if btset.count()> 0:
         ratingFilter = BusinessTopicRating.objects.filter(businesstopic=btset[0], rating__range=["0", "4"])
-        countFilter = ratingFilter.aggregate(Avg('rating'))
+        countFilter = ratingFilter.aggregate(Count('rating'))
         sumFilter = ratingFilter.aggregate(Sum('rating'))
         if countFilter['rating__count'] > 0:
             thisAvg =  sumFilter['rating__sum'] / countFilter['rating__count']
