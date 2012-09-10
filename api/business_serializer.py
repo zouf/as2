@@ -126,7 +126,7 @@ def get_single_bus_data_ios(b, user,detail):
         d['allTypes'] = get_types_data(Type.objects.all(),user)
         #bustags = BusinessTopic.objects.select_related('topic').filter(business=b)   #.exclude(tag=get_master_summary_tag())
         
-        btset = b.businesstopic_set.prefetch.all()
+        btset = b.businesstopic_set.select_related().all()
         d['categories'] = get_bustopics_data(btset,user,detail=True)
         d['health_info'] = get_health_info(b)
         
@@ -160,6 +160,7 @@ def get_single_bus_data_ios(b, user,detail):
     if hasattr(b, 'distance'):
         d['distanceFromCurrentUser'] = "%.2f" % b.distance.mi
     else:
+        logger.error('No distance! Should be impossible to get here')
         #calculate it
         dist = b.get_distance(user)
         #dist = None
