@@ -33,6 +33,8 @@ class Business(models.Model):
     city = models.CharField(max_length=100)
     url = models.URLField()
     
+    metadata = models.ForeignKey('api.models.BusinessMeta',related_name='metadata')
+    
     
     # Right now: America centric 
     state = USStateField()  
@@ -49,20 +51,7 @@ class Business(models.Model):
             return distance.distance(user.current_location,(self.lat,self.lon))
         else:
             return None
-        
-    def average_price(self):
-        return BusinessMeta.objects.get(business=self).average_price
-    
-    def serves_alcohol(self):
-        return BusinessMeta.objects.get(business=self).serves
-    
-    def has_wifi(self):
-        return BusinessMeta.objects.get(business=self).wifi
-    
-    def hours(self):
-        return BusinessMeta.objects.get(business=self).hours
-    
-    
+
     
     def save(self):
         
@@ -131,7 +120,7 @@ class BusinessMeta(models.Model):
     health_violation_text = models.TextField()
     health_letter_code = models.CharField(max_length=10)
     inspdate=models.DateField()
-    business = models.ForeignKey(Business,db_index=True)
+    business = models.ForeignKey(Business,db_index=True,related_name='business')
 
 
 ''' A photo. To be associated with a business or a user '''

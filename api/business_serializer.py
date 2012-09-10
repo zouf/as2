@@ -88,56 +88,56 @@ def get_all_nearby(mylat,mylng,distance=1):
 
 #isSideBar is true if we're using small images
 def get_single_bus_data_ios(b, user,detail):
-    try:
-        d = json.loads(b.businesscache_set.all()[0].cachedata)
-    except Exception as e:
-        d = dict()
-        d['businessID'] = b.id
-        d['businessName'] = b.name
-        d['businessID'] = b.id
-        d['businessHours'] = b.hours()  #TODO Set hours
-        d['averagePrice'] = b.average_price()  #TODO Set hours
-        
-        d['latitude'] = b.lat
-        d['longitude'] = b.lon
+#    try:
+#        d = json.loads(b.businesscache_set.all()[0].cachedata)
+#    except Exception as e:
+     d = dict()
+     bustypes = b.businesstype_set.select_related().all()
+     bustopics = b.businesstopic_set.select_related().all()
 
-        bustypes = BusinessType.objects.select_related('bustype').filter(business=b)  
-        d['types'] = get_bustypes_data(bustypes,user)
+     
+     
+     
+     d['businessID'] = b.id
+     d['businessName'] = b.name
+     d['businessID'] = b.id
+     d['businessHours'] = b.metadata.hour  #TODO Set hours
+     d['averagePrice'] = b.metadata.average_price  #TODO Set hours
+     
+     d['latitude'] = b.lat
+     d['longitude'] = b.lon
 
-        logger.debug('Creating cache for bus ' + str(b))
-            
-            
-        d['businessCity'] = b.city
-        d['businessState'] = b.state
-        d['streetAddr'] = b.address
-        d['zipcode'] = b.zipcode
-   
-            
-        d['businessPhone'] = b.phone
-        d['servesAlcohol'] = b.serves_alcohol()  #TODO Set hours
-        d['hasWiFi'] = b.has_wifi()  #TODO Set hours
-        d['businessURL'] = b.url #TODO Set URL
+     d['types'] = get_bustypes_data(bustypes,user)
 
-        d['photo'] = get_photo_id(b)
-        
-        #[hates,neutrals,likes,loves,avg] = getBusinessRatings(b)
-        d['ratingOverAllUsers']  = getBusAverageRating(b)
+     logger.debug('Creating cache for bus ' + str(b))
+         
+         
+     d['businessCity'] = b.city
+     d['businessState'] = b.state
+     d['streetAddr'] = b.address
+     d['zipcode'] = b.zipcode
 
-        d['allTypes'] = get_types_data(Type.objects.all(),user)
-        #bustags = BusinessTopic.objects.select_related('topic').filter(business=b)   #.exclude(tag=get_master_summary_tag())
-        
-        btset = b.businesstopic_set.select_related().all()
-        d['categories'] = get_bustopics_data(btset,user,detail=True)
-        d['health_info'] = get_health_info(b)
-        
-        d['photoMedURL'] = get_photo_url_medium(b)
+         
+     d['businessPhone'] = b.phone
+     d['servesAlcohol'] = b.metadata.serves  #TODO Set hours
+     d['hasWiFi'] = b.metadata.wifi  #TODO Set hours
+     d['businessURL'] = b.metadata.url #TODO Set URL
 
-        d['photoLargeURL'] = get_photo_url_large(b)
+     d['photo'] = get_photo_id(b)
+     
+     d['ratingOverAllUsers']  = getBusAverageRating(b)
 
-        if BusinessCache.objects.filter(business=b).count() > 0:
-            BusinessCache.objects.filter(business=b).delete()      
-        BusinessCache.objects.create(business=b,cachedata=json.dumps(d))
-        pass
+     d['categories'] = get_bustopics_data(bustopics,user,detail=True)
+     d['health_info'] = get_health_info(b)
+     
+     d['photoMedURL'] = get_photo_url_medium(b)
+
+     d['photoLargeURL'] = get_photo_url_large(b)
+#
+#        if BusinessCache.objects.filter(business=b).count() > 0:
+#            BusinessCache.objects.filter(business=b).delete()      
+#        BusinessCache.objects.create(business=b,cachedata=json.dumps(d))
+#        pass
 
 
 
