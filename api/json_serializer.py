@@ -40,10 +40,10 @@ def get_topic_data(topic,user):
             c['isLeaf']  = 0
         else:
             c['isLeaf'] = 1
-        topicfilter = UserTopic.objects.filter(user=user,topic=edge.to_node)
-        if topicfilter.count() > 0:
-            c['userWeight'] = topicfilter[0].importance
-        else:
+        try:
+            importance = UserTopic.objects.get(user=user,topic=edge.to_node)
+            c['userWeight'] = importance.importance
+        except:
             c['userWeight'] = 0
         data['children'].append(c)
         #data['children'].append(get_topic_data(edge.to_node,user))

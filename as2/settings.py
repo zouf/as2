@@ -176,7 +176,7 @@ MEDIA_URL = ''
 #dont use AWS for debug
 
 STATIC_ROOT = BASE_DIR+'/static/'
-FIXTURE_DIRS = BASE_DIR='/fixtures/'
+FIXTURE_DIRS = BASE_DIR+'/fixtures/'
 
 
 LOG_BASE = '/var/log/django/'
