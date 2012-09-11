@@ -24,7 +24,7 @@ from geopy.units import radians
 from queries.models import Query, QueryTopic
 from queries.views import perform_query_from_param, perform_query_from_obj
 from recommendation.models import Recommendation
-from wiki.models import Page
+#from wiki.models import Page
 import api.authenticate as auth
 import api.business_serializer as busserial
 import api.json_serializer as serial
@@ -74,7 +74,6 @@ def get_business(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        bus = Business.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -86,8 +85,8 @@ def get_business(request,oid):
     serial.set_edge_mapping()
     u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic','recommendation_set__business').select_related()[0]   
     u.current_location = user.current_location
-    bus = bus.prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
-                'businesstopic__businesstopicrating_set')
+    bus = Business.objects.filter(id=oid).prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
+                'businesstopic__businesstopicrating_set')[0]
     bus_data = get_single_bus_data_ios(bus,u,detail=True)
     serial.unset_edge_mapping()
 
@@ -585,8 +584,8 @@ def remove_business_topic(request,oid):
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "remove")
         bustopic = BusinessTopic.objects.get(id=oid)
-        pg = Page.objects.get(bustopic=bustopic)
-        pg.delete()
+        #pg = Page.objects.get(bustopic=bustopic)
+        #pg.delete()
         bustopic.delete()
     except ReadJSONError as e:
         return server_error(e.value)
@@ -1286,7 +1285,7 @@ def internal_populate_database():
     Rating.objects.all().delete()
     Business.objects.all().delete()
     BusinessMeta.objects.all().delete()
-    Page.objects.all().delete()
+    #Page.objects.all().delete()
     Photo.objects.all().delete()
     BusinessTopic.objects.all().delete()
     Topic.objects.all().delete()

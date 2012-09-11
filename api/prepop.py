@@ -163,10 +163,11 @@ def prepop_businesses(user=get_default_user()):
             topic = Topic.objects.get(descr=t)
             if row[rindex] != '':
                 bustopic = add_topic_to_bus(b, topic, user)
-                pg = Page.objects.get(bustopic=bustopic)
-                pg.content = row[rindex]
-                pg.save()
-                print('Page content: ' + str(pg.content))
+                bustopic.content = row[rindex]
+#                pg = Page.objects.get(bustopic=bustopic)
+#                pg.content = row[rindex]
+#                pg.save()
+                print('Page content: ' + str(bustopic.content))
         
         
 

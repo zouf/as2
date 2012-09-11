@@ -48,6 +48,8 @@ def add_photo_by_url(phurl, business,user,default,caption,title):
     print('done')
     p = Photo(user=user, business=business, image=outpath, title=title, caption=caption,is_default=default)
     p.save(isUpload = False,isTextMod = False)
+    business.profile_photo = p
+    business.save()
     print(p)
     return p
 

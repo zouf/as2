@@ -53,13 +53,13 @@ def add_topic_to_bus(b,topic,user=get_default_user()):
     except:
         bustopic = BusinessTopic.objects.create(topic=topic,business=b)
     
-    try:
-        Page.objects.get(bustopic=bustopic)
-        print('here')
-    except Page.DoesNotExist:
-        print('create a page')
-        pg = Page(name=topic.descr,bustopic = bustopic)
-        pg.save()
+#    try:
+#        Page.objects.get(bustopic=bustopic)
+#        print('here')
+#    except Page.DoesNotExist:
+#        print('create a page')
+#        pg = Page(name=topic.descr,bustopic = bustopic)
+#        pg.save()
     return bustopic
 
 
