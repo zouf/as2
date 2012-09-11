@@ -456,6 +456,7 @@ def get_businesses_internal(request):
         (lat, lng) = user.current_location
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
         businesses = Business.objects.distance(pnt).select_related().order_by('distance')[low:high]
+        print(str(businesses.count()) + " returned")
         
     #annotate(avg_rating=Avg('businesstopic__businesstopicrating__rating'))
     print('Performing serialization...')
