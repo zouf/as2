@@ -262,7 +262,7 @@ These are the business' sorts '''
 class BusinessTopic(models.Model):
     business = models.ForeignKey(Business,db_index=True,related_name='businesstopic')
     topic = models.ForeignKey(Topic)
-    content = models.CharField(max_length=DOUBLE_TWITTER_UNIT,null=True)
+    content = models.CharField(max_length=QUAD_TWITTER_UNIT,null=True)
     def __unicode__(self):
         return str(self.pk)
     
