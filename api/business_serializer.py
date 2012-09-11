@@ -5,12 +5,13 @@ Created on Jul 19, 2012
 '''
 #from photos.models import BusinessPhoto
 from api.json_serializer import get_bustypes_data, get_bustopics_data, \
-    get_health_info, get_types_data
+    get_health_info, get_types_data, set_edge_mapping
 from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
-    BusinessCache, Type
+    BusinessCache, Type, BusinessTopicRating, UserTopic
 from api.photos import get_photo_id, get_photo_url_medium, get_photo_url_large
 from api.ratings import getBusinessRatings, getBusAverageRating
 from decimal import getcontext, Decimal
+from django.db.models.aggregates import Avg
 from recommendation.recengine import get_best_current_recommendation, \
     get_recommendation_by_topic
 import json
@@ -23,28 +24,37 @@ logger = logging.getLogger(__name__)
 
 busTopicRelation = {}
 busTypeRelation = {}
+  
 
 def set_topic_mapping():
-    
     global busTopicRelation
-    for bt in BusinessTopic.objects.select_related('business', 'topic').all().prefetch_related('topic'):
-        print('mapping business with id ' + str(bt.business.id)+ '  to ' + str(bt))
+    if busTopicRelation != {}:
+        print 'already set topic'
+        return
+    print ' set topic mapping'
+    btrset = BusinessTopic.objects.annotate(avg_rating=Avg('businesstopicrating__rating')).prefetch_related('business','topic')
+    for bt in btrset:
         busTopicRelation.setdefault(bt.business.id, []).append(bt)
-    # Use stored lists
- 
-    
-    
-#    for business in Business.objects.all():
-#        for topic in byBusiness[business.id]:
-#            print topic.descr
+
+
+
 
 def set_type_mapping():
     global busTypeRelation
-    for bt in BusinessType.objects.select_related('business', 'type').all():
+    if busTypeRelation != {}:
+        return
+    for bt in BusinessType.objects.select_related('business', 'bustype').all():
         busTypeRelation.setdefault(bt.business.id, []).append(bt)
         
+def unset_type_mapping():
+    global busTypeRelation
+    busTypeRelation = {}
     
-    
+def unset_topic_mapping():
+    global busTopiRelation
+    busTopicRelation = {}
+        
+
 
 
 
@@ -118,30 +128,8 @@ def get_all_nearby(mylat,mylng,distance=1):
 def get_single_bus_data_ios(b, user,detail):
     
     d = dict()
-
-    global busTypeRelation
-    global busTopicRelation
-    
-    if busTopicRelation == {}:
-        print 'set topic mapping'
-        set_topic_mapping()
-    
-    if busTypeRelation == {}:
-        print' set type mapping'
-        set_type_mapping()
-    else:
-        print 'already set'
-
-    
-    if b.id in busTypeRelation:
-        bustypes = busTypeRelation[b.id]
-    else:
-        bustypes = []
-    
-    if b.id in busTopicRelation:
-        bustopics = busTopicRelation[b.id]
-    else:
-        bustopics = []
+    bustypes = b.businesstype.all()
+    bustopics = b.businesstopic.all()
     
     d['businessID'] = b.id
     d['businessName'] = b.name
@@ -149,7 +137,6 @@ def get_single_bus_data_ios(b, user,detail):
     d['latitude'] = b.lat
     d['longitude'] = b.lon
     
-
     d['businessCity'] = b.city
     d['businessState'] = b.state
     d['streetAddr'] = b.address
@@ -161,35 +148,26 @@ def get_single_bus_data_ios(b, user,detail):
     d['servesAlcohol'] = b.metadata.serves  #TODO Set hours
     d['hasWiFi'] = b.metadata.wifi  #TODO Set hours
     d['businessURL'] = b.url #TODO Set URL
+
+    #d['photo'] = get_photo_id(b)
     
-    d['photo'] = get_photo_id(b)
-    
-    d['ratingOverAllUsers']  = getBusAverageRating(b)
+    #d['ratingOverAllUsers']  = getBusAverageRating(b)
     
     d['types'] = get_bustypes_data(bustypes,user)
+
     d['categories'] = get_bustopics_data(bustopics,user,detail=True)
     
-    d['health_info'] = get_health_info(b)
+    d['health_info'] = get_health_info(b.metadata)
     
     d['photoMedURL'] = get_photo_url_medium(b)
-    
+#    
     d['photoLargeURL'] = get_photo_url_large(b)
 
-
     try:
-        if user:
-            userRatingSet = BusinessRating.objects.get(user=user, business=b)
-            d['ratingForCurrentUser'] = userRatingSet.rating
-            d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)    
-        else:
-            d['ratingForCurrentUser'] = 0
-            d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
+        
+        d['ratingRecommendation'] = "%.2f" % 0.5#user.recommendation_set.get(business_id=b.id).recommendation
     except:
-        d['ratingForCurrentUser'] = 0
-        d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)
-
-
-
+        d['ratingRecommendation'] = "%.2f" % 0.5#get_recommendation_by_topic(b, user)    
 
     # if the business has this attribute et (from some other calculation) then use it
     if hasattr(b, 'distance'):
@@ -198,9 +176,8 @@ def get_single_bus_data_ios(b, user,detail):
         logger.debug('No distance! maybe geodist?')
         #calculate it
         dist = b.get_distance(user)
-        #dist = None
         if dist is not None:
             d['distanceFromCurrentUser'] =  "%.2f" % dist.miles
         else:
-            d['distanceFromCurrentUser'] = str(-1)#b.get_distance(user))
+            d['distanceFromCurrentUser'] = str(-1)
     return d

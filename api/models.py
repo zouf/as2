@@ -10,6 +10,7 @@ from djangosphinx.models import SphinxSearch
 from geopy import distance
 from geopy.point import Point
 from os.path import basename
+import wiki.models
 import StringIO
 import datetime
 import simplejson
@@ -17,6 +18,7 @@ import urllib
 import urllib2
 
 
+DOUBLE_TWITTER_UNIT=280
 
 
 
@@ -30,6 +32,7 @@ class Business(models.Model):
     geom = models.PointField()
     #point = models.PointField(geography=True)
 
+    profile_photo = models.ForeignKey('Photo',related_name='profile_photo',null=True)
 
     address = models.CharField(max_length=250)
     city = models.CharField(max_length=100)
@@ -37,6 +40,8 @@ class Business(models.Model):
     
     metadata = models.ForeignKey('BusinessMeta',related_name='metadata',null=True)
     cache = models.ForeignKey('BusinessCache',related_name='buscache',null=True)
+    
+    
     
     # Right now: America centric 
     state = USStateField()  
@@ -247,7 +252,7 @@ class BusinessType(models.Model):
     business = models.ForeignKey(Business,db_index=True,related_name='businesstype')
     bustype = models.ForeignKey(Type)
     def __unicode__(self):
-        return str(self.business) + ": " + str(self.bustype)
+        return str(self.pk)
     
 
     
@@ -256,8 +261,9 @@ These are the business' sorts '''
 class BusinessTopic(models.Model):
     business = models.ForeignKey(Business,db_index=True,related_name='businesstopic')
     topic = models.ForeignKey(Topic)
+    content = models.CharField(max_length=DOUBLE_TWITTER_UNIT,null=True)
     def __unicode__(self):
-        return str(self.business) + ": " + str(self.topic)
+        return str(self.pk)
     
     
 ''' A user's subscription to a particular  topic '''

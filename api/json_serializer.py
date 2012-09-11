@@ -16,15 +16,45 @@ logger = logging.getLogger(__name__)
 
 childMapping = {}
 parentMapping = {}
+userTopicMapping = {}
+
 def set_edge_mapping():
-    
-    global busTopicRelation
+    global childMapping
+    global parentMapping
+    if childMapping != {} and parentMapping != {}:
+        print('already set edge!')
+        return
+ 
+
     for e in Edge.objects.select_related('to_node', 'from_node').all():
         childMapping.setdefault(e.to_node.id, []).append(e.from_node)
         parentMapping.setdefault(e.from_node.id, []).append(e.to_node)
     # Use stored lists
 
+def unset_edge_mapping():
+    global childMapping
+    global parentMapping
+    childMapping = {}
+    parentMapping = {}
+    
 
+def set_usertopic_mapping(u):
+    global userTopicMapping
+    if userTopicMapping != {}:
+        print 'already set usertopic'
+        return
+    print ' set usertopic mapping'
+    btset = UserTopic.objects.filter(user=u).prefetch_related('topic')
+    for bt in btset:
+        userTopicMapping[bt.topic.id] = bt.importance
+
+def unset_usertopic_mapping():
+    global userTopicMapping
+    userTopicMapping = {}
+    
+    
+
+    
 
 def get_topics_data(topics,user):
     data = []
@@ -49,8 +79,7 @@ def get_topic_data(topic,user):
     if topic.id in parentMapping:
         childrenEdges = parentMapping[topic.id]
     else:
-        childrenEdges = []
-        
+        childrenEdges = []   
     for t in childrenEdges:
         c = dict()
         c['topicName'] = t.descr
@@ -61,15 +90,12 @@ def get_topic_data(topic,user):
             c['isLeaf']  = 0
         else:
             c['isLeaf'] = 1
+
         try:
-            importance = UserTopic.objects.get(user=user,topic=t)
-            c['userWeight'] = importance.importance
+            c['userWeight'] = user.usertopic.get(topic_id=t.id).importance
         except:
             c['userWeight'] = 0
         data['children'].append(c)
-        #data['children'].append(get_topic_data(edge.to_node,user))
-
-
     return data
    
 
@@ -89,20 +115,13 @@ def get_user_details(user):
  
 def get_bustopic_data(bustopic,user,detail):
     data = dict()
-    avg = ratings.getBusTopicRatings(bustopic)
-    data['bustopicRating'] = avg
-    data['topic'] = get_topic_data(bustopic.topic, user)
-
-    try:
-        pg = Page.objects.get(bustopic=bustopic)
-    except Page.DoesNotExist:
-        pg = Page(name=bustopic.topic.descr,bustopic=bustopic)
-        pg.save()
-        
+    #avg = bustopic.avg_rating
+    #data['bustopicRating'] = avg
+    data['topic'] = get_topic_data(bustopic.topic, user)       
         
     if detail:
-        data['bustopicContent'] = pg.rendered
-        if pg.content == '':
+        data['bustopicContent'] = bustopic.content
+        if bustopic.content == None:
             return None
 
     return data
@@ -135,8 +154,8 @@ def get_bustypes_data(bustypes,user):
 def get_bustopics_data(bustopics,user,detail):
     data = []
     for cat in bustopics:
+        
         res = get_bustopic_data(cat,user,detail)
-        #ignore blank ones
         if res:
             data.append(res)
     return data
@@ -230,8 +249,7 @@ def get_queries_data(queries,user):
     return data
     
     
-def get_health_info(b):
-    bm = BusinessMeta.objects.get(business=b)
+def get_health_info(bm):
     data = dict()
     data['health_grade'] = str(bm.health_letter_code)
     data['health_points'] = str(bm.health_points)

@@ -161,7 +161,7 @@ def authenticate_api_request(request):
     print("device is " + str(device))
     if uname != 'none':
         try:
-            user = User.objects.get(username=uname)      
+            user = User.objects.get(username=uname)
             if AllsortzUser.objects.filter(device=device).count() == 0:
                 asuser = create_asuser(user,device)
             else:

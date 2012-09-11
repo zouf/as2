@@ -23,13 +23,14 @@ def getCommentRatings(discussion):
     return [numPos, numNeg]
     
 def getBusTopicRatings(bustopic):
+    return bustopic.avg_rating
     #if BusinessTopicRating.objects.all().count() == 0:
     #    return 0
     
-    ratingFilter = BusinessTopicRating.objects.filter(businesstopic=bustopic).aggregate(Avg('rating'))
-    avg = ratingFilter['rating__avg']
+#    ratingFilter = BusinessTopicRating.objects.filter(businesstopic=bustopic).aggregate(Avg('rating'))
+#    avg = ratingFilter['rating__avg']
     #numNeg = DiscussionRating.objects.filter(rating=0).count()
-    return avg
+    #return avg
 
 def getPhotoRatings(photo):
     ratingFilter = PhotoRating.objects.filter(photo=photo, rating__range=["1", "5"])

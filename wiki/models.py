@@ -8,7 +8,7 @@ class Page(models.Model):
     name = models.CharField(max_length=255, unique=False)
     content = models.TextField()
     rendered = models.TextField()
-    bustopic = models.ForeignKey(BusinessTopic)
+    bustopic = models.ForeignKey(BusinessTopic,related_name="businesstopic")
 
     class Meta:
         ordering = ('name', )

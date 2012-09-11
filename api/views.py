@@ -7,7 +7,7 @@ from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
 from api.models import Photo, PhotoRating, BusinessDiscussion, PhotoDiscussion, \
     Discussion, Business, Topic, DiscussionRating, BusinessRating, Type, \
     BusinessType, Rating, BusinessMeta, BusinessTopic, BusinessTopicDiscussion, \
-    BusinessTopicRating, UserTopic, AllsortzUser
+    BusinessTopicRating, UserTopic, AllsortzUser, Edge
 from api.photos import add_photo_by_url
 from api.topic_operations import add_topic_to_bus, \
     add_discussion_to_businesstopic, get_discussions_data, get_discussion_data
@@ -17,6 +17,7 @@ from django.contrib.gis.geos.factory import fromstr
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
 from django.contrib.gis.measure import D
+from django.db.models.aggregates import Avg
 from django.http import HttpResponse
 from geopy import geocoders
 from geopy.units import radians
@@ -25,14 +26,14 @@ from queries.views import perform_query_from_param, perform_query_from_obj
 from recommendation.models import Recommendation
 from wiki.models import Page
 import api.authenticate as auth
+import api.business_serializer as busserial
 import api.json_serializer as serial
 import api.photos as photos
 import api.prepop as prepop
+import cProfile
 import logging
 import simplejson as json
-import cProfile
 
-import api.business_serializer as busserial
 
 
 logger = logging.getLogger(__name__)
@@ -80,7 +81,11 @@ def get_business(request,oid):
         return server_error(e.value)
     except: 
         return server_error('Business with id '+str(oid)+'not found')
+    
+
+    serial.set_edge_mapping()
     bus_data = get_single_bus_data_ios(bus,user,detail=True)
+    serial.unset_edge_mapping()
     return server_data(bus_data,"business")
 
 def rate_business(request,oid):
@@ -419,7 +424,12 @@ def get_businesses_map(request):
         businesses = search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low=0,high=MAX_MAP_RESULTS,polygon_search_bound=poly)
     else:
         businesses = Business.objects.filter(geom__within=poly)[0:MAX_MAP_RESULTS]
+        
+
+    serial.set_edge_mapping()
     top_businesses = get_bus_data_ios(businesses ,user,detail=False)
+
+    serial.unset_edge_mapping()
     print('Serialization complete...')
     return server_data(top_businesses,"business") 
 
@@ -446,14 +456,23 @@ def get_businesses_internal(request):
         (lat, lng) = user.current_location
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
         businesses = Business.objects.distance(pnt).select_related().order_by('distance')[low:high]
-    
+        
+    #annotate(avg_rating=Avg('businesstopic__businesstopicrating__rating'))
     print('Performing serialization...')
-    serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
+    
+
+    serial.set_edge_mapping()
+    u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic','recommendation_set__business').select_related()[0]   
+    businesses = businesses.prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
+                'businesstopic__businesstopicrating_set')
+    serialized = busserial.get_bus_data_ios(businesses ,u,detail=False)
+    serial.unset_edge_mapping()
+
     print('Serialization complete...')
     return server_data(serialized,"business")
 
 
-def get_businesses(request):
+def get_businesses(request):    
     return get_businesses_internal(request)
 
  
