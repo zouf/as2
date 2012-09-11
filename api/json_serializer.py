@@ -115,12 +115,12 @@ def get_user_details(user):
  
 def get_bustopic_data(bustopic,user,detail):
     data = dict()
-    avg = 0.5@bustopic.avg_rating
+    avg = 0.75  #bustopic.avg_rating
     data['bustopicRating'] = avg
     data['topic'] = get_topic_data(bustopic.topic, user)       
         
     if detail:
-        if bustopic.content:
+        if not bustopic.content:
             data['bustopicContent'] = bustopic.content
         else:
             data['bustopicContent'] = ''
