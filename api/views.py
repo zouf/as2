@@ -445,8 +445,11 @@ def get_businesses_internal(request):
     else:  # DEFAULT FRONT PAGE (i.e. no search params)
         (lat, lng) = user.current_location
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-        businesses = Business.objects.distance(pnt).select_related().order_by('distance').prefetch_related('businesstopic_set','photo_set','businesstype_set','businessrating_set')[low:high]
-        
+        businesses = Business.objects.distance(pnt).select_related().order_by('distance')[low:high]
+    
+    
+
+
     print('Performing serialization...')
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')

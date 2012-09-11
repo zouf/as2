@@ -14,6 +14,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+childMapping = {}
+parentMapping = {}
+def set_edge_mapping():
+    
+    global busTopicRelation
+    for e in Edge.objects.select_related('to_node', 'from_node').all():
+        childMapping.setdefault(e.from_node.id, []).append(e.to_node)
+        parentMapping.setdefault(e.to_node.id, []).append(e.from_node)
+    # Use stored lists
 
 
 
@@ -29,19 +38,31 @@ def get_topic_data(topic,user):
     data['parentID'] = topic.id
     data['parentIcon'] = topic.icon
     data['children'] = []   
-    #print('children of ' + str(topic) + " are " + str(topic.children.all()))
 
-    for edge in topic.children.select_related().all():
+
+    global childMapping
+    global parentMapping
+    
+    if childMapping == {} or parentMapping == {}:
+        set_edge_mapping()
+        
+    if topic.id in parentMapping:
+        childrenEdges = parentMapping[topic.id]
+    else:
+        childrenEdges = []
+        
+    for t in childrenEdges:
         c = dict()
-        c['topicName'] = edge.to_node.descr
-        c['topicID'] = edge.to_node.id
-        c['topicIcon'] =edge.to_node.icon
-        if edge.to_node.children.all().count() > 0:
+        c['topicName'] = t.descr
+        c['topicID'] = t.id
+        c['topicIcon'] =t.icon
+        
+        if t.id in childMapping: 
             c['isLeaf']  = 0
         else:
             c['isLeaf'] = 1
         try:
-            importance = UserTopic.objects.get(user=user,topic=edge.to_node)
+            importance = UserTopic.objects.get(user=user,topic=t)
             c['userWeight'] = importance.importance
         except:
             c['userWeight'] = 0

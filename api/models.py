@@ -4,6 +4,7 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos.factory import fromstr
 from django.contrib.localflavor.us.models import USStateField, PhoneNumberField
 from django.core.files.base import ContentFile
+from django.db.models.query import QuerySet
 from django.utils.encoding import smart_str
 from djangosphinx.models import SphinxSearch
 from geopy import distance
@@ -14,6 +15,7 @@ import datetime
 import simplejson
 import urllib
 import urllib2
+
 
 
 
@@ -120,13 +122,13 @@ class BusinessMeta(models.Model):
     health_violation_text = models.TextField()
     health_letter_code = models.CharField(max_length=10)
     inspdate=models.DateField()
-    business = models.ForeignKey(Business,db_index=True,related_name='business')
+    business = models.ForeignKey(Business,db_index=True,related_name='busmetadata')
 
 
 ''' A photo. To be associated with a business or a user '''
 class  Photo(models.Model):
     user = models.ForeignKey(User,db_index=True) 
-    business = models.ForeignKey(Business,db_index=True)   
+    business = models.ForeignKey(Business,db_index=True,related_name='businessphoto')   
     is_default = models.BooleanField()
 
     def image_upload_to_profile(self, filename):
@@ -242,7 +244,7 @@ class Type(models.Model):
 ''' It's a topic / way to categorize businesses as well as
 annotate a user's interests ''' 
 class BusinessType(models.Model):
-    business = models.ForeignKey(Business,db_index=True)
+    business = models.ForeignKey(Business,db_index=True,related_name='businesstype')
     bustype = models.ForeignKey(Type)
     def __unicode__(self):
         return str(self.business) + ": " + str(self.bustype)
@@ -252,7 +254,7 @@ class BusinessType(models.Model):
 ''' A relationship between business and topic 
 These are the business' sorts '''
 class BusinessTopic(models.Model):
-    business = models.ForeignKey(Business,db_index=True)
+    business = models.ForeignKey(Business,db_index=True,related_name='businesstopic')
     topic = models.ForeignKey(Topic)
     def __unicode__(self):
         return str(self.business) + ": " + str(self.topic)

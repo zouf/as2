@@ -140,7 +140,7 @@ def register_asuser(user, newUname, password, email, deviceID):
     return user
 
 def authenticate_api_request(request):
-    print('auth')
+    logger.debug('authenticating user')
     if 'uname' not in request.GET or 'password' not in request.GET or 'deviceID' not in request.GET:
         logger.error("Username and password not specified in request URL")
         raise AuthenticationFailed("Username and password not specified in request URL")

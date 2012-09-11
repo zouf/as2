@@ -18,8 +18,36 @@ import logging
 import time
 
 logger = logging.getLogger(__name__)
-#TODO: matt fix this to handle ratings from 1-4
-#is SideBar is true if we're going to use smaller data
+
+
+
+busTopicRelation = {}
+busTypeRelation = {}
+
+def set_topic_mapping():
+    
+    global busTopicRelation
+    for bt in BusinessTopic.objects.select_related('business', 'topic').all().prefetch_related('topic'):
+        print('mapping business with id ' + str(bt.business.id)+ '  to ' + str(bt))
+        busTopicRelation.setdefault(bt.business.id, []).append(bt)
+    # Use stored lists
+ 
+    
+    
+#    for business in Business.objects.all():
+#        for topic in byBusiness[business.id]:
+#            print topic.descr
+
+def set_type_mapping():
+    global busTypeRelation
+    for bt in BusinessType.objects.select_related('business', 'type').all():
+        busTypeRelation.setdefault(bt.business.id, []).append(bt)
+        
+    
+    
+
+
+
 def get_bus_data_ios(business_list, user,detail=False):
     data = []
     for b in business_list:
@@ -90,8 +118,30 @@ def get_all_nearby(mylat,mylng,distance=1):
 def get_single_bus_data_ios(b, user,detail):
     
     d = dict()
-    bustypes = b.businesstype_set.select_related().all()
-    bustopics = b.businesstopic_set.select_related().all()
+
+    global busTypeRelation
+    global busTopicRelation
+    
+    if busTopicRelation == {}:
+        print 'set topic mapping'
+        set_topic_mapping()
+    
+    if busTypeRelation == {}:
+        print' set type mapping'
+        set_type_mapping()
+    else:
+        print 'already set'
+
+    
+    if b.id in busTypeRelation:
+        bustypes = busTypeRelation[b.id]
+    else:
+        bustypes = []
+    
+    if b.id in busTopicRelation:
+        bustopics = busTopicRelation[b.id]
+    else:
+        bustopics = []
     
     d['businessID'] = b.id
     d['businessName'] = b.name
@@ -106,11 +156,11 @@ def get_single_bus_data_ios(b, user,detail):
     d['zipcode'] = b.zipcode
     d['businessPhone'] = b.phone
     
-    d['businessHours'] = b.metadata.hour  #TODO Set hours
+    d['businessHours'] = b.metadata.hours  #TODO Set hours
     d['averagePrice'] = b.metadata.average_price  #TODO Set hours
     d['servesAlcohol'] = b.metadata.serves  #TODO Set hours
     d['hasWiFi'] = b.metadata.wifi  #TODO Set hours
-    d['businessURL'] = b.metadata.url #TODO Set URL
+    d['businessURL'] = b.url #TODO Set URL
     
     d['photo'] = get_photo_id(b)
     
@@ -145,7 +195,7 @@ def get_single_bus_data_ios(b, user,detail):
     if hasattr(b, 'distance'):
         d['distanceFromCurrentUser'] = "%.2f" % b.distance.mi
     else:
-        logger.error('No distance! Should be impossible to get here')
+        logger.debug('No distance! maybe geodist?')
         #calculate it
         dist = b.get_distance(user)
         #dist = None
