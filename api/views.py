@@ -82,10 +82,14 @@ def get_business(request,oid):
     except: 
         return server_error('Business with id '+str(oid)+'not found')
     
-
+    
     serial.set_edge_mapping()
-    bus_data = get_single_bus_data_ios(bus,user,detail=True)
+    u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic','recommendation_set__business').select_related()[0]   
+    bus = bus.prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
+                'businesstopic__businesstopicrating_set')
+    bus_data = get_single_bus_data_ios(bus,u,detail=True)
     serial.unset_edge_mapping()
+
     return server_data(bus_data,"business")
 
 def rate_business(request,oid):
@@ -426,12 +430,17 @@ def get_businesses_map(request):
         businesses = Business.objects.filter(geom__within=poly)[0:MAX_MAP_RESULTS]
         
 
+    print('Performing serialization...')
+    
     serial.set_edge_mapping()
-    top_businesses = get_bus_data_ios(businesses ,user,detail=False)
-
+    u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic','recommendation_set__business').select_related()[0]   
+    businesses = businesses.prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
+                'businesstopic__businesstopicrating_set')
+    serialized = busserial.get_bus_data_ios(businesses ,u,detail=False)
     serial.unset_edge_mapping()
+
     print('Serialization complete...')
-    return server_data(top_businesses,"business") 
+    return server_data(serialized,"business") 
 
 
 def get_businesses_internal(request):
@@ -461,7 +470,6 @@ def get_businesses_internal(request):
     #annotate(avg_rating=Avg('businesstopic__businesstopicrating__rating'))
     print('Performing serialization...')
     
-
     serial.set_edge_mapping()
     u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic','recommendation_set__business').select_related()[0]   
     businesses = businesses.prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
@@ -648,6 +656,8 @@ def get_topics(request):
         auth.authorize_user(user, request, "get")
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
+    
+    serial.set_edge_mapping()
     data = serial.get_topics_data(Topic.objects.all(),user)
     return server_data(data,"topic")
 
@@ -663,7 +673,11 @@ def get_topics_parent(request):
             parent_topic = Topic.objects.get(descr='Main')
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(e.value)
+    
+    serial.set_edge_mapping()
     data = serial.get_topic_data(parent_topic,user)
+    serial.unset_edge_mapping()
+    
     return server_data(data,"topic")
 
 
@@ -676,8 +690,11 @@ def get_topic(request,oid):
         return server_error(e.value)
     except Topic.DoesNotExist:
         return server_error("Topic with ID "+str(oid) + " not found")
-     
+    
+    serial.unset_edge_mapping()
     data = serial.get_topic_data(topic,user)
+    serial.unset_edge_mapping()
+
     return server_data(data,"topic")
 
 ''' Get types of business (e.g. sandwich, etc. '''
@@ -747,6 +764,7 @@ def subscribe_topic(request,oid):
     except Exception as e:
         print('exception')
         print(e.value)
+
     data = serial.get_topic_data(topic,user)
     return server_data(data, "subscription")
 
