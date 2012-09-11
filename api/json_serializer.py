@@ -120,10 +120,10 @@ def get_bustopic_data(bustopic,user,detail):
     data['topic'] = get_topic_data(bustopic.topic, user)       
         
     if detail:
-        data['bustopicContent'] = bustopic.content
-        if bustopic.content == None:
-            return None
-
+        if not bustopic.content:
+            data['bustopicContent'] = bustopic.content
+        else:
+            data['bustopicContent'] = ''
     return data
 
 def get_types_data(types,user):

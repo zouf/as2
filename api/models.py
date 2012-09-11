@@ -18,6 +18,7 @@ import urllib
 import urllib2
 
 
+QUAD_TWITTER_UNIT=560
 DOUBLE_TWITTER_UNIT=280
 
 
