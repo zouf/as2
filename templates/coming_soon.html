@@ -8,9 +8,9 @@ height: 100%;
 position: absolute;
 top: 0px;
 left: 0px;
-background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#1c3752));
+background: -webkit-gradient(linear, left top, left bottom, from(#7fa9d3), to(#1c3752));
 background: -moz-linear-gradient(top,  #eee,  #1c3752);
-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#1c3752');
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#7fa9d3', endColorstr='#1c3752');
 }
 
 #main {
@@ -18,11 +18,11 @@ position: absolute;
 text-align: center;
 color: #000000;
 width: 900px;
-height: 500px;
+height: 400px;
 left: 50%;
 top: 45%;
 margin-left: -450px;
-margin-top: -250px;
+margin-top: -200px;
 border: 1px solid #1c3752;
 padding: 10px;
 -moz-border-radius: 10px;
@@ -33,13 +33,14 @@ background-color: #FFFFFF;
 box-shadow: 0px 0px 8px #1c3752;
 }
 
-#job_posting
-{
-	text-align:left;
-   font-famly: 'Puritan', sans-serif;
-   font-size: 24px;
-
+.Puritan-normal-400 {
+  font-family: 'Puritan' !important;
+  font-style:  normal;
+  font-weight: 400;
+  font-size:16px;
+  text-align:left;
 }
+
 
 </style>
 
@@ -57,20 +58,27 @@ box-shadow: 0px 0px 8px #1c3752;
 <body>
 <div id="background">
 	<div id="main">
-		<img src="{{STATIC_URL}}css/logo.png" width="600" height="164">
-		<div id="job_posting">
+		<img src="{{STATIC_URL}}css/logo.png" width="400" >
+		<div class="Puritan-normal-400">
         	
 <p>        	AllSortz is an exciting new startup based in Princeton, NJ. Our goal is to reinvent merchant-consumer interaction. We are currently in the midst of develop and are looking for highly motivated and ambitious individuals to join the team and help realize our vision. 
 </p>
 <p>
 The qualifications we look for in potential AllSortz team members are:
-- Entrepreneurial spirit: hands-on, self-motivated, big picture thinking
-- Experience developing Android or iOS applications 
+<ul>
+<li>
+Entrepreneurial spirit: hands-on, self-motivated, big picture thinking
+</li><li>
+Experience developing Android or iOS applications 
+</ul>
 </p><p>
 
 Please contact Matt at jobs@allsortz.com for more details.
 </p>
 </div>
+
+<br/>
+<br/>
 
 		All Rights Reserved, AllSortz, Inc.
 		
