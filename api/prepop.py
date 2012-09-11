@@ -167,6 +167,7 @@ def prepop_businesses(user=get_default_user()):
 #                pg = Page.objects.get(bustopic=bustopic)
 #                pg.content = row[rindex]
 #                pg.save()
+                bustopic.save()
                 print('Page content: ' + str(bustopic.content))
         
         
