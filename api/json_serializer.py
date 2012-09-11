@@ -120,7 +120,7 @@ def get_bustopic_data(bustopic,user,detail):
     data['topic'] = get_topic_data(bustopic.topic, user)       
         
     if detail:
-        if not bustopic.content:
+        if bustopic.content:
             data['bustopicContent'] = bustopic.content
         else:
             data['bustopicContent'] = ''
