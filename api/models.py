@@ -36,7 +36,7 @@ class Business(models.Model):
     url = models.URLField()
     
     metadata = models.ForeignKey('BusinessMeta',related_name='metadata',null=True)
-    
+    cache = models.ForeignKey('BusinessCache',related_name='buscache',null=True)
     
     # Right now: America centric 
     state = USStateField()  

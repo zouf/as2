@@ -447,9 +447,6 @@ def get_businesses_internal(request):
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
         businesses = Business.objects.distance(pnt).select_related().order_by('distance')[low:high]
     
-    
-
-
     print('Performing serialization...')
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
     print('Serialization complete...')

@@ -20,8 +20,8 @@ def set_edge_mapping():
     
     global busTopicRelation
     for e in Edge.objects.select_related('to_node', 'from_node').all():
-        childMapping.setdefault(e.from_node.id, []).append(e.to_node)
-        parentMapping.setdefault(e.to_node.id, []).append(e.from_node)
+        childMapping.setdefault(e.to_node.id, []).append(e.from_node)
+        parentMapping.setdefault(e.from_node.id, []).append(e.to_node)
     # Use stored lists
 
 
