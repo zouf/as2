@@ -85,6 +85,7 @@ def get_business(request,oid):
     
     serial.set_edge_mapping()
     u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic','recommendation_set__business').select_related()[0]   
+    u.current_location = user.current_location
     bus = bus.prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
                 'businesstopic__businesstopicrating_set')
     bus_data = get_single_bus_data_ios(bus,u,detail=True)
@@ -434,6 +435,7 @@ def get_businesses_map(request):
     
     serial.set_edge_mapping()
     u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic','recommendation_set__business').select_related()[0]   
+    u.current_location = user.current_location
     businesses = businesses.prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
                 'businesstopic__businesstopicrating_set')
     serialized = busserial.get_bus_data_ios(businesses ,u,detail=False)
@@ -472,6 +474,7 @@ def get_businesses_internal(request):
     
     serial.set_edge_mapping()
     u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic','recommendation_set__business').select_related()[0]   
+    u.current_location = user.current_location
     businesses = businesses.prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
                 'businesstopic__businesstopicrating_set')
     serialized = busserial.get_bus_data_ios(businesses ,u,detail=False)

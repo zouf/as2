@@ -86,7 +86,7 @@ def get_topic_data(topic,user):
         c['topicID'] = t.id
         c['topicIcon'] =t.icon
         
-        if t.id in childMapping: 
+        if t.id in parentMapping: 
             c['isLeaf']  = 0
         else:
             c['isLeaf'] = 1
