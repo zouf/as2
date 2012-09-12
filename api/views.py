@@ -304,7 +304,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         g = geocoders.Google()
         try:
             _, (lat,lng) = g.geocode(str(searchLocation),exactly_one=False)[0] 
-	except Exception as e:
+        except Exception as e:
             logger.error('Error in geocoding' + str(e))
          
     else:
@@ -313,7 +313,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         
         
     searchQuery = "Search Term: "+str(searchText)+"\nLocation: "+str(searchLocation)+" \nWeight: "+str(distanceWeight)+"\nSearch Types: "+str(searchTypes)+"\nLat Lng = ("+str(lat)+","+str(lng)+")" 
-    
+    print(searchQuery)
     logger.debug(searchQuery)
     
     if distanceWeight != '':
@@ -336,28 +336,31 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         print(str(pnt))
         businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
     else:
-        print('searching with text' + str(searchText))
+        print('searching with text: ' + str(searchText))
         qset = []
         if polygon_search_bound:
-            print('searching with map')
+            print('searching with the map ')
             print(polygon_search_bound)
             results = Business.search.query(searchText)
             geom_within = []
+            print(results.count())
             if results.count() < MAX_SEARCH_LIMIT:
                 limit = results.count()
             else:
                 limit = MAX_SEARCH_LIMIT
                 logger.error("received " + str(results.count()) + " search results for " + str(searchText))
             logger.debug("Limit for search " + str(searchText) + " is " + str(limit))
-            for result in results[0:limit]:
-                if result.geom.within(polygon_search_bound):
-                    geom_within.append(result)
+            print('LIMIT Is ' + str(limit))
+            for r in results[0:limit]:
+                #print('Result: ' + str(r))
+                if r.geom.within(polygon_search_bound):
+                    geom_within.append(r)
             qset = geom_within 
         else:
             print('searching without map')
             print(lat)
             print(lng)
-	    results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
+            results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
             .filter(**{'@geodist__lt':dist_limit.m*1.0})\
             .query(searchText).order_by('-@geodist')
             if results.count() < MAX_SEARCH_LIMIT:
@@ -366,13 +369,13 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
                 limit = MAX_SEARCH_LIMIT 
             qset = []
             for result in results[0:limit]:
-	        print result
+                print result
                 qset.append(result)
         
         businesses_filtered = []
         for b in qset:
             searchWeight = b._sphinx['weight']
-            print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
+            #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
             businesses_filtered.append(Business.objects.get(id=b.id))
         #for some reason, the sphinx query set is reversed when it's returned. The largest distances are in the front
         # Reverse here
@@ -404,9 +407,9 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
     
     if lat and lng:
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-    	businesses = Business.objects.filter(id__in=idlist).distance(pnt).order_by('distance')    
+        businesses = Business.objects.filter(id__in=idlist).distance(pnt).order_by('distance')    
     else:
-    	businesses = Business.objects.filter(id__in=idlist)
+        businesses = Business.objects.filter(id__in=idlist)
     return businesses
 
 
