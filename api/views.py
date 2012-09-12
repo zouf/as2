@@ -303,7 +303,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         logger.debug('Search location not nil ')
         g = geocoders.Google()
         try:
-            _, (lat, lng) = g.geocode(str(searchLocation))  
+            _, (lat, lng) = g.geocode(str(searchLocation),exactly_one=False)  
         except Exception as e:
             logger.error('Error in geocoding' + str(e))
          
