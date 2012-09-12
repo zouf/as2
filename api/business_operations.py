@@ -17,6 +17,8 @@ def associate_business_type(b,t):
 
 def associate_business_with_types(bus,types):
     for tdescr in types:
+        if tdescr == '':
+            continue
         try:
             t = Type.objects.get(descr=tdescr) 
         except Type.MultipleObjectsReturned:
@@ -25,8 +27,9 @@ def associate_business_with_types(bus,types):
             pass
         except Type.DoesNotExist:
             print("Type " + str(tdescr) + " does not exist")
-            t = Type(descr=tdescr,creator=get_default_user(),icon='none.png')
-            t.save()
+            if tdescr != '':
+                t = Type(descr=tdescr,creator=get_default_user(),icon='none.png')
+                t.save()
             #logger.error('Type does not exist")')
             pass
         associate_business_type(bus, t)  
@@ -80,28 +83,20 @@ def add_business_server(name,addr,city,state,phone,url,types,hours='',average_pr
 #    print(url)
 #    print(types)
     try:
-        bset = Business.objects.filter(name=name,address=addr,city=city,state=state)    
-        if bset.count() ==  0:
-            bus = Business(name=name,address=addr,city=city,state=state,phone=phone,url=url)
-            bus.save()
-        elif bset.count() > 1: #too many
-            bset.delete()
-            bus = Business(name=name,address=addr,city=city,state=state,phone=phone,url=url)
-            bus.save()
-        else:
-            print('getting existing business')
-            bus = Business.objects.get(name=name,address=addr,city=city,state=state)
-  
+        bus,created = Business.objects.get_or_create(name=name,address=addr,city=city,state=state,phone=phone,url=url)  
         bmset = BusinessMeta.objects.filter(business=bus).filter()
         if bmset.count() > 0:
             bmset.delete()
         bm = BusinessMeta(business=bus,hours=hours,average_price=average_price,serves=serves,wifi=wifi,health_points=health_points,
                             health_violation_text=health_violation_text,   health_letter_code = health_letter_code,inspdate=inspdate)
-        bm.save()
         bus.metadata = bm
         bus.save()
         associate_business_with_types(bus,types)
-        #print('Creating ' + str(bus.name) + ' Done')
+        if created:
+            print('Creating ' + str(bus.name) + ' Done')
+        else:
+            print('Business ' + str(bus.name) + ' was already theres')
+
         return bus
     except Exception as e:
         logger.error("error creating businesses " + str(e))
