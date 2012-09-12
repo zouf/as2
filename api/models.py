@@ -117,7 +117,7 @@ class UserCache(models.Model):
 
 
 class TopicCache(models.Model):
-    topic = models.OneToOneField('Topic',db_index=True,related_name='topiccache')
+    topic = models.ForeignKey('Topic',related_name='topiccache+')
     cachedata = models.CharField(max_length=1000000)
     date = models.DateTimeField(auto_now=True)
 

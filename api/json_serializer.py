@@ -53,17 +53,22 @@ def unset_usertopic_mapping():
     global userTopicMapping
     userTopicMapping = {}
     
-    
 
-    
 
-def get_topics_data(topics,user):
-    data = []
-    for t in topics:
-        data.append(get_topic_data(t,user))
+def get_usertopic_data(user):
+    data = dict()
+    for ut in UserTopic.objects.all():
+        data['topicID'] = ut.importance   
     return data
 
-def get_topic_data(topic,user):
+
+def get_topics_data(topics,user,detail=False):
+    data = []
+    for t in topics:
+        data.append(get_topic_data(t,user,detail))
+    return data
+
+def get_topic_data(topic,user,detail=False):
     data = dict()
     try:
         tcache = TopicCache.objects.filter(topic=topic)[0].cachedata
@@ -75,31 +80,28 @@ def get_topic_data(topic,user):
         data['parentIcon'] = topic.icon
         data['children'] = []   
     
-#        if childMapping == {} or parentMapping == {}:
-#            set_edge_mapping()
-#            
-#        if topic.id in parentMapping:
-#            childrenEdges = parentMapping[topic.id]
-#        else:
-#            childrenEdges = []   
-        for t in topic.parents.all():
+        for t in topic.children.all():
             c = dict()
             c['topicName'] = t.to_node.descr
             c['topicID'] = t.to_node.id
             c['topicIcon'] =t.to_node.icon
             
-            if t.to_node.parents.all(): 
+            if t.to_node.children.all().count(): 
                 c['isLeaf']  = 0
             else:
                 c['isLeaf'] = 1
-    
-#            try:
-#                c['userWeight'] = user.usertopic.get(topic_id=t.id).importance
-#            except:
-#                c['userWeight'] = 0
+                
+                
+            
             data['children'].append(c)
-            #unset_edge_mapping()
             TopicCache.objects.create(cachedata = json.dumps(data),topic=topic)
+    if detail:
+        for c in data['children']:
+            try: 
+                c['userWeight'] = UserTopic.objects.get(topic_id=c['topicID']).importance
+            except:
+                c['userWeight'] = 0
+
     return data
    
 

@@ -5,7 +5,7 @@ Created on Jul 19, 2012
 '''
 #from photos.models import BusinessPhoto
 from api.json_serializer import get_bustypes_data, get_bustopics_data, \
-    get_health_info, get_types_data, set_edge_mapping
+    get_health_info, get_types_data, set_edge_mapping, get_usertopic_data
 from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
     BusinessCache, Type, BusinessTopicRating, UserTopic, UserCache
 from api.photos import get_photo_id, get_photo_url_medium, get_photo_url_large
@@ -60,10 +60,13 @@ def unset_topic_mapping():
 
 
 def get_bus_data_ios(business_list, user,detail=False):
-    data = []
+    data = dict()
+    data['businesses'] = []
     for b in business_list:
         d = get_single_bus_data_ios(b, user,detail=detail)
-        data.append(d)
+        data['businesses'].append(d)
+    
+    data['userPreferences'] = get_usertopic_data(user)
     return data
 
 class ReadJSONError(Exception):
@@ -133,7 +136,7 @@ def get_single_bus_data_ios(b, user,detail):
         #is there a cached version?
         cache= BusinessCache.objects.get(business=b)
         d = json.loads(cache.cachedata)
-        print('cached')
+        print('cached ' + str(b.name))
 
     except:
         #now we just grab the related data

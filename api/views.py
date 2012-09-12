@@ -562,8 +562,6 @@ def add_business_topic(request,oid):
         bustopic = BusinessTopic.objects.get(business=bus, topic=topic)
     else:
         bustopic = BusinessTopic.objects.create(business=bus,topic=topic,creator=user)
-        pg = Page(name=bustopic.topic.descr,bustopic=bustopic)
-        pg.save()
     data = serial.get_bustopic_data(bustopic,user)
     return server_data(data,"BusinessTopic")
 
@@ -649,7 +647,7 @@ def get_topics(request):
         return server_error(e.value)
     
     
-    data = serial.get_topics_data(Topic.objects.all(),user)
+    data = serial.get_topics_data(Topic.objects.all(),user,detail=True)
     return server_data(data,"topic")
 
 
@@ -666,7 +664,7 @@ def get_topics_parent(request):
         return server_error(e.value)
     
     
-    data = serial.get_topic_data(parent_topic,user)
+    data = serial.get_topic_data(parent_topic,user,detail=True)
     
     
     return server_data(data,"topic")
@@ -682,8 +680,8 @@ def get_topic(request,oid):
     except Topic.DoesNotExist:
         return server_error("Topic with ID "+str(oid) + " not found")
     
+    data = serial.get_topic_data(topic,user,detail=True)
     
-    data = serial.get_topic_data(topic,user)
     
     return server_data(data,"topic")
 
@@ -755,7 +753,7 @@ def subscribe_topic(request,oid):
         print('exception')
         print(e.value)
 
-    data = serial.get_topic_data(topic,user)
+    data = serial.get_topics_data(topic,user,detail=True)
     return server_data(data, "subscription")
 
 
@@ -773,7 +771,7 @@ def unsubscribe_topic(request,oid):
         UserTopic.objects.filter(user=user,topic=topic).delete()
     except :
         return server_error("Error occurred. Could not unsubscribe user.")
-    data = serial.get_topic_data(topic,user)
+    data = serial.get_topic_data(topic,user,detail=True)
     return server_data(data)
 
 '''
