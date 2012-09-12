@@ -83,7 +83,7 @@ def add_business_server(name,addr,city,state,phone,url,types,hours='',average_pr
 #    print(url)
 #    print(types)
     try:
-        bset = Business.objects.filter(name=name,address=addr,city=city,state=state)    
+        bset = Business.objects.filter(name=name,address=addr,city=city,state=state,phone=phone,url=url)
         if bset.count() ==  0:
             bus = Business(name=name,address=addr,city=city,state=state,phone=phone,url=url)
             bus.save()
@@ -93,7 +93,7 @@ def add_business_server(name,addr,city,state,phone,url,types,hours='',average_pr
             bus.save()
         else:
             print('getting existing business')
-            bus = Business.objects.get(name=name,address=addr,city=city,state=state)
+            bus = bset[0]
   
         bmset = BusinessMeta.objects.filter(business=bus).filter()
         if bmset.count() > 0:
