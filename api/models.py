@@ -39,7 +39,6 @@ class Business(models.Model):
     city = models.CharField(max_length=100)
     url = models.URLField()
     
-    metadata = models.ForeignKey('BusinessMeta',related_name='metadata',null=True)
     cache = models.ForeignKey('BusinessCache',related_name='buscache',null=True)
     
     
@@ -123,12 +122,12 @@ class BusinessMeta(models.Model):
     average_price = models.IntegerField()
     wifi = models.NullBooleanField()
     serves = models.NullBooleanField()
-    hours = models.CharField(max_length=1000)
+    hours = models.CharField(max_length=100)
     health_points = models.IntegerField()
     health_violation_text = models.TextField()
     health_letter_code = models.CharField(max_length=10)
     inspdate=models.DateField()
-    business = models.ForeignKey(Business,db_index=True,related_name='busmetadata')
+    business = models.OneToOneField(Business,db_index=True,related_name='busmetadata')
 
 
 ''' A photo. To be associated with a business or a user '''
