@@ -5,10 +5,11 @@ Created on Jul 27, 2012
 '''
 
 from api.models import DiscussionRating, PhotoRating, UserTopic, Topic, Edge, \
-    AllsortzUser, BusinessMeta
+    AllsortzUser, BusinessMeta, TopicCache
 from queries.models import QueryTopic
 from wiki.models import Page
 import api.ratings as ratings
+import json
 import logging
 
 
@@ -64,38 +65,41 @@ def get_topics_data(topics,user):
 
 def get_topic_data(topic,user):
     data = dict()
-    data['parentName'] = topic.descr
-    data['parentID'] = topic.id
-    data['parentIcon'] = topic.icon
-    data['children'] = []   
-
-
-    global childMapping
-    global parentMapping
+    try:
+        tcache = TopicCache.objects.filter(topic=topic)[0].cachedata
+        data = json.loads(tcache)
+    except:
+        #set_edge_mapping()
+        data['parentName'] = topic.descr
+        data['parentID'] = topic.id
+        data['parentIcon'] = topic.icon
+        data['children'] = []   
     
-    if childMapping == {} or parentMapping == {}:
-        set_edge_mapping()
-        
-    if topic.id in parentMapping:
-        childrenEdges = parentMapping[topic.id]
-    else:
-        childrenEdges = []   
-    for t in childrenEdges:
-        c = dict()
-        c['topicName'] = t.descr
-        c['topicID'] = t.id
-        c['topicIcon'] =t.icon
-        
-        if t.id in parentMapping: 
-            c['isLeaf']  = 0
-        else:
-            c['isLeaf'] = 1
-
-        try:
-            c['userWeight'] = user.usertopic.get(topic_id=t.id).importance
-        except:
-            c['userWeight'] = 0
-        data['children'].append(c)
+#        if childMapping == {} or parentMapping == {}:
+#            set_edge_mapping()
+#            
+#        if topic.id in parentMapping:
+#            childrenEdges = parentMapping[topic.id]
+#        else:
+#            childrenEdges = []   
+        for t in topic.parents.all():
+            c = dict()
+            c['topicName'] = t.to_node.descr
+            c['topicID'] = t.to_node.id
+            c['topicIcon'] =t.to_node.icon
+            
+            if t.to_node.parents.all(): 
+                c['isLeaf']  = 0
+            else:
+                c['isLeaf'] = 1
+    
+#            try:
+#                c['userWeight'] = user.usertopic.get(topic_id=t.id).importance
+#            except:
+#                c['userWeight'] = 0
+            data['children'].append(c)
+            #unset_edge_mapping()
+            TopicCache.objects.create(cachedata = json.dumps(data),topic=topic)
     return data
    
 

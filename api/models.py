@@ -10,12 +10,12 @@ from djangosphinx.models import SphinxSearch
 from geopy import distance
 from geopy.point import Point
 from os.path import basename
-import wiki.models
 import StringIO
 import datetime
 import simplejson
 import urllib
 import urllib2
+import wiki.models
 
 
 QUAD_TWITTER_UNIT=560
@@ -63,6 +63,7 @@ class Business(models.Model):
             
             loc = self.address + " " + self.city + ", " + self.state        
             location = urllib.quote_plus(smart_str(loc))
+            
             dd = urllib2.urlopen("http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false" % location).read() 
             ft = simplejson.loads(dd)
             zipcode = None
@@ -79,7 +80,6 @@ class Business(models.Model):
                             if tp == "postal_code":
                                 zipcode = jsonStr['long_name']
                                 break
-           
             if zipcode is not None:
                 self.zipcode  = zipcode
             else:
@@ -109,7 +109,19 @@ class BusinessCache(models.Model):
     business = models.OneToOneField(Business,db_index=True,related_name='businesscache')
     cachedata = models.CharField(max_length=1000000)
     
-    
+class UserCache(models.Model):
+    business = models.ForeignKey(Business,db_index=True)
+    user = models.ForeignKey(User,db_index=True,related_name='usercache')
+    cachedata = models.CharField(max_length=1000000)
+    date = models.DateTimeField(auto_now=True)
+
+
+class TopicCache(models.Model):
+    topic = models.OneToOneField('Topic',db_index=True,related_name='topiccache')
+    cachedata = models.CharField(max_length=1000000)
+    date = models.DateTimeField(auto_now=True)
+
+
 class HealthGrade(models.Model):
     business = models.OneToOneField(Business,db_index=True)
     

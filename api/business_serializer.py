@@ -7,10 +7,11 @@ Created on Jul 19, 2012
 from api.json_serializer import get_bustypes_data, get_bustopics_data, \
     get_health_info, get_types_data, set_edge_mapping
 from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
-    BusinessCache, Type, BusinessTopicRating, UserTopic
+    BusinessCache, Type, BusinessTopicRating, UserTopic, UserCache
 from api.photos import get_photo_id, get_photo_url_medium, get_photo_url_large
 from api.ratings import getBusinessRatings, getBusAverageRating
 from decimal import getcontext, Decimal
+from django.contrib.auth.models import User
 from django.db.models.aggregates import Avg
 from recommendation.recengine import get_best_current_recommendation, \
     get_recommendation_by_topic
@@ -128,46 +129,72 @@ def get_all_nearby(mylat,mylng,distance=1):
 def get_single_bus_data_ios(b, user,detail):
     
     d = dict()
-    bustypes = b.businesstype.all()
-    bustopics = b.businesstopic.all()
-    
-    d['businessID'] = b.id
-    d['businessName'] = b.name
+    try:
+        #is there a cached version?
+        cache= BusinessCache.objects.get(business=b)
+        d = json.loads(cache.cachedata)
+        print('cached')
 
-    d['latitude'] = b.lat
-    d['longitude'] = b.lon
+    except:
+        #now we just grab the related data
+        b = Business.objects.filter(id=b.id).prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
+                'businesstopic__businesstopicrating_set')[0]
+        bustypes = b.businesstype.all()
+        bustopics = b.businesstopic.all()
+        
+        d['businessID'] = b.id
+        d['businessName'] = b.name
     
-    d['businessCity'] = b.city
-    d['businessState'] = b.state
-    d['streetAddr'] = b.address
-    d['zipcode'] = b.zipcode
-    d['businessPhone'] = b.phone
+        d['latitude'] = b.lat
+        d['longitude'] = b.lon
+        
+        d['businessCity'] = b.city
+        d['businessState'] = b.state
+        d['streetAddr'] = b.address
+        d['zipcode'] = b.zipcode
+        d['businessPhone'] = b.phone
+        
+        d['businessHours'] = b.metadata.hours  #TODO Set hours
+        d['averagePrice'] = b.metadata.average_price  #TODO Set hours
+        d['servesAlcohol'] = b.metadata.serves  #TODO Set hours
+        d['hasWiFi'] = b.metadata.wifi  #TODO Set hours
+        d['businessURL'] = b.url #TODO Set URL
     
-    d['businessHours'] = b.metadata.hours  #TODO Set hours
-    d['averagePrice'] = b.metadata.average_price  #TODO Set hours
-    d['servesAlcohol'] = b.metadata.serves  #TODO Set hours
-    d['hasWiFi'] = b.metadata.wifi  #TODO Set hours
-    d['businessURL'] = b.url #TODO Set URL
-
-    #d['photo'] = get_photo_id(b)
-    
-    #d['ratingOverAllUsers']  = getBusAverageRating(b)
-    
-    d['types'] = get_bustypes_data(bustypes,user)
-
-    d['categories'] = get_bustopics_data(bustopics,user,detail=True)
-    
-    d['health_info'] = get_health_info(b.metadata)
-    
-    d['photoMedURL'] = get_photo_url_medium(b)
-#    
-    d['photoLargeURL'] = get_photo_url_large(b)
+        d['photo'] = get_photo_id(b)
+        
+        #d['ratingOverAllUsers']  = getBusAverageRating(b)
+        d['types'] = get_bustypes_data(bustypes,user)
+        d['categories'] = get_bustopics_data(bustopics,user,detail=True)
+        
+        d['health_info'] = get_health_info(b.metadata)
+        
+        d['photoMedURL'] = get_photo_url_medium(b)
+    #    
+        d['photoLargeURL'] = get_photo_url_large(b)
+        
+        BusinessCache.objects.create(cachedata=json.dumps(d),business=b)
+        
 
     try:
-        
-        d['ratingRecommendation'] = "%.2f" % 0.5#user.recommendation_set.get(business_id=b.id).recommendation
+        #try to get a cached version!
+        cache = UserCache.objects.get(user=user,business=b)
+        cachedata = json.loads(cache.cachedata)
+        d['ratingRecommendation'] = cachedata['ratingRecommendation']
+        print('Used cached')
+
     except:
-        d['ratingRecommendation'] = "%.2f" % 0.5#get_recommendation_by_topic(b, user)    
+        #prefetch all relevant info
+        u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic','recommendation_set__business').select_related()[0]
+        u.current_location = user.current_location
+        user = u
+        cachedata = {} 
+        try:            
+            d['ratingRecommendation'] = "%.2f" % 0.5#user.recommendation_set.get(business_id=b.id).recommendation
+        except:
+            d['ratingRecommendation'] = "%.2f" % 0.5#get_recommendation_by_topic(b, user)    
+        cachedata['ratingRecommendation'] = d['ratingRecommendation']
+        UserCache.objects.create(cachedata=json.dumps(cachedata),user=user,business=b)
+
 
     # if the business has this attribute et (from some other calculation) then use it
     if hasattr(b, 'distance'):

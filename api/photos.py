@@ -28,6 +28,8 @@ def get_photo_url_large(b):
     return b.profile_photo.image.url
 
 def get_photo_id(b):
+    if b.profile_photo == None:
+        return 0
     return b.profile_photo.id
 
 
