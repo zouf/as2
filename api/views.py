@@ -394,7 +394,11 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         #now reassign new list
         businesses_filtered = businesses_matching_type
     
-    businesses = businesses_filtered
+    
+    idlist = []
+    for b in businesses_filtered:
+        idlist.append(b.id)
+    businesses = Business.objects.filter(id__in=idlist)
     logger.debug('Search result is ' + str(businesses))
     return businesses
 
