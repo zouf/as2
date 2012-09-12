@@ -303,8 +303,8 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         logger.debug('Search location not nil ')
         g = geocoders.Google()
         try:
-            _, (lat, lng) = g.geocode(str(searchLocation),exactly_one=False)  
-        except Exception as e:
+            _, (lat,lng) = g.geocode(str(searchLocation),exactly_one=False)[0] 
+	except Exception as e:
             logger.error('Error in geocoding' + str(e))
          
     else:
@@ -329,6 +329,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         
     
     businesses_filtered = []
+  
     if searchText == '':
         print('no search text')
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
@@ -354,8 +355,9 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
             qset = geom_within 
         else:
             print('searching without map')
-            print('between ' + str(low) + ' and ' + str(high))
-            results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
+            print(lat)
+            print(lng)
+	    results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
             .filter(**{'@geodist__lt':dist_limit.m*1.0})\
             .query(searchText).order_by('-@geodist')
             if results.count() < MAX_SEARCH_LIMIT:
@@ -364,12 +366,13 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
                 limit = MAX_SEARCH_LIMIT 
             qset = []
             for result in results[0:limit]:
+	        print result
                 qset.append(result)
         
         businesses_filtered = []
         for b in qset:
             searchWeight = b._sphinx['weight']
-            #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
+            print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
             businesses_filtered.append(Business.objects.get(id=b.id))
         #for some reason, the sphinx query set is reversed when it's returned. The largest distances are in the front
         # Reverse here
@@ -398,8 +401,12 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
     idlist = []
     for b in businesses_filtered:
         idlist.append(b.id)
-    businesses = Business.objects.filter(id__in=idlist)
-    logger.debug('Search result is ' + str(businesses))
+    
+    if lat and lng:
+        pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
+    	businesses = Business.objects.filter(id__in=idlist).distance(pnt).order_by('distance')    
+    else:
+    	businesses = Business.objects.filter(id__in=idlist)
     return businesses
 
 
@@ -467,8 +474,7 @@ def get_businesses_internal(request):
         
     #annotate(avg_rating=Avg('businesstopic__businesstopicrating__rating'))
     print('Performing serialization...')
-    
-    
+    print(businesses) 
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
     
 
