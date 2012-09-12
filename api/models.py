@@ -38,11 +38,7 @@ class Business(models.Model):
     address = models.CharField(max_length=250)
     city = models.CharField(max_length=100)
     url = models.URLField()
-    
-    cache = models.ForeignKey('BusinessCache',related_name='buscache',null=True)
-    
-    
-    
+        
     # Right now: America centric 
     state = USStateField()  
     phone = PhoneNumberField(blank=True)
@@ -110,23 +106,22 @@ class Business(models.Model):
 
 
 class BusinessCache(models.Model):
-    business = models.ForeignKey(Business,db_index=True)
+    business = models.OneToOneField(Business,db_index=True,related_name='businesscache')
     cachedata = models.CharField(max_length=1000000)
     
     
 class HealthGrade(models.Model):
-
-    business = models.ForeignKey(Business,db_index=True)
+    business = models.OneToOneField(Business,db_index=True)
     
 class BusinessMeta(models.Model):
     average_price = models.IntegerField()
     wifi = models.NullBooleanField()
     serves = models.NullBooleanField()
-    hours = models.CharField(max_length=100)
-    health_points = models.IntegerField()
-    health_violation_text = models.TextField()
-    health_letter_code = models.CharField(max_length=10)
-    inspdate=models.DateField()
+    hours = models.CharField(max_length=100,null=True)
+    health_points = models.IntegerField(null=True)
+    health_violation_text = models.TextField(null=True)
+    health_letter_code = models.CharField(max_length=10,null=True)
+    inspdate=models.DateField(null=True)
     business = models.OneToOneField(Business,db_index=True,related_name='busmetadata')
 
 
