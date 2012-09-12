@@ -117,7 +117,7 @@ class BusinessMeta(models.Model):
     average_price = models.IntegerField()
     wifi = models.NullBooleanField()
     serves = models.NullBooleanField()
-    hours = models.CharField(max_length=100,null=True)
+    hours = models.CharField(max_length=1000,null=True)
     health_points = models.IntegerField(null=True)
     health_violation_text = models.TextField(null=True)
     health_letter_code = models.CharField(max_length=10,null=True)
