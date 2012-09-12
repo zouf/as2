@@ -95,7 +95,7 @@ def add_business_server(name,addr,city,state,phone,url,types,hours='',average_pr
             print('getting existing business')
             bus = bset[0]
   
-        bmset = BusinessMeta.objects.filter(business=bus).filter()
+        bmset = BusinessMeta.objects.filter(business=bus)
         if bmset.count() > 0:
             bmset.delete()
         bm = BusinessMeta(business=bus,hours=hours,average_price=average_price,serves=serves,wifi=wifi,health_points=health_points,
