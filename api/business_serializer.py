@@ -62,7 +62,7 @@ def unset_topic_mapping():
 def get_bus_data_ios(business_list, user,detail=False):
     data = dict()
     data['businesses'] = []
-    business_list = business_list.filter(businesscache__isnull=True).prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
+    business_list = business_list.filter(businesscache__isnull=True).prefetch_related('metadata',\
                 'businesstopic__businesstopicrating_set')[0]
     for b in business_list:
         d = get_single_bus_data_ios(b, user,detail=detail)
