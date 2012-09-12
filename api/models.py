@@ -122,7 +122,7 @@ class BusinessMeta(models.Model):
     health_violation_text = models.TextField(null=True)
     health_letter_code = models.CharField(max_length=10,null=True)
     inspdate=models.DateField(null=True)
-    business = models.OneToOneField(Business,db_index=True,related_name='busmetadata')
+    business = models.OneToOneField(Business,db_index=True,related_name='metadata')
 
 
 ''' A photo. To be associated with a business or a user '''
