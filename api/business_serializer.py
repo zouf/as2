@@ -62,8 +62,7 @@ def unset_topic_mapping():
 def get_bus_data_ios(business_list, user,detail=False):
     data = dict()
     data['businesses'] = []
-    business_list = business_list.filter(businesscache__isnull=True).prefetch_related('metadata','businesstopic__topic','businesstype__bustype',\
-                'businesstopic__businesstopicrating_set')[0]
+    business_list = business_list.select_related('metadata','businesscache').prefetch_related('businesstype','businesstopic__businesstopicrating_set')
     for b in business_list:
         d = get_single_bus_data_ios(b, user,detail=detail)
         data['businesses'].append(d)
@@ -134,13 +133,13 @@ def get_all_nearby(mylat,mylng,distance=1):
 def get_single_bus_data_ios(b, user,detail):
     
     d = dict()
-    try:
-        #is there a cached version?
-        cache= BusinessCache.objects.get(business=b)
-        d = json.loads(cache.cachedata)
+    if b.businesscache:
+	cache= b.businesscache.cachedata
+	#BusinessCache.objects.get(business=b)
+       	d = json.loads(cache)
         print('cached ' + str(b.name))
 
-    except:
+    else:
         #now we just grab the related data
         bustypes = b.businesstype.all()
         bustopics = b.businesstopic.all()
