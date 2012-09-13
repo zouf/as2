@@ -209,7 +209,7 @@ def getNormFactors(uid, bid):
 
 
 def getDiscussionRatings(discussion):
-    numNeg = DiscussionRating.objects.filter(rating__lt=0.0).count()
+    numNeg = DiscussionRating.objects.filter(rating__lte=0.0).count()
     numPos  = DiscussionRating.objects.filter(rating__gt=0.0).count()
     return (numPos, numNeg)
 

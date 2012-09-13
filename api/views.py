@@ -1106,7 +1106,7 @@ def get_comments(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        bustopicID = get_request_get_or_error('bustopicID',request)
+        bustopicID = get_request_get_or_error('busTopicID',request)
         bustopic = BusinessTopic.objects.get(id=bustopicID)
     except Exception as e:
         return server_error(str(e))
