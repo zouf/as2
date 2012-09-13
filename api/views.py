@@ -19,12 +19,11 @@ from django.contrib.gis.geos.polygon import Polygon
 from django.contrib.gis.measure import D
 from django.db.models.aggregates import Avg
 from django.http import HttpResponse
-from geopy import geocoders
+from geopy import geocoders, distance
 from geopy.units import radians
 from queries.models import Query, QueryTopic
 from queries.views import perform_query_from_param, perform_query_from_obj
 from recommendation.models import Recommendation
-#from wiki.models import Page
 import api.authenticate as auth
 import api.business_serializer as busserial
 import api.json_serializer as serial
@@ -33,6 +32,7 @@ import api.prepop as prepop
 import cProfile
 import logging
 import simplejson as json
+#from wiki.models import Page
 
 
 
@@ -295,6 +295,30 @@ def query_businesses(request,oid):
 #
 # 
 
+
+def is_searchtext_location(searchText, currentlocation):
+    if searchText == '':
+        return None
+    try:
+        g = geocoders.Google()
+        searchLocation, (lat,lng) = g.geocode(str(searchText),exactly_one=False)[0] 
+    except Exception as e:
+        logger.debug('Error in geocoding, so probably not a location!' + str(e))
+        print('Probably not a location!')
+        return None
+    print('location is ' + str(searchLocation))
+    
+    (cLat, cLon) = currentlocation
+    dist = distance.distance((lat,lng),currentlocation)
+    
+    
+    #basically dont return its absurdly far away
+    if dist.mi > 2500:
+        return None
+
+    
+    return searchLocation, (lat,lng)
+        
  
 
 
@@ -434,8 +458,19 @@ def get_businesses_map(request):
     searchTypes = get_request_postlist_or_warn('selectedTypes', request)
     businesses = []
     
-    #perform search
-    if searchText != '' or searchTypes != []:  
+    res = is_searchtext_location(searchText, user.current_location)
+    #user puts in an address in the search bar!
+    if res:
+        searchLocation = res[0]
+        (lat,lng) = res[1]
+        
+        
+        print(res[1])
+        pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
+        businesses = Business.objects.distance(pnt).select_related().order_by('distance')[0:MAX_MAP_RESULTS]
+        print(str(businesses.count()) + " returned")
+        
+    elif searchText != '' or searchTypes != []:  
         businesses = search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low=0,high=MAX_MAP_RESULTS,polygon_search_bound=poly)
     else:
         businesses = Business.objects.filter(geom__within=poly)[0:MAX_MAP_RESULTS]

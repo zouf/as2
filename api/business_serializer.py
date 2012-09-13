@@ -134,9 +134,8 @@ def get_single_bus_data_ios(b, user,detail):
     
     d = dict()
     if b.businesscache:
-	cache= b.businesscache.cachedata
-	#BusinessCache.objects.get(business=b)
-       	d = json.loads(cache)
+        cache= b.businesscache.cachedata
+        d = json.loads(cache)
         print('cached ' + str(b.name))
 
     else:
