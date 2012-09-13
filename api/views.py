@@ -313,7 +313,7 @@ def is_searchtext_location(searchText, currentlocation):
     
     
     #basically dont return its absurdly far away
-    if dist.mi > 2500:
+    if dist.mi > 80:
         return None
 
     
