@@ -4,10 +4,9 @@ Created on Aug 1, 2012
 @author: zouf
 '''
 from api.json_serializer import get_bustopic_data, get_user_details
-from api.models import Topic, BusinessTopic, Edge, BusinessTopicDiscussion
+from api.models import Topic, BusinessTopic, Edge, Discussion, Review, Comment
 from django.contrib.auth.models import User
-from recommendation.normalization import getNumRatings, \
-    getBusinessTopicDiscussionRatings
+import recommendation.normalization as ratings
 from wiki.models import Page
 
 def get_default_user():
@@ -20,14 +19,31 @@ def get_default_user():
         
     return user
 
-def get_discussion_data(discussion,user):
+def get_discussion_data(discussion,user,type=None):
     data = dict()
-    data['content'] = str(discussion.content)
-    data['discussionID'] = str(discussion.id)
-    (numPos, numNeg) = getBusinessTopicDiscussionRatings(discussion)
+    
+    if type:
+        data['commentType'] = type
+    else:
+        try:
+            c = discussion.bustopiccomments
+            data['commentType'] = 'comment'
+        except:
+            data['commentType'] = 'review'
+            
+            
+    data['content'] = discussion.content
+    data['commentID'] = discussion.id
+    (numPos, numNeg) = ratings.getDiscussionRatings(discussion)
     data['posRatings'] = numPos
     data['negRatings'] = numNeg
     data['creator'] = get_user_details(user)
+    
+    data['children'] = []
+    for d in Discussion.objects.filter(reply_to=discussion):
+        cdata = get_discussion_data(d, user,'comment')
+        data['children'].append(cdata)
+    print(data)
     return data;
     
     
@@ -35,15 +51,27 @@ def get_discussion_data(discussion,user):
 
 def get_discussions_data(discussions,user):
     data = []
-    for d in discussions:
+    filtered = discussions.filter(reply_to=None)
+    for d in filtered:
         data.append(get_discussion_data(d, user))
     return data
 
-def add_discussion_to_businesstopic(bt,review,user):
+def add_review_to_businesstopic(bt,review,user):
     print("Adding review " + str(review) + " to business topic " + str(bt))
-    btd = BusinessTopicDiscussion.objects.create(bsuinesstopic=bt,content=review,user=user,reply_to=None)
+    btd = Review.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)
     return btd
     
+def add_comment_to_businesstopic(bt,review,user, replyTo):
+    print("Adding comment " + str(review) + " to business topic " + str(bt))
+    if replyTo == '':
+        btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)
+    else:
+        reply = Discussion.objects.get(id=int(replyTo))
+        btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=reply)
+
+    return btd
+    
+
 
 def add_topic_to_bus(b,topic,user=get_default_user()):  
     print("Adding " + str(topic) + " to business " + str(b) )       

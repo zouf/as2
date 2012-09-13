@@ -3,9 +3,7 @@ Created on May 8, 2012
 
 @author: zouf
 '''
-from api.models import PhotoRating, DiscussionRating, BusinessRating, \
-    BusinessTopicRating, Business, BusinessDiscussion, BusinessTopicDiscussion, \
-    BusinessTopicDiscussionRating
+from api.models import PhotoRating, DiscussionRating, BusinessRating, Business
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Sum, Count
 import logging
@@ -210,9 +208,9 @@ def getNormFactors(uid, bid):
     return(fct)
 
 
-def getBusinessTopicDiscussionRatings(discussion):
-    numNeg = BusinessTopicDiscussionRating.objects.filter(rating__lt=0.0)
-    numPos  = BusinessTopicDiscussionRating.objects.filter(rating__gt=0.0)
+def getDiscussionRatings(discussion):
+    numNeg = DiscussionRating.objects.filter(rating__lt=0.0).count()
+    numPos  = DiscussionRating.objects.filter(rating__gt=0.0).count()
     return (numPos, numNeg)
 
 def getNumRatings(bid):

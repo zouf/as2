@@ -46,15 +46,16 @@ urlpatterns = patterns('api.views',
 
    #currently not designed / implemented    
    # (r'^comments/?$', 'get_comment'),
+#    (r'^comment/(?P<oid>\d+)/?$', 'get_comment'),
+#    (r'^comment/add/?$', 'add_comment'),
+#    (r'^comment/remove/?$', 'remove_comment'),
+#    (r'^comment/rate/(?P<oid>\d+)/?$', 'rate_comment'),
+#    (r'^comment/edit/(?P<oid>\d+)/?$','edit_comment'),
+#    
     (r'^comment/(?P<oid>\d+)/?$', 'get_comment'),
+    (r'^comments/?$', 'get_comments'),
     (r'^comment/add/?$', 'add_comment'),
-    (r'^comment/remove/?$', 'remove_comment'),
     (r'^comment/rate/(?P<oid>\d+)/?$', 'rate_comment'),
-    (r'^comment/edit/(?P<oid>\d+)/?$','edit_comment'),
-    
-    (r'^discussion/(?P<oid>\d+)/?$', 'get_discussion'),
-    (r'^discussions/?$', 'get_discussions'),
-    (r'^discussion/add/?$', 'add_discussion'),
 
     
     

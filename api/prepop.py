@@ -5,7 +5,8 @@ Created on Apr 2, 2012
 '''
 from api.business_operations import add_business_server
 from api.models import Topic, Business, BusinessType, BusinessRating, \
-    BusinessMeta, Type, BusinessTopicRating, BusinessTopic, UserTopic
+    BusinessMeta, Type, BusinessTopicRating, BusinessTopic, UserTopic, Comment, \
+    Review
 from api.photos import add_photo_by_url
 from api.topic_operations import add_topic, add_topic_to_bus
 from as2 import settings
@@ -300,6 +301,27 @@ def format_inspdata(inspdate):
 
     return ('{0}-{1}-{2}'.format(year,month,day))
     
+    
+def prepop_discussions():
+    user = get_default_user()
+    pos = 0
+    for b in Business.objects.filter(state='NJ'):
+        for t in Topic.objects.filter(descr='Main'):
+            print t
+            print b
+            try:
+                bt = BusinessTopic.objects.get(business=b,topic=t)
+                comment="zouf comment " + str(pos)
+                review = "matts review " + str(pos)
+                comment_reply = "Hey, I agree with you, Zouf"
+                
+                rootComment,createdComment = Comment.objects.get_or_create(businesstopic=bt, user=user,content=comment)  
+                rootReview,createdReview = Review.objects.get_or_create(businesstopic=bt, user=user,content=review) 
+                replyComment, createdReply = Comment.objects.get_or_create(businesstopic=bt,user=user,content=comment_reply,reply_to=rootComment)  
+                pos+=1
+            except:
+                pass
+
 def prepop_nyc_doh_ratings():
     
     fp = open(settings.DOH_DATASET_LOCATION)

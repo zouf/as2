@@ -76,4 +76,28 @@ def getBusinessRatings(b):
     loves = BusinessRating.objects.filter(rating=LOVE).count()
     avg = getBusAverageRating(b)
     return [hates,neutrals,likes,loves,avg]
+
+
+def rate_businesstopic_internal(bustopic,rating,user):
+    if rating < 0:
+        rating = 0.0
+    elif rating > 1:
+        rating = 1.0
+    
+    #remove existing rating
+    if BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).count() > 0:
+        BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).delete()
+    BusinessTopicRating.objects.create(businesstopic=bustopic, rating=rating,user=user) 
+    
+def rate_comment_internal(comment,rating,user):
+    if rating < 0:
+        rating = 0.0
+    elif rating > 1:
+        rating = 1.0
+    
+    #remove existing rating
+    
+    if DiscussionRating.objects.filter(discussion=comment,user=user).count() > 0:
+        DiscussionRating.objects.filter(discussion=comment,user=user).delete()
+    DiscussionRating.objects.create(discussion=comment, rating=rating,user=user) 
     

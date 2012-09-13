@@ -110,12 +110,16 @@ def get_user_details(user):
     data['userName'] = user.username
     data['userEmail'] = user.email
     
-    asuser = AllsortzUser.objects.get(user=user)
-    if asuser.registered:
-        data['registered'] = "true"
-    else:
-        data['registered'] = "false"
+    try:
+        asuser = AllsortzUser.objects.get(user=user)
+        if asuser.registered:
+            data['registered'] = "true"
+        else:
+            data['registered'] = "false"
     
+    except:
+        data['registered'] = "false"
+   
     
     return data
  
@@ -166,31 +170,31 @@ def get_bustopics_data(bustopics,user,detail):
             data.append(res)
     return data
     
-
-
-def get_comment_data(comment,user):
-    data = dict()
-    data['commentCreator'] = comment.user.username
-    data['posted'] = comment.date
-    data['content'] = comment.content
-    [pos,neg] = ratings.getCommentRatings(comment)
-    data['positiveVotes'] = pos
-    data['negativeVotes'] = neg
+#
+#
+#def get_comment_data(comment,user):
+#    data = dict()
+#    data['commentCreator'] = comment.user.username
+#    data['posted'] = comment.date
+#    data['content'] = comment.content
+#    [pos,neg] = ratings.getCommentRatings(comment)
+#    data['positiveVotes'] = pos
+#    data['negativeVotes'] = neg
+#    
+#    try:
+#        thisUsersRating = DiscussionRating.objects.get(discussion=comment,user=user)
+#    except:
+#        thisUsersRating = None
+#    
+#    data['thisUsersRating'] = thisUsersRating       
+#    return data
+#    
     
-    try:
-        thisUsersRating = DiscussionRating.objects.get(discussion=comment,user=user)
-    except:
-        thisUsersRating = None
-    
-    data['thisUsersRating'] = thisUsersRating       
-    return data
-    
-    
-def get_comments_data(comments,user):
-    data = []
-    for c in comments:
-        data.append(get_comment_data(c,user))
-    return data
+#def get_comments_data(comments,user):
+#    data = []
+#    for c in comments:
+#        data.append(get_comment_data(c,user))
+#    return data
 
 
 def get_photo_data(photo,user):

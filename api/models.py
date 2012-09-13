@@ -482,22 +482,24 @@ class Discussion(models.Model):
     date = models.DateTimeField(auto_now=True)
     reply_to = models.ForeignKey('self', related_name='replies', 
         null=True, blank=True)
-    content = models.TextField(max_length=2000)    
+    content = models.TextField(max_length=2000) 
+    businesstopic = models.ForeignKey(BusinessTopic,db_index=True,related_name='bustopicreviews')
     class Admin:
         pass
+
     
-class BusinessTopicDiscussion(Discussion):
-    businesstopic = models.ForeignKey(BusinessTopic,db_index=True)
+class Review(Discussion):
     class Admin:
         pass
     def __unicode__(self):
-        return str(self.user) + " for businesstopic " + str(self.businesstopic) ;
+        return 'Review object for '  + str(self.user) + " for businesstopic " + str(self.businesstopic) ;
     
-    
-class BusinessDiscussion(Discussion):
-    business = models.ForeignKey(Business,db_index=True)
+class Comment(Discussion):
     class Admin:
         pass
+    def __unicode__(self):
+        return 'Comment object for '  + str(self.user) + " for businesstopic " + str(self.businesstopic) ;
+    
     
 class PhotoDiscussion(Discussion):
     photo = models.ForeignKey(Photo,db_index=True)
@@ -535,15 +537,7 @@ class BusinessTopicRating(Rating):
         pass
     def __unicode__(self):
         return str(self.rating) + " : " + str(self.businesstopic) + " - " + str(self.user) 
-    
-    
-class BusinessTopicDiscussionRating(Rating):
-    busTopicDiscussion = models.ForeignKey(BusinessTopicDiscussion,db_index=True)
-    class Admin:
-        pass
-    def __unicode__(self):
-        return str(self.rating) + " : " + str(self.busTopicDiscussion) + " - " + str(self.user) 
-    
+      
 class BusinessRating(Rating):
     business = models.ForeignKey(Business,db_index=True)
     class Admin:

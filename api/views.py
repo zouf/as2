@@ -4,13 +4,14 @@ from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
     get_request_get_or_error, get_request_post_or_error, get_bus_data_ios, \
     get_request_post_or_warn, get_request_postlist_or_warn, \
     get_request_postlist_or_error
-from api.models import Photo, PhotoRating, BusinessDiscussion, PhotoDiscussion, \
-    Discussion, Business, Topic, DiscussionRating, BusinessRating, Type, \
-    BusinessType, Rating, BusinessMeta, BusinessTopic, BusinessTopicDiscussion, \
-    BusinessTopicRating, UserTopic, AllsortzUser, Edge
+from api.models import Photo, PhotoRating, PhotoDiscussion, Discussion, Business, \
+    Topic, DiscussionRating, BusinessRating, Type, BusinessType, Rating, \
+    BusinessMeta, BusinessTopic, BusinessTopicRating, UserTopic, AllsortzUser, Edge, \
+    Comment
 from api.photos import add_photo_by_url
-from api.topic_operations import add_topic_to_bus, \
-    add_discussion_to_businesstopic, get_discussions_data, get_discussion_data
+from api.ratings import rate_businesstopic_internal, rate_comment_internal
+from api.topic_operations import add_topic_to_bus, get_discussions_data, \
+    get_discussion_data, add_review_to_businesstopic, add_comment_to_businesstopic
 from django.contrib.auth.models import User
 from django.contrib.gis.db.models.fields import PolygonField
 from django.contrib.gis.geos.factory import fromstr
@@ -313,7 +314,7 @@ def is_searchtext_location(searchText, currentlocation):
     
     
     #basically dont return its absurdly far away
-    if dist.mi > 2500:
+    if dist.mi > 80:
         return None
 
     
@@ -573,20 +574,11 @@ def rate_business_topic(request,oid):
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-        return server_error(e.value)
+        return server_error(str(e))
     except: 
         return server_error('bustopic with id '+str(oid)+'not found')
     
-    if rating < 0:
-        rating = 0.0
-    elif rating > 1:
-        rating = 1.0
-    
-    #remove existing rating
-    if BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).count() > 0:
-        BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).delete()
-    BusinessTopicRating.objects.create(businesstopic=bustopic, rating=rating,user=user) 
-    
+    rate_businesstopic_internal(bustopic=bustopic,user=user,rating=rating)
     data = serial.get_bustopic_data(bustopic,user)
     return server_data(data)
 
@@ -825,128 +817,128 @@ def unsubscribe_topic(request,oid):
 '''
 PRAGMA Code to handle comments
 '''
-
-def get_comments(request):
-    try:
-        user = auth.authenticate_api_request(request)
-        auth.authorize_user(user, request, "get")
-    except ReadJSONError as e:
-        return server_error(e.value)
-    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-        return server_error(e.value)
-    return server_error('unimplemented')
-
-def get_comment(request,oid):
-    try:
-        user = auth.authenticate_api_request(request)
-        auth.authorize_user(user, request, "get")
-        comment = Discussion.objects.get(id=oid)
-    except ReadJSONError as e:
-        return server_error(e.value)
-    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-        return server_error(e.value)
-    
-    data = serial.get_comment_data(comment,user)
-    return server_data(data)
-
-def rate_comment(request,oid):
-    try:
-        user = auth.authenticate_api_request(request)
-        auth.authorize_user(user, request, "rate")
-        rating = int(get_request_get_or_error('rating', request))
-        comment = Discussion.objects.get(id=oid)
-    except ReadJSONError as e:
-        return server_error(e.value)
-    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-        return server_error(e.value)
-    except: 
-        return server_error('Comment with id '+str(oid)+'not found')
-
-    if rating < 0:
-        rating = 0.0
-    elif rating > 1:
-        rating = 1.0
-    
-    #XXX TODO make sure rating is an int
-    #remove existing rating
-    if DiscussionRating.objects.filter(user=user,comment=comment).count() > 0:
-        DiscussionRating.objects.filter(user=user,comment=comment).delete()
-    DiscussionRating.objects.create(user=user,rating=rating,comment=comment)
-    data = serial.get_comment_data(comment,user)
-    return server_data(data)
-
-def add_comment(request):
-    try: 
-        user = auth.authenticate_api_request(request)
-        oid = get_request_get_or_error('commentBaseID', request)  
-        commentType = get_request_get_or_error('type', request)  
-        content = get_request_post_or_error('commentContent', request)  
-    except ReadJSONError as e:
-        return server_error(e.value)
-    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-        return server_error(e.value)
-
-    try:
-        if 'replyTo' in request.GET:
-            replyToID = request.GET['replyTo']
-            replyComment = Discussion.objects.get(id=replyToID)
-        else:
-            replyComment = None
-    except:
-        return server_error("No comment found with id "+str(replyToID))
-    
-    if commentType == 'business':
-        try:
-            bus = Business.objects.get(id=oid)
-        except:
-            return server_error("Business with ID "+str(oid)+ " does not exist")
-        comment = BusinessDiscussion.objects.create(user=user,reply_to=replyComment,content=content,business=bus)
-    elif commentType == 'businesstopic':
-        try:
-            btopic = BusinessTopic.objects.get(id=oid)
-        except:
-            return server_error("bustopic with ID "+str(oid)+ " does not exist")
-        comment = BusinessTopicDiscussion.objects.create(user=user,reply_to=replyComment,content=content,businesstopic=btopic)
-    elif commentType == 'photo':
-        try:
-            photo = Photo.objects.get(id=oid)
-        except:
-            return server_error("Photo with ID "+str(oid)+ " does not exist")
-        comment = PhotoDiscussion.objects.create(user=user,reply_to=replyComment,content=content,photo=photo)  
-    else:
-        return server_error("Invalid commentType "+str(commentType))
-    data = serial.get_comment_data(comment,user)
-    return server_data(data)
-
-def edit_comment(request,oid):
-    try:
-        user = auth.authenticate_api_request(request)
-        auth.authorize_user(user, request, "edit")
-        content = get_request_post_or_error('commentContent', request)  
-    except ReadJSONError as e:
-        return server_error(e.value)
-    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-        return server_error(e.value)
-    
-    comment = BusinessTopicDiscussion.objects.create(id=oid,content=content)
-    data = serial.get_comment_data(comment,user)
-    return server_data(data)
-    
-def remove_comment(request,oid):
-    try:
-        user = auth.authenticate_api_request(request)
-        auth.authorize_user(user, request, "user")
-    except ReadJSONError as e:
-        return server_error(e.value)
-    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-        return server_error(e.value)
-    
-    try:
-        Discussion.objects.filter(id=oid).delete()
-    except: 
-        return server_error('Comment with id '+str(oid)+' not found. Deletion failed')
-    
-    return server_data("Deletion successful")
+#
+#def get_comments(request):
+#    try:
+#        user = auth.authenticate_api_request(request)
+#        auth.authorize_user(user, request, "get")
+#    except ReadJSONError as e:
+#        return server_error(e.value)
+#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+#        return server_error(e.value)
+#    return server_error('unimplemented')
+#
+#def get_comment(request,oid):
+#    try:
+#        user = auth.authenticate_api_request(request)
+#        auth.authorize_user(user, request, "get")
+#        comment = Discussion.objects.get(id=oid)
+#    except ReadJSONError as e:
+#        return server_error(e.value)
+#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+#        return server_error(e.value)
+#    
+#    data = serial.get_comment_data(comment,user)
+#    return server_data(data)
+#
+#def rate_comment(request,oid):
+#    try:
+#        user = auth.authenticate_api_request(request)
+#        auth.authorize_user(user, request, "rate")
+#        rating = int(get_request_get_or_error('rating', request))
+#        comment = Discussion.objects.get(id=oid)
+#    except ReadJSONError as e:
+#        return server_error(e.value)
+#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+#        return server_error(e.value)
+#    except: 
+#        return server_error('Comment with id '+str(oid)+'not found')
+#
+#    if rating < 0:
+#        rating = 0.0
+#    elif rating > 1:
+#        rating = 1.0
+#    
+#    #XXX TODO make sure rating is an int
+#    #remove existing rating
+#    if DiscussionRating.objects.filter(user=user,comment=comment).count() > 0:
+#        DiscussionRating.objects.filter(user=user,comment=comment).delete()
+#    DiscussionRating.objects.create(user=user,rating=rating,comment=comment)
+#    data = serial.get_comment_data(comment,user)
+#    return server_data(data)
+#
+#def add_comment(request):
+#    try: 
+#        user = auth.authenticate_api_request(request)
+#        oid = get_request_get_or_error('commentBaseID', request)  
+#        commentType = get_request_get_or_error('type', request)  
+#        content = get_request_post_or_error('commentContent', request)  
+#    except ReadJSONError as e:
+#        return server_error(e.value)
+#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+#        return server_error(e.value)
+#
+#    try:
+#        if 'replyTo' in request.GET:
+#            replyToID = request.GET['replyTo']
+#            replyComment = Discussion.objects.get(id=replyToID)
+#        else:
+#            replyComment = None
+#    except:
+#        return server_error("No comment found with id "+str(replyToID))
+#    
+#    if commentType == 'review':
+#        try:
+#            bus = Business.objects.get(id=oid)
+#        except:
+#            return server_error("Business with ID "+str(oid)+ " does not exist")
+#        comment = Comment.objects.create(user=user,reply_to=replyComment,content=content,business=bus)
+#    elif commentType == 'comment':
+#        try:
+#            btopic = BusinessTopic.objects.get(id=oid)
+#        except:
+#            return server_error("bustopic with ID "+str(oid)+ " does not exist")
+#        comment = Comment.objects.create(user=user,reply_to=replyComment,content=content,businesstopic=btopic)
+#    elif commentType == 'photo':
+#        try:
+#            photo = Photo.objects.get(id=oid)
+#        except:
+#            return server_error("Photo with ID "+str(oid)+ " does not exist")
+#        comment = PhotoDiscussion.objects.create(user=user,reply_to=replyComment,content=content,photo=photo)  
+#    else:
+#        return server_error("Invalid commentType "+str(commentType))
+#    data = serial.get_comment_data(comment,user)
+#    return server_data(data)
+#
+#def edit_comment(request,oid):
+#    try:
+#        user = auth.authenticate_api_request(request)
+#        auth.authorize_user(user, request, "edit")
+#        content = get_request_post_or_error('commentContent', request)  
+#    except ReadJSONError as e:
+#        return server_error(e.value)
+#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+#        return server_error(e.value)
+#    
+#    comment = Comment.objects.create(id=oid,content=content)
+#    data = serial.get_discussion_data(comment,user)
+#    return server_data(data)
+#    
+#def remove_comment(request,oid):
+#    try:
+#        user = auth.authenticate_api_request(request)
+#        auth.authorize_user(user, request, "user")
+#    except ReadJSONError as e:
+#        return server_error(e.value)
+#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+#        return server_error(e.value)
+#    
+#    try:
+#        Discussion.objects.filter(id=oid).delete()
+#    except: 
+#        return server_error('Comment with id '+str(oid)+' not found. Deletion failed')
+#    
+#    return server_data("Deletion successful")
 
 
 '''
@@ -1108,9 +1100,9 @@ def remove_photo(request,oid):
 ''' 
 PRAMGA Code to handle discussions 
 '''
-#the discussions are the "reviews". Discussions with no parent are eligible to the be
+#the comments are the "reviews" and "comments" (that are replies to the business topic or the review. Discussions with no parent are eligible to the be
 # top review for a topic and will be displayed on the business details page
-def get_discussions(request):
+def get_comments(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
@@ -1119,26 +1111,28 @@ def get_discussions(request):
     except Exception as e:
         return server_error(str(e))
     
-    discussions = BusinessTopicDiscussion.objects.filter(businesstopic =bustopic)
+    discussions = Discussion.objects.filter(businesstopic =bustopic)
     
     data = dict()
-    data['discussions'] = get_discussions_data(discussions)
-    return server_data(data,"discussions")
+    data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
+    data['comments'] = get_discussions_data(discussions,user)
+    print(data)
+    return server_data(data,"comments")
 
 
-def get_discussion(request,oid):
+def get_comment(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        discussion = BusinessTopicDiscussion.objects.get(id=oid)
+        discussion = Discussion.objects.get(id=oid)
     except Exception as e:
         return server_error(str(e))
     
     data = dict()
-    data['discussion'] = get_discussion_data(discussion)
-    return server_data(data,"discussion")
+    data['comment'] = get_discussion_data(discussion,user)
+    return server_data(data,"comment")
 
-def add_discussion(request):
+def add_comment(request):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
@@ -1146,23 +1140,44 @@ def add_discussion(request):
         businessID = get_request_get_or_error('businessID', request)   
         topics = Topic.objects.get(id__in=topicIDs)
         business = Business.objects.get(id=businessID) 
-        review = get_request_post_or_error('review', request)
+        commentType = get_request_post_or_error('commentType')
+        replyTo = get_request_post_or_warn('replyToID', request)
+        review = get_request_post_or_error('content', request)
     except Exception as e:
         return server_error(str(e))
     except Exception as e:
         return server_error(str(e))
     
-    print("Add a discussion to " + str(business) + " for the topics " + str(topics))
+    print("Add a comment to " + str(business) + " for the topics " + str(topics))
     print('Review is ' + str(review))
     try:
         for t in topics:
             bt = add_topic_to_bus(business,t,user)
-            add_discussion_to_businesstopic(bt,user)
+            if commentType == "review":
+                add_review_to_businesstopic(bt,user)
+            else:
+                add_comment_to_businesstopic(bt,user, replyTo)
+
     except Exception as e:
         return server_error(str(e))
     
     return server_data("success","msg")
 
+def rate_comment(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "rate")
+        comment = Discussion.objects.get(id=oid)
+        rating = int(get_request_get_or_error('rating', request))
+    except Exception as e:
+        return server_error(str(e))
+    
+    print('rating')
+    rate_comment_internal(comment=comment,user=user,rating=rating)
+    serialized = get_discussion_data(comment, user)
+    return server_data(serialized,"comment")
+
+    
     
 ''' 
 PRAGMA Code to handle social
