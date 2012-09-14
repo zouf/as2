@@ -69,13 +69,13 @@ def getBusinessRatings(b):
     return [hates,neutrals,likes,loves,avg]
 
 def get_bustopic_adjective(bustopic, avg):
-    if avg < .2:
+    if avg < .3:
         return 'Avoid it!'
-    elif avg < .4:
+    elif avg < .45:
         return 'Not so good.'
-    elif avg < .6:
+    elif avg < .55:
         return 'Decent'
-    elif avg < .8:
+    elif avg < .7:
         return 'Good!'
     else:
         return 'Stunning!'
