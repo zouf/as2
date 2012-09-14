@@ -74,8 +74,11 @@ def get_avg_bustopic_rating(bustopic):
         return ' ALREADY ON MODEL'
         return avg
     except:
-        ratingFilter = BusinessTopicRating.objects.filter(businesstopic=bustopic).aggregate(Avg('rating'))
-        return ratingFilter['rating__avg']
+        try:
+            ratingFilter = BusinessTopicRating.objects.filter(businesstopic=bustopic).aggregate(Avg('rating'))
+            return ratingFilter['rating__avg']
+        except:
+            return 0
 
 def get_user_bustopic_rating(bustopic,user):
     r = BusinessTopicRating.objects.get(businesstopic=bustopic,user=user).rating
