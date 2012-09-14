@@ -1,10 +1,6 @@
 from django.conf.urls import url, patterns
 
-urlpatterns = patterns('api.views',
-    (r'^populate_database/?$','prepopulate_database'),
-    
-    
-    
+urlpatterns = patterns('api.views', 
     (r'^businesses/?$', 'get_businesses'),
     (r'^businesses/map/?$', 'get_businesses_map'),
 

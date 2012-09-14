@@ -191,46 +191,49 @@ def prepop_topic_ratings():
     NumBusiness = Business.objects.count()
     NumTopics = Topic.objects.count()
       
-    user = get_default_user()
-    print('User ' + str(user))
+    #user = get_default_user()
+    
     i = 0
     center = random.randint(0, NumTopics-1)
+    for user  in User.objects.all():
+        print('User ' + str(user))
+        for t in Topic.objects.all():
+            for b in Business.objects.filter(state='NJ'):
+                print('Rating ' + str(b) + ' under the topic ' + str(t))
+                #norm_given_rat = stats.norm(center,rating_given_sd)  #gaussian distribution for giving a rating
+                
+                #almost everything will get a rating
+                prob_rat_given =  .8 # norm_given_rat.pdf(i)  *  1/norm_given_rat.pdf(center)
     
-    for t in Topic.objects.all():
-        for b in Business.objects.all():
-            print('Rating ' + str(b) + ' under the topic ' + str(t))
-            #norm_given_rat = stats.norm(center,rating_given_sd)  #gaussian distribution for giving a rating
-            prob_rat_given =  1 # norm_given_rat.pdf(i)  *  1/norm_given_rat.pdf(center)
-
-            rat_given_rv = binomial(1, prob_rat_given, 1) #1 if rated, 0 otherwise
-            if rat_given_rv[0] != 0:
-                #norm_pos_rat = stats.norm(center,pos_rating_sd) #create a normal distribution
-                prob_pos_rat =  0.5 #norm_pos_rat.pdf(i)  *  1/norm_pos_rat.pdf(center) #probability positive
-                
-                SIZE = 5
-                #We'll ge tan array that is of lenght SIZE and the probability of the event being '1' is prob_pos_rat
-                pos_rat_rv = binomial(1, prob_pos_rat, SIZE) #1 if positive, 0 negative
-                
-
-                #sum up the array and divide to get a rating between 0 and 1
-                rating_scaled = 0                    
-                SUM = 0.0
-                for r in pos_rat_rv:
-                    SUM += r
-                rating_scaled = float(SUM)/float(SIZE)
-                print('giving rating' + str(rating_scaled))
-                try:
+                rat_given_rv = binomial(1, prob_rat_given, 1) #1 if rated, 0 otherwise
+                if rat_given_rv[0] != 0:
+                    #norm_pos_rat = stats.norm(center,pos_rating_sd) #create a normal distribution
+                    prob_pos_rat =  0.5 #norm_pos_rat.pdf(i)  *  1/norm_pos_rat.pdf(center) #probability positive
                     
-                    bt = BusinessTopic.objects.get(business=b,topic=t)
-                    BusinessTopicRating.objects.filter(businesstopic=bt,user=user).delete()
-                #UserTopic.objects.create(user=user,topic=t,importance=1)
-                    rat = BusinessTopicRating(businesstopic=bt, user=user, rating=float(rating_scaled))
-                    rat.save()
-                except:
-                    pass
-            #no rating        
-            i=i+1
-            
+                    SIZE = 5
+                    #We'll ge tan array that is of lenght SIZE and the probability of the event being '1' is prob_pos_rat
+                    pos_rat_rv = binomial(1, prob_pos_rat, SIZE) #1 if positive, 0 negative
+                    
+    
+                    #sum up the array and divide to get a rating between 0 and 1
+                    rating_scaled = 0                    
+                    SUM = 0.0
+                    for r in pos_rat_rv:
+                        SUM += r
+                    rating_scaled = float(SUM)/float(SIZE)
+                    print('giving rating' + str(rating_scaled))
+                    try:
+                        
+                        bt = BusinessTopic.objects.get(business=b,topic=t)
+                        BusinessTopicRating.objects.filter(businesstopic=bt,user=user).delete()
+                    #UserTopic.objects.create(user=user,topic=t,importance=1)
+                        rat = BusinessTopicRating(businesstopic=bt, user=user, rating=float(rating_scaled))
+                        rat.save()
+                    except:
+                        pass
+                #no rating        
+                i=i+1
+                
 
 
     

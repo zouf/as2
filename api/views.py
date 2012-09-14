@@ -7,7 +7,7 @@ from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
 from api.models import Photo, PhotoRating, PhotoDiscussion, Discussion, Business, \
     Topic, DiscussionRating, BusinessRating, Type, BusinessType, Rating, \
     BusinessMeta, BusinessTopic, BusinessTopicRating, UserTopic, AllsortzUser, Edge, \
-    Comment
+    Comment, BusinessCache, UserCache
 from api.photos import add_photo_by_url
 from api.ratings import rate_businesstopic_internal, rate_comment_internal
 from api.topic_operations import add_topic_to_bus, get_discussions_data, \
@@ -1323,9 +1323,15 @@ def remove_query(request,oid):
     return server_data("Deletion successful")
 
  
-def edit_query(requst):
+def edit_query(request):
     return server_error("unimplemented")
  
+ 
+def clear_caches(): 
+    BusinessCache.objects.all().delete()
+    Recommendation.objects.all().delete()
+    UserCache.objects.all().delete()
+
 def internal_populate_database():
     Rating.objects.all().delete()
     Business.objects.all().delete()
@@ -1339,14 +1345,14 @@ def internal_populate_database():
     Recommendation.objects.all().delete()
     BusinessTopicRating.objects.all().delete()
     
+    clear_caches()
+    
     prepop.prepop_types(user)
     prepop.prepop_topics(user)
     prepop.prepop_businesses(user)
     prepop.prepop_queries(user)
     
-    
-    
-    #prepop.prepop_users()
+    prepop.prepop_users()
 #    prepop.prepop_business_ratings()
     prepop.prepop_topic_ratings()
  
