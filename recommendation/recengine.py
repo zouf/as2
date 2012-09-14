@@ -20,13 +20,11 @@ def get_recommendation_by_topic(business,user):
         r = Recommendation.objects.get(business=business,user=user)
         return r.recommendation
     except:
-        return 0
-    
         (runSum, runCt) = get_node_average(business,Topic.objects.get(descr='Main'),user)
         if runCt > 0:
             avg = float(runSum)/float(runCt)
-            logger.debug('AVG for business ' + str(business) + ' is ' + str(avg))
-            
+            #logger.debug('AVG for business ' + str(business) + ' is ' + str(avg))
+
             try:
                 rec = Recommendation.objects.get(user=user,business=business).delete()
                 rec.recommendation = avg;
