@@ -578,9 +578,11 @@ def rate_business_topic(request,oid):
     except: 
         return server_error('bustopic with id '+str(oid)+'not found')
     
+    
+    print('here')
     rate_businesstopic_internal(bustopic=bustopic,user=user,rating=rating)
-    data = serial.get_bustopic_data(bustopic,user)
-    return server_data(data)
+    #data = serial.get_bustopic_data(bustopic,user)
+    return server_data("success","bustopic")
 
 
 '''Associates a topic with a business '''

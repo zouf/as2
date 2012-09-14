@@ -79,21 +79,25 @@ def getBusinessRatings(b):
 
 
 def rate_businesstopic_internal(bustopic,rating,user):
-    if rating < 0:
-        rating = 0.0
+    if rating < -1:
+        rating = -1.0
     elif rating > 1:
         rating = 1.0
     
+    print('blarg')
     #remove existing rating
     if BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).count() > 0:
         BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).delete()
+    print('CREATING RAITNG FOR '
+           +str(bustopic))
     BusinessTopicRating.objects.create(businesstopic=bustopic, rating=rating,user=user) 
     
 def rate_comment_internal(comment,rating,user):
-    if rating < 0:
-        rating = 0.0
+    if rating < -1:
+        rating = -1.0
     elif rating > 1:
         rating = 1.0
+    
     
     #remove existing rating
     
