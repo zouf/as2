@@ -179,9 +179,9 @@ def get_single_bus_data_ios(b, user,detail):
         #try to get a cached version!
         cache = UserCache.objects.get(user=user,business=b)
         cachedata = json.loads(cache.cachedata)
-        d['categories'] = get_bustopics_data(bustopics,user,detail=True)
+        d['categories'] = cachedata['categories'] 
         d['ratingRecommendation'] = cachedata['ratingRecommendation']
-        print('Used cached')
+        print('Used cached user data')
 
     except:
         #prefetch all relevant info
@@ -189,10 +189,13 @@ def get_single_bus_data_ios(b, user,detail):
         u.current_location = user.current_location
         user = u
         cachedata = {} 
-        try:            
+        try:
+            d['categories'] = get_bustopics_data(bustopics,user,detail=True)
             d['ratingRecommendation'] = "%.2f" % 0.5#user.recommendation_set.get(business_id=b.id).recommendation
         except:
+            d['categories'] = get_bustopics_data(bustopics,user,detail=True)
             d['ratingRecommendation'] = "%.2f" % 0.5#get_recommendation_by_topic(b, user)    
+        cachedata['categories'] = d['categories']
         cachedata['ratingRecommendation'] = d['ratingRecommendation']
         UserCache.objects.create(cachedata=json.dumps(cachedata),user=user,business=b)
 
