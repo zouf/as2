@@ -127,7 +127,12 @@ def get_bustopic_data(bustopic,user,detail):
     data = dict()
     #avg = 0.75  #bustopic.avg_rating
     try:
-        data['bustopicRating'] = BusinessTopicRating.objects.get(businesstopic=bustopic,user=user)
+        r = BusinessTopicRating.objects.get(businesstopic=bustopic,user=user).rating
+        if r >= 1:
+            r = 1
+        elif r <= 0:
+            r = 0
+        data['bustopicRating'] = r
     except:
         data['bustopicRating'] = 0
     data['bustopicID'] = bustopic.id

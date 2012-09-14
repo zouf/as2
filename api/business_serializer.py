@@ -190,10 +190,10 @@ def get_single_bus_data_ios(b, user,detail):
         user = u
         cachedata = {} 
         try:
-            d['categories'] = get_bustopics_data(bustopics,user,detail=True)
+            d['categories'] = get_bustopics_data(b.businesstopic.all(),user,detail=True)
             d['ratingRecommendation'] = "%.2f" % 0.5#user.recommendation_set.get(business_id=b.id).recommendation
         except:
-            d['categories'] = get_bustopics_data(bustopics,user,detail=True)
+            d['categories'] = get_bustopics_data(b.businesstopic.all(),user,detail=True)
             d['ratingRecommendation'] = "%.2f" % 0.5#get_recommendation_by_topic(b, user)    
         cachedata['categories'] = d['categories']
         cachedata['ratingRecommendation'] = d['ratingRecommendation']
