@@ -81,12 +81,15 @@ def get_avg_bustopic_rating(bustopic):
             return 0
 
 def get_user_bustopic_rating(bustopic,user):
-    r = BusinessTopicRating.objects.get(businesstopic=bustopic,user=user).rating
-    if r >= 1:
-        r = 1
-    elif r <= 0:
-        r = 0
-    return r
+    try:
+        r = BusinessTopicRating.objects.get(businesstopic=bustopic,user=user).rating
+        if r >= 1:
+            r = 1
+        elif r <= 0:
+            r = 0
+        return r
+    except:
+        return -1
     
     
 def rate_businesstopic_internal(bustopic,rating,user):
