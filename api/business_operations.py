@@ -34,6 +34,16 @@ def associate_business_with_types(bus,types):
             pass
         associate_business_type(bus, t)  
 
+def associate_business_with_type_IDs(bus,types):
+    for tid in types:
+        try:
+            t = Type.objects.get(id=tid) 
+        except Type.DoesNotExist:
+            print("with id " + str(tid) + " does not exist")
+            #logger.error('Type does not exist")')
+            pass
+        associate_business_type(bus, t)  
+
 
 def edit_business_server(bus,name,addr,city,state,phone,url,types,hours):
     print("Editing business!\n")
@@ -66,7 +76,7 @@ def edit_business_server(bus,name,addr,city,state,phone,url,types,hours):
     
     
     if types != '': 
-        associate_business_with_types(bus,types)   
+        associate_business_with_type_IDs(bus,types)   
         
     BusinessCache.objects.filter(business=bus).delete()
     bus.save()
