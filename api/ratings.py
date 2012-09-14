@@ -76,7 +76,12 @@ def get_avg_bustopic_rating(bustopic):
     except:
         try:
             ratingFilter = BusinessTopicRating.objects.filter(businesstopic=bustopic).aggregate(Avg('rating'))
-            return ratingFilter['rating__avg']
+            avg= ratingFilter['rating__avg']
+            print ' AVG IS ' + str(avg)
+            if avg is None:
+                return 0
+            else:
+                return avg
         except:
             return 0
 
