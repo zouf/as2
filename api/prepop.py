@@ -211,7 +211,7 @@ def prepop_topic_ratings():
                     rat_given_rv = binomial(1, prob_rat_given, 1) #1 if rated, 0 otherwise
                     if rat_given_rv[0] != 0:
                         #norm_pos_rat = stats.norm(center,pos_rating_sd) #create a normal distribution
-                        prob_pos_rat =  0.75 #norm_pos_rat.pdf(i)  *  1/norm_pos_rat.pdf(center) #probability positive
+                        prob_pos_rat =  0.6 #norm_pos_rat.pdf(i)  *  1/norm_pos_rat.pdf(center) #probability positive
                         
                         #like or dislike
                         SIZE = 1
