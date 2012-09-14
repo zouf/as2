@@ -68,6 +68,19 @@ def getBusinessRatings(b):
     avg = getBusAverageRating(b)
     return [hates,neutrals,likes,loves,avg]
 
+def get_bustopic_adjective(bustopic, avg):
+    if avg < .2:
+        return 'Avoid it!'
+    elif avg < .4:
+        return 'Not so good.'
+    elif avg < .6:
+        return 'Decent'
+    elif avg < .8:
+        return 'Good!'
+    else:
+        return 'Stunning!'
+
+
 def get_avg_bustopic_rating(bustopic):
     try:
         avg = bustopic.bustopicrating.rating__avg

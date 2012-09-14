@@ -197,8 +197,8 @@ def prepop_topic_ratings():
     center = random.randint(0, NumTopics-1)
     for user  in User.objects.all():
         print('User ' + str(user))
-        for t in Topic.objects.all():
-            for b in Business.objects.filter(state='NJ'):
+        for b in Business.objects.filter(state='NJ'):
+            for t in Topic.objects.all():
                 try:
                     bt = BusinessTopic.objects.get(business=b,topic=t)
 
