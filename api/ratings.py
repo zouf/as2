@@ -22,15 +22,6 @@ def getCommentRatings(discussion):
     numNeg = DiscussionRating.objects.filter(rating=0).count()
     return [numPos, numNeg]
     
-def getBusTopicRatings(bustopic):
-    return bustopic.avg_rating
-    #if BusinessTopicRating.objects.all().count() == 0:
-    #    return 0
-    
-#    ratingFilter = BusinessTopicRating.objects.filter(businesstopic=bustopic).aggregate(Avg('rating'))
-#    avg = ratingFilter['rating__avg']
-    #numNeg = DiscussionRating.objects.filter(rating=0).count()
-    #return avg
 
 def getPhotoRatings(photo):
     ratingFilter = PhotoRating.objects.filter(photo=photo, rating__range=["1", "5"])
@@ -77,7 +68,24 @@ def getBusinessRatings(b):
     avg = getBusAverageRating(b)
     return [hates,neutrals,likes,loves,avg]
 
+def get_avg_bustopic_rating(bustopic):
+    try:
+        avg = bustopic.bustopicrating.rating__avg
+        return ' ALREADY ON MODEL'
+        return avg
+    except:
+        ratingFilter = BusinessTopicRating.objects.filter(businesstopic=bustopic).aggregate(Avg('rating'))
+        return ratingFilter['rating__avg']
 
+def get_user_bustopic_rating(bustopic,user):
+    r = BusinessTopicRating.objects.get(businesstopic=bustopic,user=user).rating
+    if r >= 1:
+        r = 1
+    elif r <= 0:
+        r = 0
+    return r
+    
+    
 def rate_businesstopic_internal(bustopic,rating,user):
     if rating < -1:
         rating = -1.0

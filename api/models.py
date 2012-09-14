@@ -532,7 +532,7 @@ class PhotoRating(Rating):
     
     
 class BusinessTopicRating(Rating):
-    businesstopic = models.ForeignKey(BusinessTopic,db_index=True)
+    businesstopic = models.ForeignKey(BusinessTopic,db_index=True,related_name='bustopicrating')
     class Admin:
         pass
     def __unicode__(self):
