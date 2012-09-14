@@ -2,7 +2,7 @@
 from api.authenticate import get_default_user
 from api.models import BusinessRating, Business, UserTopic, BusinessTopicRating, \
     BusinessTopic, Topic
-from api.ratings import getBusAverageRating
+from api.ratings import getBusAverageRating, get_avg_bustopic_rating
 from cProfile import runctx
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Count, Sum, Avg
@@ -15,24 +15,28 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 def get_recommendation_by_topic(business,user):
+
     logger.debug('Getting recommendation for ' + str(business))
     try:
         r = Recommendation.objects.get(business=business,user=user)
         return r.recommendation
     except:
-        (runSum, runCt) = get_node_average(business,Topic.objects.get(descr='Main'),user)
+        u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic').select_related()[0]
+        (runSum, runCt) = get_node_average(business,Topic.objects.get(descr='Main'),u)
         if runCt > 0:
             avg = float(runSum)/float(runCt)
             #logger.debug('AVG for business ' + str(business) + ' is ' + str(avg))
 
-            try:
-                rec = Recommendation.objects.get(user=user,business=business).delete()
-                rec.recommendation = avg;
-                rec.save()
-            except:
-                Recommendation.objects.create(user=user,business=business,recommendation=avg)
-            return avg
-        return 0
+        else:
+            avg = 0  #get avg? some default? TODO
+        try:
+            rec = Recommendation.objects.get(user=user,business=business).delete()
+            rec.recommendation = avg;
+            rec.save()
+        except:
+            Recommendation.objects.create(user=user,business=business,recommendation=avg)
+        return avg
+        
            
         
     

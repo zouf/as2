@@ -175,30 +175,23 @@ def get_single_bus_data_ios(b, user,detail):
         BusinessCache.objects.create(cachedata=json.dumps(d),business=b)
         
 
-    try:
-        #try to get a cached version!
-        cache = UserCache.objects.get(user=user,business=b)
-        cachedata = json.loads(cache.cachedata)
-        d['categories'] = cachedata['categories'] 
-        d['ratingRecommendation'] = cachedata['ratingRecommendation']
-        print('Used cached user data')
-
-    except:
-        #prefetch all relevant info
-        u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic','recommendation_set__business').select_related()[0]
-        u.current_location = user.current_location
-        user = u
-        cachedata = {} 
+    #does caching internally    
+    d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user) 
+    if detail: 
         try:
-            d['categories'] = get_bustopics_data(b.businesstopic.all(),user,detail=True)
-            d['ratingRecommendation'] = "%.2f" % user.recommendation_set.get(business_id=b.id).recommendation
+            #try to get a cached version!
+            cache = UserCache.objects.get(user=user,business=b)
+            cachedata = json.loads(cache.cachedata)
+            d['categories'] = cachedata['categories'] 
+            print('Used cached user data')
         except:
-            d['categories'] = get_bustopics_data(b.businesstopic.all(),user,detail=True)
-            d['ratingRecommendation'] = "%.2f" % get_recommendation_by_topic(b, user)    
-        cachedata['categories'] = d['categories']
-        cachedata['ratingRecommendation'] = d['ratingRecommendation']
-        UserCache.objects.create(cachedata=json.dumps(cachedata),user=user,business=b)
-
+            u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic').select_related()[0]
+            cachedata = {} 
+            d['categories'] = get_bustopics_data(b.businesstopic.all(),u,detail=True)
+            cachedata['categories'] = d['categories']
+            UserCache.objects.create(cachedata=json.dumps(cachedata),user=user,business=b)
+    else:
+        print('NO DETAIL, so NO TOPIC DATA!')
 
     # if the business has this attribute et (from some other calculation) then use it
     if hasattr(b, 'distance'):

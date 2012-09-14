@@ -511,8 +511,6 @@ def get_businesses_internal(request):
     print('Performing serialization...')
     print(businesses) 
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
-    
-
     print('Serialization complete...')
     return server_data(serialized,"business")
 
