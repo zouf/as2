@@ -165,7 +165,6 @@ def get_single_bus_data_ios(b, user,detail):
         
         #d['ratingOverAllUsers']  = getBusAverageRating(b)
         d['types'] = get_bustypes_data(bustypes,user)
-        d['categories'] = get_bustopics_data(bustopics,user,detail=True)
         
         d['health_info'] = get_health_info(b.metadata)
         
@@ -180,6 +179,7 @@ def get_single_bus_data_ios(b, user,detail):
         #try to get a cached version!
         cache = UserCache.objects.get(user=user,business=b)
         cachedata = json.loads(cache.cachedata)
+        d['categories'] = get_bustopics_data(bustopics,user,detail=True)
         d['ratingRecommendation'] = cachedata['ratingRecommendation']
         print('Used cached')
 

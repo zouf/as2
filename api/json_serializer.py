@@ -5,7 +5,7 @@ Created on Jul 27, 2012
 '''
 
 from api.models import DiscussionRating, PhotoRating, UserTopic, Topic, Edge, \
-    AllsortzUser, BusinessMeta, TopicCache
+    AllsortzUser, BusinessMeta, TopicCache, BusinessTopicRating
 from queries.models import QueryTopic
 from wiki.models import Page
 import api.ratings as ratings
@@ -125,8 +125,11 @@ def get_user_details(user):
  
 def get_bustopic_data(bustopic,user,detail):
     data = dict()
-    avg = 0.75  #bustopic.avg_rating
-    data['bustopicRating'] = avg
+    #avg = 0.75  #bustopic.avg_rating
+    try:
+        data['bustopicRating'] = BusinessTopicRating.objects.get(businesstopic=bustopic,user=user)
+    except:
+        data['bustopicRating'] = 0
     data['bustopicID'] = bustopic.id
     data['topic'] = get_topic_data(bustopic.topic, user)       
         
