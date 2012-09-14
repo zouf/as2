@@ -7,7 +7,7 @@ Created on Aug 1, 2012
 #import ios_interface 
 
 from api.models import PhotoRating, DiscussionRating, BusinessRating, \
-    BusinessTopicRating
+    BusinessTopicRating, UserCache
 from django.db.models.aggregates import Count, Sum, Avg
 
 HATE = 0
@@ -90,6 +90,7 @@ def rate_businesstopic_internal(bustopic,rating,user):
         BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).delete()
     print('CREATING RAITNG FOR '
            +str(bustopic))
+    UserCache.objects.filter(business=bustopic.business,user=user).delete()
     BusinessTopicRating.objects.create(businesstopic=bustopic, rating=rating,user=user) 
     
 def rate_comment_internal(comment,rating,user):
@@ -103,5 +104,6 @@ def rate_comment_internal(comment,rating,user):
     
     if DiscussionRating.objects.filter(discussion=comment,user=user).count() > 0:
         DiscussionRating.objects.filter(discussion=comment,user=user).delete()
+    
     DiscussionRating.objects.create(discussion=comment, rating=rating,user=user) 
     
