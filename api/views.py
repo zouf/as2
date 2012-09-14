@@ -123,7 +123,7 @@ def add_business(request):
         auth.authorize_user(user, request, "add")
         bus = Business()
         name=get_request_post_or_warn('businessName', request)
-        addr=get_request_post_or_warn('businessStreet', request)
+        addr=get_request_post_or_warn('businessAddress', request)
         city = get_request_post_or_warn('businessCity', request)
         state = get_request_post_or_warn('businessState', request)
         phone =  get_request_post_or_warn('businessPhone', request)
@@ -168,7 +168,7 @@ def edit_business(request,oid):
         return server_error("Getting business with id "+str(oid)+" failed")
     
     #bus.dist = distance.distance(user.current_location,(bus.lat,bus.lon)).miles
-    bus_data = get_single_bus_data_ios(bus,user)
+    bus_data = get_single_bus_data_ios(bus,user,detail=True)
     return server_data(bus_data,"business")
 
 def remove_business(request,oid):
