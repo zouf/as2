@@ -27,33 +27,33 @@ busTopicRelation = {}
 busTypeRelation = {}
   
 
-def set_topic_mapping():
-    global busTopicRelation
-    if busTopicRelation != {}:
-        print 'already set topic'
-        return
-    print ' set topic mapping'
-    btrset = BusinessTopic.objects.annotate(avg_rating=Avg('businesstopicrating__rating')).prefetch_related('business','topic')
-    for bt in btrset:
-        busTopicRelation.setdefault(bt.business.id, []).append(bt)
-
-
-
-
-def set_type_mapping():
-    global busTypeRelation
-    if busTypeRelation != {}:
-        return
-    for bt in BusinessType.objects.select_related('business', 'bustype').all():
-        busTypeRelation.setdefault(bt.business.id, []).append(bt)
-        
-def unset_type_mapping():
-    global busTypeRelation
-    busTypeRelation = {}
-    
-def unset_topic_mapping():
-    global busTopiRelation
-    busTopicRelation = {}
+#def set_topic_mapping():
+#    global busTopicRelation
+#    if busTopicRelation != {}:
+#        print 'already set topic'
+#        return
+#    print ' set topic mapping'
+#    btrset = BusinessTopic.objects.annotate(avg_rating=Avg('businesstopicrating__rating')).prefetch_related('business','topic')
+#    for bt in btrset:
+#        busTopicRelation.setdefault(bt.business.id, []).append(bt)
+#
+#
+#
+#
+#def set_type_mapping():
+#    global busTypeRelation
+#    if busTypeRelation != {}:
+#        return
+#    for bt in BusinessType.objects.select_related('business', 'bustype').all():
+#        busTypeRelation.setdefault(bt.business.id, []).append(bt)
+#        
+#def unset_type_mapping():
+#    global busTypeRelation
+#    busTypeRelation = {}
+#    
+#def unset_topic_mapping():
+#    global busTopiRelation
+#    busTopicRelation = {}
         
 
 
@@ -62,7 +62,7 @@ def unset_topic_mapping():
 def get_bus_data_ios(business_list, user,detail=False):
     data = dict()
     data['businesses'] = []
-    business_list = business_list.select_related('metadata','businesscache').prefetch_related('businesstype','businesstopic__businesstopicrating_set')
+    business_list = business_list.select_related('metadata','businesscache').prefetch_related('businesstype','businesstopic__bustopicrating')
     for b in business_list:
         d = get_single_bus_data_ios(b, user,detail=detail)
         data['businesses'].append(d)
@@ -190,7 +190,7 @@ def get_single_bus_data_ios(b, user,detail):
         user = u
         cachedata = {} 
         try:
-            d['categories'] = get_bustopics_data(b.businesstopic.annotate(avg_rating=Avg('bustopicrating__rating')),user,detail=True)
+            d['categories'] = get_bustopics_data(b.businesstopic.all(),user,detail=True)
             d['ratingRecommendation'] = "%.2f" % user.recommendation_set.get(business_id=b.id).recommendation
         except:
             d['categories'] = get_bustopics_data(b.businesstopic.all(),user,detail=True)
