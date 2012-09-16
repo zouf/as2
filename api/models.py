@@ -489,6 +489,7 @@ class Discussion(models.Model):
 
     
 class Review(Discussion):
+    business = models.ForeignKey(Business,db_index=True)
     class Admin:
         pass
     def __unicode__(self):

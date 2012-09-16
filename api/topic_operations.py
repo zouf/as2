@@ -4,10 +4,12 @@ Created on Aug 1, 2012
 @author: zouf
 '''
 from api.json_serializer import get_bustopic_data, get_user_details
-from api.models import Topic, BusinessTopic, Edge, Discussion, Review, Comment
+from api.models import Topic, BusinessTopic, Edge, Discussion, Review, Comment, \
+    BusinessCache, UserCache
 from django.contrib.auth.models import User
-import recommendation.normalization as ratings
 from wiki.models import Page
+import api.json_serializer as jsonserial
+import recommendation.normalization as ratings
 
 def get_default_user():
     try:
@@ -19,6 +21,12 @@ def get_default_user():
         
     return user
 
+def get_review_data(business,user):
+    data = dict()
+    data['allTopics'] = jsonserial.get_topics_data(Topic.objects.all(),user,detail=False)
+    data['businessID'] = business.id
+
+    return data
 def get_discussion_data(discussion,user,type=None):
     data = dict()
     
@@ -58,7 +66,7 @@ def get_discussions_data(discussions,user):
 
 def add_review_to_businesstopic(bt,review,user):
     print("Adding review " + str(review) + " to business topic " + str(bt))
-    btd = Review.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)
+    btd = Review.objects.create(businesstopic=bt,business=bt.business,content=review,user=user,reply_to=None)
     return btd
     
 def add_comment_to_businesstopic(bt,review,user, replyTo):
@@ -88,6 +96,9 @@ def add_topic_to_bus(b,topic,user=get_default_user()):
 #        print('create a page')
 #        pg = Page(name=topic.descr,bustopic = bustopic)
 #        pg.save()
+    #BusinessCache.objects.filter(business=b).delete()
+    UserCache.objects.filter(business=b).delete()
+
     return bustopic
 
 

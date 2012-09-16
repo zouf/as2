@@ -11,7 +11,8 @@ from api.models import Photo, PhotoRating, PhotoDiscussion, Discussion, Business
 from api.photos import add_photo_by_url
 from api.ratings import rate_businesstopic_internal, rate_comment_internal
 from api.topic_operations import add_topic_to_bus, get_discussions_data, \
-    get_discussion_data, add_review_to_businesstopic, add_comment_to_businesstopic
+    get_discussion_data, add_review_to_businesstopic, add_comment_to_businesstopic, \
+    get_review_data
 from django.contrib.auth.models import User
 from django.contrib.gis.db.models.fields import PolygonField
 from django.contrib.gis.geos.factory import fromstr
@@ -1128,18 +1129,31 @@ def get_comment(request,oid):
     data['comment'] = get_discussion_data(discussion,user)
     return server_data(data,"comment")
 
-def add_comment(request):
+def get_review(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+        business = Business.objects.get(id=oid)
+    except Exception as e:
+        return server_error(str(e))
+
+    data = get_review_data(business,user)
+    print(data)
+    return server_data(data,"review")
+
+
+def add_comment(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
         topicIDs = get_request_postlist_or_error('topicIDs', request)
-        businessID = get_request_get_or_error('businessID', request)   
-        topics = Topic.objects.get(id__in=topicIDs)
-        business = Business.objects.get(id=businessID) 
-        commentType = get_request_post_or_error('commentType')
+        business = Business.objects.get(id=oid)#('businessID', request)   
+        topics = Topic.objects.filter(id__in=topicIDs)
+        commentType = get_request_post_or_error('commentType',request)
         replyTo = get_request_post_or_warn('replyToID', request)
         review = get_request_post_or_error('content', request)
     except Exception as e:
+        print('error ' + str(e))
         return server_error(str(e))
     except Exception as e:
         return server_error(str(e))
@@ -1150,11 +1164,12 @@ def add_comment(request):
         for t in topics:
             bt = add_topic_to_bus(business,t,user)
             if commentType == "review":
-                add_review_to_businesstopic(bt,user)
+                add_review_to_businesstopic(bt,review,user)
             else:
-                add_comment_to_businesstopic(bt,user, replyTo)
+                add_comment_to_businesstopic(bt,review,user, replyTo)
 
     except Exception as e:
+        print('error is ' + str(e))
         return server_error(str(e))
     
     return server_data("success","msg")

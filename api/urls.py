@@ -50,10 +50,11 @@ urlpatterns = patterns('api.views',
 #    
     (r'^comment/(?P<oid>\d+)/?$', 'get_comment'),
     (r'^comments/?$', 'get_comments'),
-    (r'^comment/add/?$', 'add_comment'),
+    (r'^comment/add/(?P<oid>\d+)/?$', 'add_comment'),
     (r'^comment/rate/(?P<oid>\d+)/?$', 'rate_comment'),
 
-    
+    (r'^review/(?P<oid>\d+)/?$', 'get_review'),
+
     
     url(r'^photos/all/?$', 'get_all_photos'),
     (r'^photos/(?P<oid>\d+)/?$', 'get_photos'),
