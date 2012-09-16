@@ -49,7 +49,7 @@ urlpatterns = patterns('api.views',
 #    (r'^comment/edit/(?P<oid>\d+)/?$','edit_comment'),
 #    
     (r'^comment/(?P<oid>\d+)/?$', 'get_comment'),
-    (r'^comments/?$', 'get_comments'),
+    (r'^comments/(?P<oid>\d+)/?$', 'get_comments'),
     (r'^comment/add/(?P<oid>\d+)/?$', 'add_comment'),
     (r'^comment/rate/(?P<oid>\d+)/?$', 'rate_comment'),
 

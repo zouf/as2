@@ -1099,12 +1099,12 @@ PRAMGA Code to handle discussions
 '''
 #the comments are the "reviews" and "comments" (that are replies to the business topic or the review. Discussions with no parent are eligible to the be
 # top review for a topic and will be displayed on the business details page
-def get_comments(request):
+def get_comments(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        bustopicID = get_request_get_or_error('busTopicID',request)
-        bustopic = BusinessTopic.objects.get(id=bustopicID)
+        #bustopicID = get_request_get_or_error('busTopicID',request)
+        bustopic = BusinessTopic.objects.get(id=oid)
     except Exception as e:
         return server_error(str(e))
     
