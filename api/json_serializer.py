@@ -72,9 +72,11 @@ def get_topics_data(topics,user,detail=False):
 
 def get_topic_data(topic,user,detail=False):
     data = dict()
+
     try:
-        tcache = TopicCache.objects.filter(topic=topic)[0].cachedata
-        data = json.loads(tcache)
+        tcache = TopicCache.objects.get(topic=topic)
+        data = json.loads(tcache.cachedata)
+        print(data)
     except:
         #set_edge_mapping()
         data['parentName'] = topic.descr
