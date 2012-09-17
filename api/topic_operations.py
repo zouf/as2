@@ -9,6 +9,7 @@ from api.models import Topic, BusinessTopic, Edge, Discussion, Review, Comment, 
 from django.contrib.auth.models import User
 from wiki.models import Page
 import api.json_serializer as jsonserial
+import datetime
 import recommendation.normalization as ratings
 
 def get_default_user():
@@ -40,7 +41,7 @@ def get_discussion_data(discussion,user,type=None):
             data['commentType'] = 'review'
             
             
-    data['date'] = discussion.date        
+    data['date'] = str(now - discussion.date)      
     data['content'] = discussion.content
     data['commentID'] = discussion.id
     (numPos, numNeg) = ratings.getDiscussionRatings(discussion)
