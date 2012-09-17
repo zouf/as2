@@ -41,7 +41,7 @@ def get_discussion_data(discussion,user,type=None):
             data['commentType'] = 'review'
             
     
-    data['date'] = str(discussion.date.strftime('%b-%d %H:%M %p'))    
+    data['date'] = str(discussion.date.strftime('%b %d %I:%M %p'))    
       
     data['content'] = discussion.content
     data['commentID'] = discussion.id
