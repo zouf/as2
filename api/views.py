@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
             
             
 MAX_MAP_RESULTS = 40
-MAX_SEARCH_LIMIT = 1000
+MAX_SEARCH_LIMIT = 40
 def get_default_user():
     try:
         user = User.objects.get(username='matt')
@@ -469,13 +469,13 @@ def get_businesses_map(request):
         
         print(res[1])
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-        businesses = Business.objects.distance(pnt).select_related().order_by('distance')[0:1000]
+        businesses = Business.objects.distance(pnt).select_related().order_by('distance')[0:MAX_MAP_RESULTS]
         print(str(businesses.count()) + " returned")
         
     elif searchText != '' or searchTypes != []:  
-        businesses = search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low=0,high=1000,polygon_search_bound=poly)
+        businesses = search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low=0,high=MAX_MAP_RESULTS,polygon_search_bound=poly)
     else:
-        businesses = Business.objects.filter(geom__within=poly)[0:1000]
+        businesses = Business.objects.filter(geom__within=poly)[0:MAX_MAP_RESULTS]
         
 
     print('Performing serialization...')
