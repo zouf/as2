@@ -40,6 +40,7 @@ def get_discussion_data(discussion,user,type=None):
             data['commentType'] = 'review'
             
             
+    data['date'] = discussion.date        
     data['content'] = discussion.content
     data['commentID'] = discussion.id
     (numPos, numNeg) = ratings.getDiscussionRatings(discussion)
