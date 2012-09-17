@@ -40,8 +40,8 @@ def get_discussion_data(discussion,user,type=None):
         except:
             data['commentType'] = 'review'
             
-            
-    data['date'] = str(now - discussion.date)      
+    
+    data['date'] = str(datetime.now() - discussion.date)      
     data['content'] = discussion.content
     data['commentID'] = discussion.id
     (numPos, numNeg) = ratings.getDiscussionRatings(discussion)
