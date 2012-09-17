@@ -68,7 +68,7 @@ def get_bus_data_ios(business_list, user,detail=False):
         d = get_single_bus_data_ios(b, user,detail=detail)
         data['businesses'].append(d)
      
-    newlist = sorted(data['businesses'],key=lambda bus: bus['ratingRecommendation']).reverse()
+    newlist = sorted(data['businesses'],key=lambda bus: bus['ratingRecommendation'],reverse=True)
     data['businesses'] = newlist
     data['userPreferences'] = get_usertopic_data(user)
     return data
