@@ -17,6 +17,7 @@ from recommendation.recengine import get_best_current_recommendation, \
     get_recommendation_by_topic
 import json
 import logging
+import operator
 import time
 
 logger = logging.getLogger(__name__)
@@ -67,6 +68,8 @@ def get_bus_data_ios(business_list, user,detail=False):
         d = get_single_bus_data_ios(b, user,detail=detail)
         data['businesses'].append(d)
      
+    newlist = sorted(data['businesses'],key=lambda bus: bus['ratingRecommendation']).reverse()
+    data['businesses'] = newlist
     data['userPreferences'] = get_usertopic_data(user)
     return data
 
