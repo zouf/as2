@@ -5,7 +5,7 @@ Created on Jul 19, 2012
 '''
 #from photos.models import BusinessPhoto
 from api.json_serializer import get_bustypes_data, get_bustopics_data, \
-    get_health_info, get_types_data, set_edge_mapping, get_usertopic_data
+    get_health_info, get_types_data, get_usertopic_data
 from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
     BusinessCache, Type, BusinessTopicRating, UserTopic, UserCache
 from api.photos import get_photo_id, get_photo_url_medium, get_photo_url_large

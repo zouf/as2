@@ -17,45 +17,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-childMapping = {}
-parentMapping = {}
-userTopicMapping = {}
-
-def set_edge_mapping():
-    global childMapping
-    global parentMapping
-    if childMapping != {} and parentMapping != {}:
-        print('already set edge!')
-        return
- 
-
-    for e in Edge.objects.select_related('to_node', 'from_node').all():
-        childMapping.setdefault(e.to_node.id, []).append(e.from_node)
-        parentMapping.setdefault(e.from_node.id, []).append(e.to_node)
-    # Use stored lists
-
-def unset_edge_mapping():
-    global childMapping
-    global parentMapping
-    childMapping = {}
-    parentMapping = {}
-    
-
-def set_usertopic_mapping(u):
-    global userTopicMapping
-    if userTopicMapping != {}:
-        print 'already set usertopic'
-        return
-    print ' set usertopic mapping'
-    btset = UserTopic.objects.filter(user=u).prefetch_related('topic')
-    for bt in btset:
-        userTopicMapping[bt.topic.id] = bt.importance
-
-def unset_usertopic_mapping():
-    global userTopicMapping
-    userTopicMapping = {}
-    
-
 
 def get_usertopic_data(user):
     data = dict()
@@ -78,7 +39,6 @@ def get_topic_data(topic,user,detail=False):
         data = json.loads(tcache.cachedata)
         print(data)
     except:
-        #set_edge_mapping()
         data['parentName'] = topic.descr
         data['parentID'] = topic.id
         data['parentIcon'] = topic.icon

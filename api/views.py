@@ -1116,6 +1116,31 @@ def get_comments(request,oid):
     print(data)
     return server_data(data,"comments")
 
+def edit_main_review(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "edit")
+        #bustopicID = get_request_get_or_error('busTopicID',request)
+        content = get_request_post_or_error('content', request)
+        bustopic = BusinessTopic.objects.get(id=oid)
+    except Exception as e:
+        return server_error(str(e))
+    
+    print('Modifying bustopic review')
+    print('new review is '+ str(content))
+    bustopic.content = content
+    bustopic.save()
+    UserCache.objects.filter(business=bustopic.business).delete()
+    print('done !')
+    
+    discussions = Discussion.objects.filter(businesstopic =bustopic)
+    
+    data = dict()
+    data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
+    data['comments'] = get_discussions_data(discussions,user)
+    print(data)
+    return server_data(data,"comments")
+
 
 def get_comment(request,oid):
     try:
