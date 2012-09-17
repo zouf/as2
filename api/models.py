@@ -279,6 +279,11 @@ class UserTopic(models.Model):
     topic = models.ForeignKey(Topic)
     importance = models.FloatField()
 
+''' A user's subscription to a particular  topic '''
+class UserBusinessTopic(models.Model):
+    user = models.ForeignKey(User,db_index=True)
+    bustopic = models.ForeignKey(BusinessTopic)
+    importance = models.FloatField()
 
 ''' A user's favorite business '''
 class UserFavorite(models.Model):
