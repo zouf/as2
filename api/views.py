@@ -790,7 +790,7 @@ def subscribe_topic(request,oid):
         print('exception')
         print(e.value)
 
-    data = serial.get_topics_data(topic,user,detail=True)
+    data = serial.get_topic_data(topic,user,detail=True)
     return server_data(data, "subscription")
 
 
