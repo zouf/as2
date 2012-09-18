@@ -62,7 +62,9 @@ def get_topic_data(topic,user,detail=False):
     if detail:
         for c in data['children']:
             try: 
-                c['userWeight'] = UserTopic.objects.get(c['topicID'],user).importance
+		print(c['topicID'])
+		ut = UserTopic.objects.get(topic_id=c['topicID'],user=user)
+                c['userWeight'] =  ut.importance
             except Exception as e:
                 print('could not get the user weight. Error' + str(e))
                 c['userWeight'] = 0
