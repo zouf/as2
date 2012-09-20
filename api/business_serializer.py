@@ -15,7 +15,7 @@ from decimal import getcontext, Decimal
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Avg
 from recommendation.recengine import get_best_current_recommendation, \
-    get_recommendation_by_topic, get_node_average
+    get_recommendation_by_topic, get_node_average,  get_main_node_average
 import json
 import logging
 import operator
@@ -61,10 +61,13 @@ busTypeRelation = {}
 
 def test_serializer():
     b = Business.objects.filter(name='Hoagie Haven')
-    b =b.select_related('metadata','businesscache').prefetch_related('businesstopic', 'businesstype','businesstopic__bustopicrating','businesstopic__topic', 'businesstopic__topic__to_node')
+    b =b.select_related('metadata','businesscache').prefetch_related('businesstopic', 'businesstype','businesstopic__bustopicrating','businesstopic__topic', 'businesstopic__topic__children')
     bus = b[0]
-    t = Topic.objects.get(name='Main')
-    get_node_average(bus,t.id,get_default_user())
+    t = Topic.objects.get(descr='Main')
+    print(bus)
+    print(t)
+    res = get_main_node_average(bus,t.id,get_default_user())
+    print(res)
 
 def get_bus_data_ios(business_list, user,detail=False):
     data = dict()
