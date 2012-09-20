@@ -63,7 +63,8 @@ busTypeRelation = {}
 def get_bus_data_ios(business_list, user,detail=False):
     data = dict()
     data['businesses'] = []
-    business_list = business_list.select_related('metadata','businesscache').prefetch_related('businesstype','businesstopic__bustopicrating')
+    business_list =
+    business_list.select_related('metadata','businesscache').prefetch_related('businesstopic', 'businesstype','businesstopic__bustopicrating')
     for b in business_list:
         d = get_single_bus_data_ios(b, user,detail=detail)
         data['businesses'].append(d)

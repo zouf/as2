@@ -1418,10 +1418,8 @@ def prepopulate_database(request):
     prepop.prepop_types(user)
     prepop.prepop_topics(user)
     prepop.prepop_businesses(user)
-    prepop.prepop_queries(user)
-    
+    prepop.prepop_queries(user)    
     prepop.prepop_users()
-#    prepop.prepop_business_ratings()
     prepop.prepop_topic_ratings()
 
     
