@@ -23,57 +23,30 @@ import time
 
 logger = logging.getLogger(__name__)
 
-
-
-busTopicRelation = {}
-busTypeRelation = {}
-  
-
-#def set_topic_mapping():
-#    global busTopicRelation
-#    if busTopicRelation != {}:
-#        print 'already set topic'
-#        return
-#    print ' set topic mapping'
-#    btrset = BusinessTopic.objects.annotate(avg_rating=Avg('businesstopicrating__rating')).prefetch_related('business','topic')
-#    for bt in btrset:
-#        busTopicRelation.setdefault(bt.business.id, []).append(bt)
-#
-#
-#
-#
-#def set_type_mapping():
-#    global busTypeRelation
-#    if busTypeRelation != {}:
-#        return
-#    for bt in BusinessType.objects.select_related('business', 'bustype').all():
-#        busTypeRelation.setdefault(bt.business.id, []).append(bt)
-#        
-#def unset_type_mapping():
-#    global busTypeRelation
-#    busTypeRelation = {}
-#    
-#def unset_topic_mapping():
-#    global busTopiRelation
-#    busTopicRelation = {}
-        
+       
 
 
 def test_serializer():
-    b = Business.objects.filter(name='Hoagie Haven')
-    b =b.select_related('metadata','businesscache').prefetch_related('businesstopic', 'businesstype','businesstopic__bustopicrating','businesstopic__topic', 'businesstopic__topic__children')
-    bus = b[0]
+    b = Business.objects.filter(state='NJ')
+    filtered =b.select_related('metadata').prefetch_related('businesstopic', 'businesstype','businesstopic__bustopicrating','businesstopic__topic', 'businesstopic__topic__children')
+    newlist = []
+    for i in range(0,filtered.count()):
+        f = filtered[i]
+        newlist.append(f)
+
     t = Topic.objects.get(descr='Main')
-    print(bus)
-    print(t)
-    res = get_main_node_average(bus,t.id,get_default_user())
-    print(res)
+    res = get_main_node_average(newlist[0],t.id,get_default_user())
 
 def get_bus_data_ios(business_list, user,detail=False):
     data = dict()
     data['businesses'] = []
-    business_list =business_list.select_related('metadata','businesscache').prefetch_related('businesstopic', 'businesstype','businesstopic__bustopicrating','businesstopic__topic', 'businesstopic__topic__to_node')
-    for b in business_list:
+    filtered = business_list.select_related('metadata').prefetch_related('businesstopic', 'businesstype','businesstopic__bustopicrating','businesstopic__topic', 'businesstopic__topic__children')
+    newlist = []
+    for i in range(0,filtered.count()):
+        newlist.append(filtered[i])
+
+    for b in newlist:
+        print('BUSINESS IS ' + str(b) + ' + ID IS ' + str(b.id))
         d = get_single_bus_data_ios(b, user,detail=detail)
         data['businesses'].append(d)
      
@@ -150,7 +123,8 @@ def get_single_bus_data_ios(b, user,detail):
         d = json.loads(cache)
         print('cached ' + str(b.name))
 
-    except:
+    except Exception as e:
+        print('exception ' + str(e))
         #now we just grab the related data
         bustypes = b.businesstype.all()
         #bustopics = b.businesstopic.all()
