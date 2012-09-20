@@ -179,7 +179,7 @@ STATIC_ROOT = BASE_DIR+'/static/'
 FIXTURE_DIRS = BASE_DIR+'/fixtures/'
 
 
-LOG_BASE = '/var/log/django/'
+LOG_BASE = '/var/log/as2/'
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 
