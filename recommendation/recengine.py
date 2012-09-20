@@ -56,14 +56,14 @@ def get_main_node_average(b, tid, user):
                 thisAvg = ratSum / thisCount
             else:
                 thisAvg = 0
-    	 for edge in bt.topic.children.all():
-        	(childSum, childCount) = get_main_node_average(b,edge.to_node_id,user)
-        	if childCount > 0:
-            		childAverage = childSum / childCount
-            		#print('Average for topic ' + str(edge.to_node) + ' is ' + str(childAverage))
-            		thisAvg += childAverage
-            		thisCount += 1
-    return (thisAvg, thisCount)
+            for edge in bt.topic.children.all():
+                (childSum, childCount) = get_main_node_average(b,edge.to_node_id,user)
+                if childCount > 0:
+                    childAverage = childSum / childCount
+                    #print('Average for topic ' + str(edge.to_node) + ' is ' + str(childAverage))
+                    thisAvg += childAverage
+                    thisCount += 1
+            return (thisAvg, thisCount)
 #get average over whole tree
 #We're treating the children and the parent with the same weight. This way leaves do not lose importance higher up in the tree
 def get_node_average(business,topic,user):
