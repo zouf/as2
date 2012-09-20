@@ -41,9 +41,9 @@ def get_recommendation_by_topic(business,user):
         
 def get_main_node_average(b, tid, user):
     thisAvg = 0
-    thisCt = 0    
+    thisCount = 0    
     for bt in b.businesstopic.all():
-	if bt.topic.id == tid:
+        if bt.topic_id == tid:
             thisCount = 0
             ratSum = 0
             for r in bt.bustopicrating.all():
@@ -54,14 +54,13 @@ def get_main_node_average(b, tid, user):
             else:
                 thisAvg = 0
     for edge in bt.topic.children.all():
-	(childSum, childCount) = get_main_node_average(b,edge.to_node_id,user)
+        (childSum, childCount) = get_main_node_average(b,edge.to_node_id,user)
         if childCount > 0:
-	  childAverage = childSum / childCount
-          #print('Average for topic ' + str(edge.to_node) + ' is ' + str(childAverage))
-          thisAvg += childAverage
-          thisCount += 1
-            
-     return (thisAvg, thisCount)
+            childAverage = childSum / childCount
+            #print('Average for topic ' + str(edge.to_node) + ' is ' + str(childAverage))
+            thisAvg += childAverage
+            thisCount += 1
+    return (thisAvg, thisCount)
 #get average over whole tree
 #We're treating the children and the parent with the same weight. This way leaves do not lose importance higher up in the tree
 def get_node_average(business,topic,user):
