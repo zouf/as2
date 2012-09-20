@@ -22,7 +22,7 @@ def get_recommendation_by_topic(business,user):
         return r.recommendation
     except:
         u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic').select_related()[0]
-        (runSum, runCt) = get_node_average(business,Topic.objects.get(descr='Main'),u)
+        (runSum, runCt) = get_main_node_average(business,Topic.objects.get(descr='Main').id,u)
         if runCt > 0:
             avg = float(runSum)/float(runCt)
             #logger.debug('AVG for business ' + str(business) + ' is ' + str(avg))
@@ -40,9 +40,10 @@ def get_recommendation_by_topic(business,user):
            
         
 def get_main_node_average(b, tid, user):
-        
+    thisAvg = 0
+    thisCt = 0    
     for bt in b.businesstopic.all():
-        if bt.topic.id == tid:
+	if bt.topic.id == tid:
             thisCount = 0
             ratSum = 0
             for r in bt.bustopicrating.all():
@@ -52,16 +53,15 @@ def get_main_node_average(b, tid, user):
                 thisAvg = ratSum / thisCount
             else:
                 thisAvg = 0
-        for edge in bt.topic.children.all():
-            (childSum, childCount) = get_main_node_average(b,edge.to_node_id,user)
-
-            if childCount > 0:
-                childAverage = childSum / childCount
-                #print('Average for topic ' + str(edge.to_node) + ' is ' + str(childAverage))
-                thisAvg += childAverage
-                thisCount += 1
+    for edge in bt.topic.children.all():
+	(childSum, childCount) = get_main_node_average(b,edge.to_node_id,user)
+        if childCount > 0:
+	  childAverage = childSum / childCount
+          #print('Average for topic ' + str(edge.to_node) + ' is ' + str(childAverage))
+          thisAvg += childAverage
+          thisCount += 1
             
-        return (thisAvg, thisCount)
+     return (thisAvg, thisCount)
 #get average over whole tree
 #We're treating the children and the parent with the same weight. This way leaves do not lose importance higher up in the tree
 def get_node_average(business,topic,user):

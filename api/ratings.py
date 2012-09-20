@@ -95,7 +95,8 @@ def get_avg_bustopic_rating(bustopic):
                 return 0
             else:
                 return avg
-        except:
+        except Exception as e:
+            print('Exception ' + str(e))
             return 0
 
 def get_user_bustopic_rating(bustopic,user):

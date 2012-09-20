@@ -1,3 +1,5 @@
+# vi: set filetype=python:
+
 import os
 import sys
 

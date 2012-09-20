@@ -59,7 +59,7 @@ def create_user(username, uid):
 
 
 def prepop_topics(user=get_default_user()):
-    reader = csv.reader(open(settings.BASE_DIR+'/prepop/topics.csv', 'U'), delimiter=',', quotechar='"')
+    reader = csv.reader(open(settings.PREPOP_DIR+'/topics.csv', 'U'), delimiter=',', quotechar='"')
     i = 0
     for row in reader:
         i+=1
@@ -77,7 +77,7 @@ def prepop_topics(user=get_default_user()):
     
         
 def prepop_types(user):
-    reader = csv.reader(open(settings.BASE_DIR+'/prepop/types.csv', 'U'), delimiter=',', quotechar='"')
+    reader = csv.reader(open(settings.PREPOP_DIR+'/types.csv', 'U'), delimiter=',', quotechar='"')
     i = 0
     for row in reader:
         i+=1
@@ -101,7 +101,7 @@ def prepop_types(user):
 def prepop_businesses(user=get_default_user()):
     if user == None:
         user = get_default_user()
-    reader = csv.reader(open(settings.BASE_DIR+'/prepop/businesses.csv', 'U'), delimiter=',', quotechar='"')
+    reader = csv.reader(open(settings.PREPOP_DIR+'/businesses.csv', 'U'), delimiter=',', quotechar='"')
     i = 0
     indices = {}
     tag_indices ={}

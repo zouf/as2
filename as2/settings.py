@@ -6,23 +6,28 @@ import socket
 DEBUG = True
 
 SPHINX_API_VERSION = 0x116
-SPHINX_SERVER='db.allsortz.com'
+SPHINX_SERVER='127.0.0.1'
 
 
 
 
 TEMPLATE_DEBUG = DEBUG
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))+'/..'
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                        '..', '..'))
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+FIXTURE_DIRS = os.path.join(BASE_DIR, 'fixtures')
+
 
 #Dataset locations
-DOH_DATASET_LOCATION=BASE_DIR+'/'+'prepop/grades_raw.json'
+PREPOP_DIR = os.path.join(STATIC_ROOT, 'prepop')
+DOH_DATASET_LOCATION = os.path.join(PREPOP_DIR, 'grades_raw.json')
 
 #add your admin name heres
 ADMINS = (
      ('Matt Zoufaly', 'matt@allsortz.com'),
 )
 
-DEV_BOXES = ['hydralisk', 'connie-VirtualBox', 'enceladus'] # add your dev computer here
+DEV_BOXES = ['hydralisk', 'enceladus'] # add your dev computer here
 
 #always use https
 #SESSION_COOKIE_SECURE= True
@@ -89,11 +94,12 @@ if DEPLOY:
     DATABASES = {
         'default': {
             'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'as_deploy',                      # Or path to database file if using sqlite3.
+            'NAME': 'allsortz_db',                      # Or path to database file if using sqlite3.
                 # Not used with sqlite3.
-            'USER': 'root',
-            'PASSWORD': 'zoufzouf',                  # Not used with sqlite3.
-            'HOST': 'db.allsortz.com',
+            'USER': 'django',
+            'PASSWORD': 'welcometoallsortz',                  # Not used with sqlite3.
+#            'HOST': 'db.allsortz.com',
+            'HOST': 'localhost',
             'PORT': '5432',       
                 # Set to empty string for default. Not used with sqlite3.
         }
@@ -101,11 +107,11 @@ if DEPLOY:
     #FOR SPHINX
     
     DATABASE_ENGINE='postgresql'
-    DATABASE_HOST='db.allsortz.com'
+    DATABASE_HOST='127.0.0.1'
     DATABASE_PORT='5432'
-    DATABASE_USER='root'
-    DATABASE_NAME='as_deploy'
-    DATABASE_PASSWORD='zoufzouf'
+    DATABASE_USER='django'
+    DATABASE_NAME='allsortz_db'
+    DATABASE_PASSWORD='welcometoallsortz'
     #for amazon RDS
     #'USER': 'zouf',                  
     # 'HOST': 'rateoutdb-mysql.carvpvtur6or.us-east-1.rds.amazonaws.com',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -115,7 +121,7 @@ else:
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         #'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'as_deploy',                      # Or path to database file if using sqlite3.
+        'NAME': 'allsortz_db',                      # Or path to database file if using sqlite3.
         'USER': 'root',                      # Not used with sqlite3.
         'PASSWORD': 'zoufzouf',                  # Not used with sqlite3.
         'HOST': 'db.allsortz.com',
@@ -124,11 +130,11 @@ else:
     }
     #FOR SPHINX
     DATABASE_ENGINE='postgresql'
-    DATABASE_HOST='db.allsortz.com'
+    DATABASE_HOST='127.0.0.1'
     DATABASE_PORT='5432'
-    DATABASE_USER='root'
-    DATABASE_NAME='as_deploy'
-    DATABASE_PASSWORD='zoufzouf'
+    DATABASE_USER='django'
+    DATABASE_NAME='allsortz_db'
+    DATABASE_PASSWORD='welcometoallsortz'
     
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -137,7 +143,7 @@ else:
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/New_York'
+TIME_ZONE = 'UTC'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -175,11 +181,8 @@ MEDIA_URL = ''
 
 #dont use AWS for debug
 
-STATIC_ROOT = BASE_DIR+'/static/'
-FIXTURE_DIRS = BASE_DIR+'/fixtures/'
 
-
-LOG_BASE = '/var/log/as2/'
+LOG_BASE = os.path.abspath(os.path.join('/var', 'log', 'as2'))
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 
@@ -189,9 +192,9 @@ else:
     STATIC_URL='http://allsortz.s3-website-us-east-1.amazonaws.com/'
     
 RESULTS_DIR = '/tmp/'
-CLIB_DIR = BASE_DIR+'/clib'
+CLIB_DIR = os.path.join(BASE_DIR, 'clib')
 
-PYTHON_PATH = BASE_DIR+'/clib'
+PYTHON_PATH = os.path.join(BASE_DIR, 'clib')
 
 
 STATIC_MEDIA_PATH=BASE_DIR+'/wiki/media/'

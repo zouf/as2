@@ -37,7 +37,7 @@ def get_photo_id(b):
 
 
 def add_photo_by_url(phurl, business,user,default,caption,title):
-    outpath =settings.STATIC_ROOT+str(business.id)+"_"+str(business.city)+"_"+str(business.state)
+    outpath =settings.STATIC_ROOT+"/"+str(business.id)+"_"+str(business.city)+"_"+str(business.state)
     print('retrieve')
     
     try:
