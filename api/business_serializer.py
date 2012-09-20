@@ -4,17 +4,18 @@ Created on Jul 19, 2012
 @author: zouf
 '''
 #from photos.models import BusinessPhoto
+from api.authenticate import get_default_user
 from api.json_serializer import get_bustypes_data, get_bustopics_data, \
     get_health_info, get_types_data, get_usertopic_data
 from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
-    BusinessCache, Type, BusinessTopicRating, UserTopic, UserCache
+    BusinessCache, Type, BusinessTopicRating, UserTopic, UserCache, Topic
 from api.photos import get_photo_id, get_photo_url_medium, get_photo_url_large
 from api.ratings import getBusinessRatings, getBusAverageRating
 from decimal import getcontext, Decimal
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Avg
 from recommendation.recengine import get_best_current_recommendation, \
-    get_recommendation_by_topic
+    get_recommendation_by_topic, get_node_average
 import json
 import logging
 import operator
