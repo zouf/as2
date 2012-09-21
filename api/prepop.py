@@ -72,7 +72,7 @@ def prepop_topics(user=get_default_user()):
         parents = []
         for p in all_parents:
             parents.append(p.strip(None))
-        #print('Adding topic ' + str(descr) + ' parent is ' + str(parents))
+        #logger.debug('Adding topic ' + str(descr) + ' parent is ' + str(parents))
         add_topic(descr,parents,icon)
     
         
@@ -169,7 +169,7 @@ def prepop_businesses(user=get_default_user()):
 #                pg.content = row[rindex]
 #                pg.save()
                 bustopic.save()
-                print('Page content: ' + str(bustopic.content))
+                logger.debug('Page content: ' + str(bustopic.content))
         
         
 
@@ -196,13 +196,13 @@ def prepop_topic_ratings():
     i = 0
     center = random.randint(0, NumTopics-1)
     for user  in User.objects.all():
-        print('User ' + str(user))
+        logger.debug('User ' + str(user))
         for b in Business.objects.filter(state='NJ'):
             for t in Topic.objects.all():
                 try:
                     bt = BusinessTopic.objects.get(business=b,topic=t)
 
-                    print('Rating ' + str(b) + ' under the topic ' + str(t))
+                    logger.debug('Rating ' + str(b) + ' under the topic ' + str(t))
                     #norm_given_rat = stats.norm(center,rating_given_sd)  #gaussian distribution for giving a rating
                     
                     #almost everything will get a rating
@@ -225,7 +225,7 @@ def prepop_topic_ratings():
                         for r in pos_rat_rv:
                             SUM += r
                         rating_scaled = float(SUM)/float(SIZE)
-                        print('giving rating' + str(rating_scaled))
+                        logger.debug('giving rating' + str(rating_scaled))
                         
                             
                         BusinessTopicRating.objects.filter(businesstopic=bt,user=user).delete()
@@ -334,9 +334,9 @@ def prepop_nyc_doh_ratings():
 
     
     data = json.load(fp,encoding="utf-8")
-    #pprint(objs)
+    #plogger.debug(objs)
     for key in data:
-        print(key)
+        logger.debug(key)
     #inspdate
     #cuisine
     #name
@@ -355,11 +355,11 @@ def prepop_nyc_doh_ratings():
         pos += 1
     
     pos = 0
-    print(len(data['name']))
+    logger.debug(len(data['name']))
     #15287
     for name in data['name']:
         nm = name
-        print(nm)
+        logger.debug(nm)
         lat = data['lat'][pos]
         lng = data['lng'][pos]
         if data['cuisine'][pos] in cuisineDict:
@@ -368,8 +368,8 @@ def prepop_nyc_doh_ratings():
             restaurant_type = ''
         grade = str(data['grade'][pos])
         if pos % 400 == 0:
-            print('\n----------')
-            print(nm)
+            logger.debug('\n----------')
+            logger.debug(nm)
 
         all_violations= ''
         violationIDs = data['violations'][pos]
@@ -384,14 +384,14 @@ def prepop_nyc_doh_ratings():
         
         (street, borough, zipcode, phone) = parseAddress(data['address'][pos])
         if pos %400 == 0:
-            print('Orig type ID ' + str(data['cuisine'][pos]))
-            print(restaurant_type)
-            print(all_violations)
-            print(str(grade))
-            print(str(violationPoints))
-            print(str( (street, borough, zipcode, phone)))
-            print(inspdate)
-            print('---------------\n')
+            logger.debug('Orig type ID ' + str(data['cuisine'][pos]))
+            logger.debug(restaurant_type)
+            logger.debug(all_violations)
+            logger.debug(str(grade))
+            logger.debug(str(violationPoints))
+            logger.debug(str( (street, borough, zipcode, phone)))
+            logger.debug(inspdate)
+            logger.debug('---------------\n')
         b = add_business_server(name=nm,addr=street,state='NY',city=borough,phone=phone,
                     types=[restaurant_type], hours='',wifi=None,serves=None, url='', 
                     average_price=-1,health_letter_code=grade,health_violation_text=all_violations,health_points=int(violationPoints),inspdate=inspdate)

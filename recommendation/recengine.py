@@ -1,7 +1,7 @@
 #from celery.execute import send_task
 from api.authenticate import get_default_user
 from api.models import BusinessRating, Business, UserTopic, BusinessTopicRating, \
-    BusinessTopic, Topic
+    BusinessTopic, Topic,Edge
 from api.ratings import getBusAverageRating, get_avg_bustopic_rating
 from cProfile import runctx
 from django.contrib.auth.models import User
@@ -22,7 +22,11 @@ def get_recommendation_by_topic(business,user):
         return r.recommendation
     except:
         u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic').select_related()[0]
-        (runSum, runCt) = get_main_node_average(business,Topic.objects.get(descr='Main').id,u)
+        main = Topic.objects.get(descr='Main')
+        edges = {}
+        for e in Edge.objects.prefetch_related('to_node', 'from_node').all():
+            edges.setdefault(e.from_node.id, []).append(e.to_node)
+        (runSum, runCt) = get_main_node_average(business,main,u,edges)
         if runCt > 0:
             avg = float(runSum)/float(runCt)
             #logger.debug('AVG for business ' + str(business) + ' is ' + str(avg))
@@ -39,31 +43,44 @@ def get_recommendation_by_topic(business,user):
         
            
         
-def get_main_node_average(b, tid, user):
+def get_main_node_average(b, topic, user,edges):
     thisAvg = 0
     thisCount = 0 
-    print(b)   
     for bt in b.businesstopic.all():
-        print bt
-        if bt.topic_id == tid:
-            thisCount = 0
-            print(bt)
+        if bt.topic_id == topic.id:
+            avgCt = 0
             ratSum = 0
             for r in bt.bustopicrating.all():
-                thisCount += 1
+                avgCt += 1
                 ratSum += r.rating
-            if thisCount != 0:
-                thisAvg = ratSum / thisCount
+            if avgCt != 0:
+                thisAvg = ratSum / avgCt
+                thisCount += 1
             else:
                 thisAvg = 0
-            for edge in bt.topic.children.all():
-                (childSum, childCount) = get_main_node_average(b,edge.to_node_id,user)
-                if childCount > 0:
-                    childAverage = childSum / childCount
-                    #print('Average for topic ' + str(edge.to_node) + ' is ' + str(childAverage))
-                    thisAvg += childAverage
-                    thisCount += 1
-            return (thisAvg, thisCount)
+            logger.debug('this avg is ' + str(thisAvg))
+    
+    #change this to something that isn't a query
+    if topic.id in edges:
+        for edge in edges[topic.id]:
+            (childSum, childCount) = get_main_node_average(b,edge,user,edges)
+            if childCount > 0:
+                childAverage = childSum / childCount
+                thisAvg += childAverage
+                thisCount += 1
+        logger.debug('overall for node ' + str(topic.descr)+ ' count of ' + str(thisCount)+ ' avg of ' + str(thisAvg))
+    else:
+        logger.debug('topic ' + str(topic)+ ' is a leaf')
+    return (thisAvg, thisCount)
+
+
+
+
+
+
+
+
+
 #get average over whole tree
 #We're treating the children and the parent with the same weight. This way leaves do not lose importance higher up in the tree
 def get_node_average(business,topic,user):

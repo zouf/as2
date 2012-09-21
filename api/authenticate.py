@@ -20,12 +20,12 @@ def set_user_location(user,request):
         lat = float(request.GET['lat'])
         lon = float(request.GET['lon'])
         user.current_location = (lat,lon) 
-        print(str(user.current_location))
+        logger.debug(str(user.current_location))
     else:
         g = geocoders.Google()
         _, (lat, lng) = g.geocode("08540",exactly_one=False)[0] 
         user.current_location = (float(lat),float(lng)) 
-        print("Centering user in Princeton, NJ by default")
+        logger.debug("Centering user in Princeton, NJ by default")
     return user
 
 
@@ -42,12 +42,12 @@ def get_default_user():
 def create_device(request):
     logger.debug('Creating a new device')
     deviceID=request.GET['deviceID']
-    print('device id is ' + str(deviceID))
+    logger.debug('device id is ' + str(deviceID))
     try:
         device = Device.objects.create(deviceID=deviceID,os=1,model=1, manufacturer =0)
     except Exception as e:
-        print(e)
-    print('creation done')
+        logger.debug(e)
+    logger.debug('creation done')
     return device
 
 class AuthenticationFailed(Exception):
@@ -150,15 +150,15 @@ def authenticate_api_request(request):
         deviceID = request.GET['deviceID']
     
     
-    print('uname is ' + str(uname) + ' password is ' + str(password))
+    logger.debug('uname is ' + str(uname) + ' password is ' + str(password))
     #using only the device ID
     try:
         device = Device.objects.get(deviceID=deviceID)
     except Device.DoesNotExist:
         device = create_device(request)
-        print('device created' + str(device))  
+        logger.debug('device created' + str(device))  
     
-    print("device is " + str(device))
+    logger.debug("device is " + str(device))
     if uname != 'none':
         try:
             user = User.objects.get(username=uname)
@@ -177,7 +177,7 @@ def authenticate_api_request(request):
     #auth the user by device alone   
     else:            
         if AllsortzUser.objects.filter(device=device).count() == 0:
-            print('creating an ASUSER')
+            logger.debug('creating an ASUSER')
             logger.debug('Creating a new AllSortz User')
             genuser = create_fake_user()  
             asuser = create_asuser(genuser, device)
@@ -186,7 +186,7 @@ def authenticate_api_request(request):
             asuser = AllsortzUser.objects.get(device=device) 
     
     
-    print('authenticate user ' + str(asuser.user))
+    logger.debug('authenticate user ' + str(asuser.user))
     user = authenticate(username=asuser.user, password=password)
     if not  user:
         raise AuthenticationFailed('Incorrect username password combination')

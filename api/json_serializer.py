@@ -37,7 +37,7 @@ def get_topic_data(topic,user,detail=False):
     try:
         tcache = TopicCache.objects.get(topic=topic)
         data = json.loads(tcache.cachedata)
-        print(data)
+        logger.debug(data)
     except:
         #set_edge_mapping()
         data['parentName'] = topic.descr
@@ -64,11 +64,11 @@ def get_topic_data(topic,user,detail=False):
         for c in data['children']:
       
             try:
-                print(c['topicID'])
+                logger.debug(c['topicID'])
                 ut = UserTopic.objects.get(topic_id=c['topicID'],user=user)
                 c['userWeight'] =  ut.importance            
             except Exception as e:
-                print('could not get the user weight. Error' + str(e))
+                logger.debug('could not get the user weight. Error' + str(e))
                 c['userWeight'] = 0
 
     return data
@@ -193,9 +193,9 @@ def get_photos_data(photos,user,order_by):
         data.append(get_photo_data(p,user))
     
     if order_by == 'date':
-        print('order by date')
+        logger.debug('order by date')
     else:
-        print('order by rating')
+        logger.debug('order by rating')
     return data
 
 def get_query_data(query,user):

@@ -105,7 +105,6 @@ if DEPLOY:
         }
     }
     #FOR SPHINX
-    
     DATABASE_ENGINE='postgresql'
     DATABASE_HOST='127.0.0.1'
     DATABASE_PORT='5432'

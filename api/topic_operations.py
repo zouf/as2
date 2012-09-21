@@ -54,7 +54,7 @@ def get_discussion_data(discussion,user,type=None):
     for d in Discussion.objects.filter(reply_to=discussion):
         cdata = get_discussion_data(d, user,'comment')
         data['children'].append(cdata)
-    print(data)
+    logger.debug(data)
     return data;
     
     
@@ -68,12 +68,12 @@ def get_discussions_data(discussions,user):
     return data
 
 def add_review_to_businesstopic(bt,review,user):
-    print("Adding review " + str(review) + " to business topic " + str(bt))
+    logger.debug("Adding review " + str(review) + " to business topic " + str(bt))
     btd = Review.objects.create(businesstopic=bt,business=bt.business,content=review,user=user,reply_to=None)
     return btd
     
 def add_comment_to_businesstopic(bt,review,user, replyTo):
-    print("Adding comment " + str(review) + " to business topic " + str(bt))
+    logger.debug("Adding comment " + str(review) + " to business topic " + str(bt))
     if replyTo == '':
         btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)
     else:
@@ -85,7 +85,7 @@ def add_comment_to_businesstopic(bt,review,user, replyTo):
 
 
 def add_topic_to_bus(b,topic,user=get_default_user()):  
-    print("Adding " + str(topic) + " to business " + str(b) )       
+    logger.debug("Adding " + str(topic) + " to business " + str(b) )       
   
     try: 
         bustopic = BusinessTopic.objects.get(topic=topic,business=b)
@@ -94,9 +94,9 @@ def add_topic_to_bus(b,topic,user=get_default_user()):
     
 #    try:
 #        Page.objects.get(bustopic=bustopic)
-#        print('here')
+#        logger.debug('here')
 #    except Page.DoesNotExist:
-#        print('create a page')
+#        logger.debug('create a page')
 #        pg = Page(name=topic.descr,bustopic = bustopic)
 #        pg.save()
     #BusinessCache.objects.filter(business=b).delete()
@@ -116,18 +116,18 @@ def add_topic(descr,parenttopics,icon,user=get_default_user()):
         t = Topic(descr=descr,creator=user,icon=icon)
         t.save()
         for p in parenttopics:
-            #print('Parent topic is '+str(p))
+            #logger.debug('Parent topic is '+str(p))
             pset = Topic.objects.filter(descr=p)
             if pset.count() == 0:
                 return None
             parent = pset[0]
             Edge.objects.create(from_node=parent,to_node=t)
             #t.parent_topics.add(parent)
-            print("add "+str(parent)+" as a parent of " + str(t))
-            #print('add parent done')
+            logger.debug("add "+str(parent)+" as a parent of " + str(t))
+            #logger.debug('add parent done')
         
     else:
-        print('creating parent topic')
+        logger.debug('creating parent topic')
         t = Topic(descr=descr,creator=user,icon=icon)
         t.save()
     return t

@@ -26,7 +26,7 @@ def associate_business_with_types(bus,types):
             t = Type.objects.filter(descr=tdescr)[0] 
             pass
         except Type.DoesNotExist:
-            print("Type " + str(tdescr) + " does not exist")
+            logger.debug("Type " + str(tdescr) + " does not exist")
             if tdescr != '':
                 t = Type(descr=tdescr,creator=get_default_user(),icon='none.png')
                 t.save()
@@ -39,22 +39,22 @@ def associate_business_with_type_IDs(bus,types):
         try:
             t = Type.objects.get(id=tid) 
         except Type.DoesNotExist:
-            print("with id " + str(tid) + " does not exist")
+            logger.debug("with id " + str(tid) + " does not exist")
             #logger.error('Type does not exist")')
             pass
         associate_business_type(bus, t)  
 
 
 def edit_business_server(bus,name,addr,city,state,phone,url,types,hours):
-    print("Editing business!\n")
-    print(name)
-    print(addr)
-    print(city)
-    print(state)
-    print(phone)
-    print(url)
-    print(types)
-    print(hours)
+    logger.debug("Editing business!\n")
+    logger.debug(name)
+    logger.debug(addr)
+    logger.debug(city)
+    logger.debug(state)
+    logger.debug(phone)
+    logger.debug(url)
+    logger.debug(types)
+    logger.debug(hours)
     if name != '':
         bus.name = name
     if addr != '':
@@ -84,14 +84,14 @@ def edit_business_server(bus,name,addr,city,state,phone,url,types,hours):
 
 def add_business_server(name,addr,city,state,phone,url,types,hours='',average_price=-1,serves=None,wifi=None,\
                         health_points=-1,health_violation_text='',health_letter_code='',inspdate='2000-1-1'):
-#    print("Creating business!\n")
-#    print(name)
-#    print(addr)
-#    print(city)
-#    print(state)
-#    print(phone)
-#    print(url)
-#    print(types)
+#    logger.debug("Creating business!\n")
+#    logger.debug(name)
+#    logger.debug(addr)
+#    logger.debug(city)
+#    logger.debug(state)
+#    logger.debug(phone)
+#    logger.debug(url)
+#    logger.debug(types)
     try:
         bset = Business.objects.filter(name=name,address=addr,city=city,state=state,phone=phone,url=url)
         if bset.count() ==  0:
@@ -102,20 +102,20 @@ def add_business_server(name,addr,city,state,phone,url,types,hours='',average_pr
             bus = Business(name=name,address=addr,city=city,state=state,phone=phone,url=url)
             bus.save()
         else:
-            print('getting existing business')
+            logger.debug('getting existing business')
             bus = bset[0]
   
         bmset = BusinessMeta.objects.filter(business=bus)
         if bmset.count() > 0:
             bmset.delete()
-        print('Create meta for ' + str(bus))
+        logger.debug('Create meta for ' + str(bus))
         bm = BusinessMeta(business=bus,hours=hours,average_price=average_price,serves=serves,wifi=wifi,health_points=health_points,
                             health_violation_text=health_violation_text,   health_letter_code = health_letter_code,inspdate=inspdate)
         bm.save()
         associate_business_with_types(bus,types)
-        #print('Creating ' + str(bus.name) + ' Done')
+        #logger.debug('Creating ' + str(bus.name) + ' Done')
         return bus
     except Exception as e:
         logger.error("error creating businesses " + str(e))
-        print("error creating  business" + str(e))
+        logger.debug("error creating  business" + str(e))
         return None

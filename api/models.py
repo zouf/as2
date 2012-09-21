@@ -180,7 +180,7 @@ class  Photo(models.Model):
             else:
                 imgFile = Image.open(str(self.image))
             #Convert to RGB
-            #print(imgFile)
+            #logger.debug(imgFile)
             if imgFile.mode not in ('L', 'RGB'):
                 imgFile = imgFile.convert('RGB')
             

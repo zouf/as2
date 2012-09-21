@@ -96,7 +96,7 @@ def get_avg_bustopic_rating(bustopic):
             else:
                 return avg
         except Exception as e:
-            print('Exception ' + str(e))
+            logger.debug('Exception ' + str(e))
             return 0
 
 def get_user_bustopic_rating(bustopic,user):
@@ -117,11 +117,11 @@ def rate_businesstopic_internal(bustopic,rating,user):
     elif rating > 1:
         rating = 1.0
     
-    print('blarg')
+    logger.debug('blarg')
     #remove existing rating
     if BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).count() > 0:
         BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).delete()
-    print('CREATING RAITNG FOR '
+    logger.debug('CREATING RAITNG FOR '
            +str(bustopic))
     UserCache.objects.filter(business=bustopic.business,user=user).delete()
     BusinessTopicRating.objects.create(businesstopic=bustopic, rating=rating,user=user) 

@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
             
             
 MAX_MAP_RESULTS = 40
-MAX_SEARCH_LIMIT = 40
+MAX_SEARCH_LIMIT = 1000
 def get_default_user():
     try:
         user = User.objects.get(username='matt')
@@ -119,7 +119,7 @@ def rate_business(request,oid):
     
 def add_business(request):
     try:
-        print('add business')
+        logger.debug('add business')
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
         bus = Business()
@@ -135,7 +135,7 @@ def add_business(request):
     
         if photoURL != '':
             add_photo_by_url(phurl=photoURL,business=bus,user=user, default=True,caption="Picture of "+str(bus.name), title=str(bus.name))
-        print(request.POST)
+        logger.debug(request.POST)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
@@ -232,11 +232,11 @@ def query_businesses(request,oid):
 #    high = get_request_get_or_error('bus_high', request)
 #   
 #    searchQuery = "Search Term: "+str(searchText)+"\nLocation: "+str(searchLocation)+" \nWeight: "+str(distanceWeight)+"\nSearch Types: "+str(searchTypes)+"\nLat Lng = ("+str(lat)+","+str(lng)+")" 
-#    print('between ' + str(low) + ' and ' + str(high))
+#    logger.debug('between ' + str(low) + ' and ' + str(high))
 #    logger.debug(searchQuery)
 #
 #    if distanceWeight != '':
-#        print(str(float(distanceWeight)))
+#        logger.debug(str(float(distanceWeight)))
 #        if float(distanceWeight) > 0.67:
 #            dist_limit = D(mi=0.5)
 #        elif float(distanceWeight) > 0.33:
@@ -249,10 +249,10 @@ def query_businesses(request,oid):
 #    businesses_filtered = []
 #    if searchText == '':
 #        pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-#        print(str(pnt))
+#        logger.debug(str(pnt))
 #        businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
 #    else:
-#        #print('searching ' + str(lat) + ' long ' + str(lng))
+#        #logger.debug('searching ' + str(lat) + ' long ' + str(lng))
 #        qset = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
 #        .filter(**{'@geodist__lt':dist_limit.m*1.0})\
 #        .query(searchText).order_by('-@geodist')[low:high]
@@ -260,20 +260,20 @@ def query_businesses(request,oid):
 #        businesses_filtered = []
 #        for b in qset:
 #            searchWeight = b._sphinx['weight']
-#            #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
+#            #logger.debug('businesss ' + str(b) + ' has weight ' + str(searchWeight))
 #            businesses_filtered.append(b)
-#            print(str(b))
+#            logger.debug(str(b))
 #        #for some reason, the qset is reversed when it's returned. The largest distances are in the front
 #        # Reverse here
 #        businesses_filtered.reverse()
 #
 #    if searchTypes != []:
 #        logger.debug("Potentially filtering businesses by type")
-#        print("Filter businesses by type")
+#        logger.debug("Filter businesses by type")
 #        unique_types = dict()
 #        #quickly turn the array into a hash map for faster lookup
 #        for tid in searchTypes:
-#            print(tid)
+#            logger.debug(tid)
 #            unique_types[tid] =True
 #            
 #        businesses_matching_type = []
@@ -283,15 +283,15 @@ def query_businesses(request,oid):
 #                #if this business has a type that is part of unique_types
 #                if bt.bustype.id in unique_types:
 #                    businesses_matching_type.append(b)
-#            #print("Filtering businesses!")
+#            #logger.debug("Filtering businesses!")
 #        #now reassign new list
 #        businesses_filtered = businesses_matching_type
 #    
-#    print('Search result is ' + str(businesses_filtered))
+#    logger.debug('Search result is ' + str(businesses_filtered))
 #    logger.debug("Search result is " + str(businesses_filtered))
-#    print('Performing serialization...')
+#    logger.debug('Performing serialization...')
 #    serialized_businesses = get_bus_data_ios(businesses_filtered, user,detail=False)
-#    print('Serialization complete...')
+#    logger.debug('Serialization complete...')
 #    
 #    return server_data(serialized_businesses,"business")
 #
@@ -306,9 +306,9 @@ def is_searchtext_location(searchText, currentlocation):
         searchLocation, (lat,lng) = g.geocode(str(searchText),exactly_one=False)[0] 
     except Exception as e:
         logger.debug('Error in geocoding, so probably not a location!' + str(e))
-        print('Probably not a location!')
+        logger.debug('Probably not a location!')
         return None
-    print('location is ' + str(searchLocation))
+    logger.debug('location is ' + str(searchLocation))
     
     (cLat, cLon) = currentlocation
     dist = distance.distance((lat,lng),currentlocation)
@@ -339,7 +339,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         
         
     searchQuery = "Search Term: "+str(searchText)+"\nLocation: "+str(searchLocation)+" \nWeight: "+str(distanceWeight)+"\nSearch Types: "+str(searchTypes)+"\nLat Lng = ("+str(lat)+","+str(lng)+")" 
-    print(searchQuery)
+    logger.debug(searchQuery)
     logger.debug(searchQuery)
     
     if distanceWeight != '':
@@ -357,35 +357,35 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
     businesses_filtered = []
   
     if searchText == '':
-        print('no search text')
+        logger.debug('no search text')
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
-        print(str(pnt))
+        logger.debug(str(pnt))
         businesses_filtered = Business.objects.filter(geom__distance_lte=(pnt,dist_limit)).distance(pnt).order_by('distance')
     else:
-        print('searching with text: ' + str(searchText))
+        logger.debug('searching with text: ' + str(searchText))
         qset = []
         if polygon_search_bound:
-            print('searching with the map ')
-            print(polygon_search_bound)
+            logger.debug('searching with the map ')
+            logger.debug(polygon_search_bound)
             results = Business.search.query(searchText)
             geom_within = []
-            print(results.count())
+            logger.debug(results.count())
             if results.count() < MAX_SEARCH_LIMIT:
                 limit = results.count()
             else:
                 limit = MAX_SEARCH_LIMIT
                 logger.error("received " + str(results.count()) + " search results for " + str(searchText))
             logger.debug("Limit for search " + str(searchText) + " is " + str(limit))
-            print('LIMIT Is ' + str(limit))
+            logger.debug('LIMIT Is ' + str(limit))
             for r in results[0:limit]:
-                #print('Result: ' + str(r))
+                logger.debug('Result: ' + str(r))
                 if r.geom.within(polygon_search_bound):
                     geom_within.append(r)
             qset = geom_within 
         else:
-            print('searching without map')
-            print(lat)
-            print(lng)
+            logger.debug('searching without map')
+            logger.debug(lat)
+            logger.debug(lng)
             results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
             .filter(**{'@geodist__lt':dist_limit.m*1.0})\
             .query(searchText).order_by('-@geodist')
@@ -401,7 +401,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         businesses_filtered = []
         for b in qset:
             searchWeight = b._sphinx['weight']
-            #print('businesss ' + str(b) + ' has weight ' + str(searchWeight))
+            #logger.debug('businesss ' + str(b) + ' has weight ' + str(searchWeight))
             businesses_filtered.append(Business.objects.get(id=b.id))
         #for some reason, the sphinx query set is reversed when it's returned. The largest distances are in the front
         # Reverse here
@@ -422,7 +422,7 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
                 #if this business has a type that is part of unique_types
                 if bt.bustype.id in unique_types:
                     businesses_matching_type.append(b)
-            #print("Filtering businesses!")
+            #logger.debug("Filtering businesses!")
         #now reassign new list
         businesses_filtered = businesses_matching_type
     
@@ -467,10 +467,10 @@ def get_businesses_map(request):
         (lat,lng) = res[1]
         
         
-        print(res[1])
+        logger.debug(res[1])
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
         businesses = Business.objects.distance(pnt).select_related().order_by('distance')[0:MAX_MAP_RESULTS]
-        print(str(businesses.count()) + " returned")
+        logger.debug(str(businesses.count()) + " returned")
         
     elif searchText != '' or searchTypes != []:  
         businesses = search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low=0,high=MAX_MAP_RESULTS,polygon_search_bound=poly)
@@ -478,10 +478,10 @@ def get_businesses_map(request):
         businesses = Business.objects.filter(geom__within=poly)[0:MAX_MAP_RESULTS]
         
 
-    print('Performing serialization...')
-    print(businesses)
+    logger.debug('Performing serialization...')
+    logger.debug(businesses)
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
-    print('Serialization complete...')
+    logger.debug('Serialization complete...')
     return server_data(serialized,"business") 
 
 
@@ -507,13 +507,13 @@ def get_businesses_internal(request):
         (lat, lng) = user.current_location
         pnt = fromstr('POINT( '+str(lng)+' '+str(lat)+')')
         businesses = Business.objects.distance(pnt).select_related().order_by('distance')[low:high]
-        print(str(businesses.count()) + " returned")
+        logger.debug(str(businesses.count()) + " returned")
         
     #annotate(avg_rating=Avg('businesstopic__businesstopicrating__rating'))
-    print('Performing serialization...')
-    print(businesses) 
+    logger.debug('Performing serialization...')
+    logger.debug(businesses) 
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
-    print('Serialization complete...')
+    logger.debug('Serialization complete...')
     return server_data(serialized,"business")
 
 
@@ -575,7 +575,7 @@ def rate_business_topic(request,oid):
         return server_error('bustopic with id '+str(oid)+'not found')
     
     
-    print('here')
+    logger.debug('here')
     rate_businesstopic_internal(bustopic=bustopic,user=user,rating=rating)
     #data = serial.get_bustopic_data(bustopic,user)
     return server_data("success","bustopic")
@@ -777,19 +777,19 @@ def subscribe_topic(request,oid):
     except Topic.DoesNotExist:
         return server_error("Topic with ID "+str(oid) + " not found")
      
-    print('trying to subscribe')
+    logger.debug('trying to subscribe')
     try:
-        print('Creating a user subscription with user' + str(user)+ " weight " + str(weight) + " to  the topic " + str(topic)) 
+        logger.debug('Creating a user subscription with user' + str(user)+ " weight " + str(weight) + " to  the topic " + str(topic)) 
         
         if UserTopic.objects.filter(user=user,topic=topic).count() > 0:
             UserTopic.objects.filter(user=user,topic=topic).delete()
         UserTopic.objects.create(user=user,topic=topic,importance=weight)
     except UserTopic.DoesNotExist:
-        print('error could not subscribe')
+        logger.debug('error could not subscribe')
         return server_error("Could not subscribe user. ")
     except Exception as e:
-        print('exception')
-        print(e.value)
+        logger.debug('exception')
+        logger.debug(e.value)
 
     data = serial.get_topic_data(topic,user,detail=True)
     return server_data(data, "subscription")
@@ -1114,7 +1114,7 @@ def get_comments(request,oid):
     data = dict()
     data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
     data['comments'] = get_discussions_data(discussions,user)
-    print(data)
+    logger.debug(data)
     return server_data(data,"comments")
 
 def edit_main_review(request,oid):
@@ -1127,19 +1127,19 @@ def edit_main_review(request,oid):
     except Exception as e:
         return server_error(str(e))
     
-    print('Modifying bustopic review')
-    print('new review is '+ str(content))
+    logger.debug('Modifying bustopic review')
+    logger.debug('new review is '+ str(content))
     bustopic.content = content
     bustopic.save()
     UserCache.objects.filter(business=bustopic.business).delete()
-    print('done !')
+    logger.debug('done !')
     
     discussions = Discussion.objects.filter(businesstopic =bustopic)
     
     data = dict()
     data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
     data['comments'] = get_discussions_data(discussions,user)
-    print(data)
+    logger.debug(data)
     return server_data(data,"comments")
 
 
@@ -1164,7 +1164,7 @@ def get_review(request,oid):
         return server_error(str(e))
 
     data = get_review_data(business,user)
-    print(data)
+    logger.debug(data)
     return server_data(data,"review")
 
 
@@ -1179,13 +1179,13 @@ def add_comment(request,oid):
         replyTo = get_request_post_or_warn('replyToID', request)
         review = get_request_post_or_error('content', request)
     except Exception as e:
-        print('error ' + str(e))
+        logger.debug('error ' + str(e))
         return server_error(str(e))
     except Exception as e:
         return server_error(str(e))
     
-    print("Add a comment to " + str(business) + " for the topics " + str(topics))
-    print('Review is ' + str(review))
+    logger.debug("Add a comment to " + str(business) + " for the topics " + str(topics))
+    logger.debug('Review is ' + str(review))
     try:
         for t in topics:
             bt = add_topic_to_bus(business,t,user)
@@ -1195,7 +1195,7 @@ def add_comment(request,oid):
                 add_comment_to_businesstopic(bt,review,user, replyTo)
 
     except Exception as e:
-        print('error is ' + str(e))
+        logger.debug('error is ' + str(e))
         return server_error(str(e))
     
     return server_data("success","msg")
@@ -1209,7 +1209,7 @@ def rate_comment(request,oid):
     except Exception as e:
         return server_error(str(e))
     
-    print('rating')
+    logger.debug('rating')
     rate_comment_internal(comment=comment,user=user,rating=rating)
     serialized = get_discussion_data(comment, user)
     return server_data(serialized,"comment")
