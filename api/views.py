@@ -364,44 +364,37 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
     else:
         logger.debug('searching with text: ' + str(searchText))
         qset = []
-        if polygon_search_bound:
-            logger.debug('searching with the map ')
-            logger.debug(polygon_search_bound)
-            results = Business.search.query(searchText)
-            geom_within = []
-            logger.debug(results.count())
-            if results.count() < MAX_SEARCH_LIMIT:
-                limit = results.count()
-            else:
-                limit = MAX_SEARCH_LIMIT
-                logger.error("received " + str(results.count()) + " search results for " + str(searchText))
-            logger.debug("Limit for search " + str(searchText) + " is " + str(limit))
-            logger.debug('LIMIT Is ' + str(limit))
-            for r in results[0:limit]:
-                logger.debug('Result: ' + str(r))
-                if r.geom.within(polygon_search_bound):
-                    geom_within.append(r)
-            qset = geom_within 
-        else:
-            logger.debug('searching without map')
-            logger.debug(lat)
-            logger.debug(lng)
-            results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
+        logger.debug(polygon_search_bound)
+        results = Business.search.query(searchText)
+        results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
             .filter(**{'@geodist__lt':dist_limit.m*1.0})\
             .query(searchText).order_by('-@geodist')
-            if results.count() < MAX_SEARCH_LIMIT:
-                limit = results.count()
+        geom_within = []
+        logger.debug(results.count())
+        if results.count() < MAX_SEARCH_LIMIT:
+            limit = results.count()
+        else:
+            limit = MAX_SEARCH_LIMIT
+            
+
+        logger.debug("Limit for search " + str(searchText) + " is " + str(limit))
+        for r in results[0:limit]:
+            logger.debug('Result: ' + str(r))
+            #are we searching with a map bound?
+            if polygon_search_bound:
+                if r.geom.within(polygon_search_bound):
+                    logger.debug('Business ' + str(r) + ' is in the polygon')
+                geom_within.append(r)
+                logger.debug('Business ' + str(r) + ' being added even if not in bound')
             else:
-                limit = MAX_SEARCH_LIMIT 
-            qset = []
-            for result in results[0:limit]:
-                print result
-                qset.append(result)
+                geom_within.append(r)
+                
+        qset = geom_within 
         
         businesses_filtered = []
         for b in qset:
             searchWeight = b._sphinx['weight']
-            #logger.debug('businesss ' + str(b) + ' has weight ' + str(searchWeight))
+            logger.debug('businesss ' + str(b) + ' has weight ' + str(searchWeight))
             businesses_filtered.append(Business.objects.get(id=b.id))
         #for some reason, the sphinx query set is reversed when it's returned. The largest distances are in the front
         # Reverse here
@@ -485,7 +478,7 @@ def get_businesses_map(request):
     return server_data(serialized,"business") 
 
 
-def get_businesses_internal(request):
+def get_businesses(request):    
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
@@ -515,12 +508,6 @@ def get_businesses_internal(request):
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
     logger.debug('Serialization complete...')
     return server_data(serialized,"business")
-
-
-def get_businesses(request):    
-    return get_businesses_internal(request)
-
- 
 
 '''
 PRAGMA Code to handle business bustopics

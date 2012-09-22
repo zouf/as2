@@ -262,7 +262,7 @@ LOGIN_URL = '/accounts/login/'
 #WSGI_APPLICATION = 'rateout.wsgi.application'
 
 TEMPLATE_DIRS = (
-	BASE_DIR+'/templates',
+	BASE_DIR+'/src/templates/',
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
