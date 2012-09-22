@@ -11,6 +11,8 @@ from wiki.models import Page
 import api.json_serializer as jsonserial
 import datetime
 import recommendation.normalization as ratings
+import logging
+logger = logging.getLogger(__name__)
 
 def get_default_user():
     try:

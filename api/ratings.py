@@ -9,7 +9,9 @@ Created on Aug 1, 2012
 from api.models import PhotoRating, DiscussionRating, BusinessRating, \
     BusinessTopicRating, UserCache
 from django.db.models.aggregates import Count, Sum, Avg
+import logging
 
+logger = logging.getLogger(__name__)
 HATE = 0
 NEUTRAL = 1
 LIKE = 2
