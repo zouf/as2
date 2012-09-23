@@ -6,6 +6,10 @@ Created on Jul 30, 2012
 from api.models import Photo
 from as2 import settings
 from urllib import urlretrieve
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 '''
 Created on Jul 27, 2012

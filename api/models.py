@@ -186,9 +186,9 @@ class  Photo(models.Model):
             
             #Save a thumbnail for each of the given dimensions
             #The IMAGE_SIZES looks like:
-            IMAGE_SIZES = {'image'    : (225, 225),
-                           'image_medium'    : (125,125),
-                           'image_thumb'    : (80,80)}
+            IMAGE_SIZES = {'image'    : (320, 120),
+                           'image_medium'    : (225,225),
+                           'image_thumb'    : (125,125)}
     
             #each of which corresponds to an ImageField of the same name
             for field_name, size in IMAGE_SIZES.iteritems():
