@@ -99,6 +99,7 @@ def prepop_types(user):
     
 
 def prepop_businesses(user=get_default_user()):
+    print('yo')
     if user == None:
         user = get_default_user()
     reader = csv.reader(open(settings.PREPOP_DIR+'/businesses.csv', 'U'), delimiter=',', quotechar='"')
@@ -106,6 +107,7 @@ def prepop_businesses(user=get_default_user()):
     indices = {}
     tag_indices ={}
     for row in reader:
+        print(row)
         i+=1
         if i == 1:
             bpoint = 0
