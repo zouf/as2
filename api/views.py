@@ -981,7 +981,6 @@ def add_comment(request,oid):
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
         topicIDs = get_request_postlist_or_error('topicIDs', request)
-        business = Business.objects.get(id=oid)#('businessID', request)   
         topics = Topic.objects.filter(id__in=topicIDs)
         commentType = get_request_post_or_error('commentType',request)
         replyTo = get_request_post_or_warn('replyToID', request)
@@ -992,6 +991,14 @@ def add_comment(request,oid):
     except Exception as e:
         return server_error(str(e))
     
+    
+    if commentType == "review":
+        business = Business.objects.get(id=oid)#('businessID', request)   
+    else:
+        bustopic = BusinessTopic.objects.get(id=oid)
+        business = bustopic.business
+        
+        
     logger.debug("Add a comment to " + str(business) + " for the topics " + str(topics))
     logger.debug('Review is ' + str(review))
     try:
