@@ -7,7 +7,7 @@ from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
 from api.models import Photo, PhotoRating, PhotoDiscussion, Discussion, Business, \
     Topic, DiscussionRating, BusinessRating, Type, BusinessType, Rating, \
     BusinessMeta, BusinessTopic, BusinessTopicRating, UserTopic, AllsortzUser, Edge, \
-    Comment, BusinessCache, UserCache
+    Comment, BusinessCache, UserCache, Review
 from api.photos import add_photo_by_url
 from api.ratings import rate_businesstopic_internal, rate_comment_internal
 from api.topic_operations import add_topic_to_bus, get_discussions_data, \
@@ -545,7 +545,7 @@ def get_business_reviews(request,oid):
     except: 
         return server_error('Business with id '+str(oid)+'not found')
     
-    discussions = Discussion.objects.filter(businesstopic__business =bus)
+    discussions = Review.objects.filter(business =bus)
 
     data = dict()
     data['reviews'] = get_discussions_data(discussions,user)
