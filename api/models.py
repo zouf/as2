@@ -194,11 +194,11 @@ class  Photo(models.Model):
             for field_name, size in IMAGE_SIZES.iteritems():
                 width, height = imgFile.size
                 
-                if width > height:
-                    fitSize = (height, height)
-                else:
-                    fitSize = (width,width)
-                
+                #if width > height:
+                #    fitSize = (height, height)
+                #else:
+                #    fitSize = (width,width)
+                fitSize = size 
                
                 #img.thumbnail(size, Image.ANTIALIAS)              
                 
