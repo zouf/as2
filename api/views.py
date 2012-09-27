@@ -531,6 +531,32 @@ def remove_business_topic(request,oid):
     return server_data("Deletion successful","message")
 
 ''' 
+PRAGMA Code to handle business reviews (for aggregate display)
+''' 
+def get_business_reviews(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+        bus = Business.objects.get(id=oid)
+    except ReadJSONError as e:
+        return server_error(e.value)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(e.value)
+    except: 
+        return server_error('Business with id '+str(oid)+'not found')
+    
+    discussions = Discussion.objects.filter(businesstopic__business =bus)
+
+    data = dict()
+    data['reviews'] = get_discussions_data(discussions,user)
+
+    bustypes = BusinessType.objects.filter(business=bus)
+    data = serial.get_bustypes_data(bustypes,user)
+    return server_data(data,"businessReviews")
+
+
+
+''' 
 PRAGMA Code to handle business types
 ''' 
 def get_business_types(request,oid):
@@ -722,131 +748,6 @@ def unsubscribe_topic(request,oid):
     data = serial.get_topic_data(topic,user,detail=True)
     return server_data(data)
 
-'''
-PRAGMA Code to handle comments
-'''
-#
-#def get_comments(request):
-#    try:
-#        user = auth.authenticate_api_request(request)
-#        auth.authorize_user(user, request, "get")
-#    except ReadJSONError as e:
-#        return server_error(e.value)
-#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-#        return server_error(e.value)
-#    return server_error('unimplemented')
-#
-#def get_comment(request,oid):
-#    try:
-#        user = auth.authenticate_api_request(request)
-#        auth.authorize_user(user, request, "get")
-#        comment = Discussion.objects.get(id=oid)
-#    except ReadJSONError as e:
-#        return server_error(e.value)
-#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-#        return server_error(e.value)
-#    
-#    data = serial.get_comment_data(comment,user)
-#    return server_data(data)
-#
-#def rate_comment(request,oid):
-#    try:
-#        user = auth.authenticate_api_request(request)
-#        auth.authorize_user(user, request, "rate")
-#        rating = int(get_request_get_or_error('rating', request))
-#        comment = Discussion.objects.get(id=oid)
-#    except ReadJSONError as e:
-#        return server_error(e.value)
-#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-#        return server_error(e.value)
-#    except: 
-#        return server_error('Comment with id '+str(oid)+'not found')
-#
-#    if rating < 0:
-#        rating = 0.0
-#    elif rating > 1:
-#        rating = 1.0
-#    
-#    #XXX TODO make sure rating is an int
-#    #remove existing rating
-#    if DiscussionRating.objects.filter(user=user,comment=comment).count() > 0:
-#        DiscussionRating.objects.filter(user=user,comment=comment).delete()
-#    DiscussionRating.objects.create(user=user,rating=rating,comment=comment)
-#    data = serial.get_comment_data(comment,user)
-#    return server_data(data)
-#
-#def add_comment(request):
-#    try: 
-#        user = auth.authenticate_api_request(request)
-#        oid = get_request_get_or_error('commentBaseID', request)  
-#        commentType = get_request_get_or_error('type', request)  
-#        content = get_request_post_or_error('commentContent', request)  
-#    except ReadJSONError as e:
-#        return server_error(e.value)
-#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-#        return server_error(e.value)
-#
-#    try:
-#        if 'replyTo' in request.GET:
-#            replyToID = request.GET['replyTo']
-#            replyComment = Discussion.objects.get(id=replyToID)
-#        else:
-#            replyComment = None
-#    except:
-#        return server_error("No comment found with id "+str(replyToID))
-#    
-#    if commentType == 'review':
-#        try:
-#            bus = Business.objects.get(id=oid)
-#        except:
-#            return server_error("Business with ID "+str(oid)+ " does not exist")
-#        comment = Comment.objects.create(user=user,reply_to=replyComment,content=content,business=bus)
-#    elif commentType == 'comment':
-#        try:
-#            btopic = BusinessTopic.objects.get(id=oid)
-#        except:
-#            return server_error("bustopic with ID "+str(oid)+ " does not exist")
-#        comment = Comment.objects.create(user=user,reply_to=replyComment,content=content,businesstopic=btopic)
-#    elif commentType == 'photo':
-#        try:
-#            photo = Photo.objects.get(id=oid)
-#        except:
-#            return server_error("Photo with ID "+str(oid)+ " does not exist")
-#        comment = PhotoDiscussion.objects.create(user=user,reply_to=replyComment,content=content,photo=photo)  
-#    else:
-#        return server_error("Invalid commentType "+str(commentType))
-#    data = serial.get_comment_data(comment,user)
-#    return server_data(data)
-#
-#def edit_comment(request,oid):
-#    try:
-#        user = auth.authenticate_api_request(request)
-#        auth.authorize_user(user, request, "edit")
-#        content = get_request_post_or_error('commentContent', request)  
-#    except ReadJSONError as e:
-#        return server_error(e.value)
-#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-#        return server_error(e.value)
-#    
-#    comment = Comment.objects.create(id=oid,content=content)
-#    data = serial.get_discussion_data(comment,user)
-#    return server_data(data)
-#    
-#def remove_comment(request,oid):
-#    try:
-#        user = auth.authenticate_api_request(request)
-#        auth.authorize_user(user, request, "user")
-#    except ReadJSONError as e:
-#        return server_error(e.value)
-#    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
-#        return server_error(e.value)
-#    
-#    try:
-#        Discussion.objects.filter(id=oid).delete()
-#    except: 
-#        return server_error('Comment with id '+str(oid)+' not found. Deletion failed')
-#    
-#    return server_data("Deletion successful")
 
 
 '''

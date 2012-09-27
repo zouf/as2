@@ -21,6 +21,9 @@ urlpatterns = patterns('api.views',
     (r'^business/topic/remove/(?P<oid>\d+)/?$', 'remove_business_topic'),
     (r'^business/topic/rate/(?P<oid>\d+)/?$', 'rate_business_topic'),
 
+
+    (r'^business/reviews/(?P<oid>\d+)/?$','get_business_reviews'),
+
     (r'^business/types/(?P<oid>\d+)/?$', 'get_business_types'),
     (r'^business/type/add/(?P<oid>\d+)/?$', 'add_business_type'),
     (r'^business/type/remove/(?P<oid>\d+)/?$', 'remove_business_topic'),
