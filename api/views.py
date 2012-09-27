@@ -11,7 +11,7 @@ from api.models import Photo, PhotoRating, PhotoDiscussion, Discussion, Business
 from api.photos import add_photo_by_url
 from api.ratings import rate_businesstopic_internal, rate_comment_internal
 from api.topic_operations import add_topic_to_bus, get_discussions_data, \
-    get_discussion_data, add_review_to_businesstopic, add_comment_to_businesstopic, \
+    get_discussion_data, add_review_to_business, add_comment_to_businesstopic, \
     get_review_data
 from django.contrib.auth.models import User
 from django.contrib.gis.db.models.fields import PolygonField
@@ -917,9 +917,10 @@ def get_comments(request,oid):
     except Exception as e:
         return server_error(str(e))
     
-    discussions = Discussion.objects.filter(businesstopic =bustopic)
+    discussions = Comment.objects.filter(businesstopic =bustopic)
     
     data = dict()
+    print(str(discussions))
     data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
     data['comments'] = get_discussions_data(discussions,user)
     logger.debug(data)
@@ -942,7 +943,7 @@ def edit_main_review(request,oid):
     UserCache.objects.filter(business=bustopic.business).delete()
     logger.debug('done !')
     
-    discussions = Discussion.objects.filter(businesstopic =bustopic)
+    discussions = Comment.objects.filter(businesstopic =bustopic)
     
     data = dict()
     data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
@@ -980,7 +981,7 @@ def add_comment(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "add")
-        topicIDs = get_request_postlist_or_error('topicIDs', request)
+        topicIDs = get_request_postlist_or_warn('topicIDs', request)
         topics = Topic.objects.filter(id__in=topicIDs)
         commentType = get_request_post_or_error('commentType',request)
         replyTo = get_request_post_or_warn('replyToID', request)
@@ -997,28 +998,24 @@ def add_comment(request,oid):
     else:
         bustopic = BusinessTopic.objects.get(id=oid)
         business = bustopic.business
+        topics = [bustopic.topic]
         
-        
+    print('TOPICS ARE NOW' + str(topics))    
     logger.debug("Add a comment to " + str(business) + " for the topics " + str(topics))
     logger.debug('Review is ' + str(review))
-    try:
-        for t in topics:
-            if t.descr != 'Main':
-                bt = add_topic_to_bus(business,t,user)
-                if commentType == "review":
-                    add_review_to_businesstopic(bt,review,user)
-                else:
-                    add_comment_to_businesstopic(bt,review,user, replyTo)
-        #ALWAYS AGGREGATE REVIEWS IN MAIN
-        t = Topic.objects.get(descr='Main')
-        if commentType == "review":
-            bt = add_topic_to_bus(business,t,user)
-            add_review_to_businesstopic(bt,review,user)
 
-    except Exception as e:
-        logger.debug('error is ' + str(e))
-        return server_error(str(e))
-    
+    if commentType=="comment":
+
+        try:
+            for t in topics:
+                bt = add_topic_to_bus(business,t,user)
+                add_comment_to_businesstopic(bt,review,user, replyTo)
+        except Exception as e:
+            logger.debug('error is ' + str(e))
+            return server_error(str(e))
+    else:
+        add_review_to_business(business,review,user)
+        
     return server_data("success","msg")
 
 def rate_comment(request,oid):

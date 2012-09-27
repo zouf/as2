@@ -488,11 +488,9 @@ class Discussion(models.Model):
     reply_to = models.ForeignKey('self', related_name='replies', 
         null=True, blank=True)
     content = models.TextField(max_length=2000) 
-    businesstopic = models.ForeignKey(BusinessTopic,db_index=True,related_name='bustopicreviews')
     class Admin:
         pass
 
-    
 class Review(Discussion):
     business = models.ForeignKey(Business,db_index=True)
     class Admin:
@@ -501,11 +499,17 @@ class Review(Discussion):
         return 'Review object for '  + str(self.user) + " for businesstopic " + str(self.businesstopic) ;
     
 class Comment(Discussion):
+    businesstopic = models.ForeignKey(BusinessTopic,db_index=True,related_name='bustopiccomments')
     class Admin:
         pass
     def __unicode__(self):
         return 'Comment object for '  + str(self.user) + " for businesstopic " + str(self.businesstopic) ;
-    
+ 
+class ReviewTag(models.Model):
+    review = models.ForeignKey(Review,db_index=True,related_name='reviews')
+    bustopics = models.ForeignKey(BusinessTopic, db_index=True,related_name='bustopicreviews')
+ 
+   
     
 class PhotoDiscussion(Discussion):
     photo = models.ForeignKey(Photo,db_index=True)

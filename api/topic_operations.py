@@ -69,9 +69,9 @@ def get_discussions_data(discussions,user):
         data.append(get_discussion_data(d, user))
     return data
 
-def add_review_to_businesstopic(bt,review,user):
-    logger.debug("Adding review " + str(review) + " to business topic " + str(bt))
-    btd = Review.objects.create(businesstopic=bt,business=bt.business,content=review,user=user,reply_to=None)
+def add_review_to_business(b,review,user):
+    logger.debug("Adding review " + str(review) + " to business " + str(b))
+    btd = Review.objects.create(business=b,content=review,user=user,reply_to=None)
     return btd
     
 def add_comment_to_businesstopic(bt,review,user, replyTo):
