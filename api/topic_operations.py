@@ -50,7 +50,8 @@ def get_discussion_data(discussion,user,type=None):
     (numPos, numNeg, thisUsers) = ratings.getDiscussionRatings(discussion,user)
     data['posRatings'] = numPos
     data['negRatings'] = numNeg
-    data['thisUsers'] = thisUsers
+    if thisUsers:
+       data['thisUsers'] = thisUsers
     data['creator'] = get_user_details(user)
     
     data['children'] = []
