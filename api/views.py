@@ -549,9 +549,6 @@ def get_business_reviews(request,oid):
 
     data = dict()
     data['reviews'] = get_discussions_data(discussions,user)
-
-    bustypes = BusinessType.objects.filter(business=bus)
-    data = serial.get_bustypes_data(bustypes,user)
     return server_data(data,"businessReviews")
 
 
