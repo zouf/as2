@@ -139,6 +139,11 @@ def rate_comment_internal(comment,rating,user):
     
     if DiscussionRating.objects.filter(discussion=comment,user=user).count() > 0:
         DiscussionRating.objects.filter(discussion=comment,user=user).delete()
-    
-    DiscussionRating.objects.create(discussion=comment, rating=rating,user=user) 
+    print('creating a rating for discussions ' + str(comment.id) + ' ' + str(rating)) 
+    try:
+
+        DiscussionRating.objects.create(discussion=comment, rating=rating,user=user) 
+    except Exception as e:
+        print(str(e))
+        
     
