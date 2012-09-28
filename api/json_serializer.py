@@ -102,11 +102,14 @@ def get_bustopic_data(bustopic,user,detail):
     data['topic'] = get_topic_data(bustopic.topic, user)       
     
     if detail:
-        try:
-            ut = UserTopic.objects.get(topic_id=bustopic.topic.id,user=user)
-            data['bustopicImportance'] = ut.importance   
-        except:
-            data['bustopicImportance'] = 0
+        if bustopic.topic.descr == 'Main':
+            data['bustopicImportance'] = 10 #higher to make sure it gets sorted to top
+        else:
+            try:
+                ut = UserTopic.objects.get(topic_id=bustopic.topic.id,user=user)
+                data['bustopicImportance'] = ut.importance   
+            except:
+                data['bustopicImportance'] = 0
         if bustopic.content:
             data['bustopicContent'] = bustopic.content
         else:

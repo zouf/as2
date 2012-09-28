@@ -245,7 +245,7 @@ def get_search_string(searchText,searchLocation, searchTypes,num,isLocationSearc
     
     if searchString != "":
         old = searchString
-        searchString = "Found " + str(num) + " businesses when searching for " + str(old) + "."
+        searchString = "Found " + str(num) + "businesses for " + str(old) + "."
     elif isLocationSearch:
         searchString = "Displaying " + str(num) + " businesses near " + searchLocation + "."
     else:
@@ -725,6 +725,7 @@ def subscribe_topic(request,oid):
         if UserTopic.objects.filter(user=user,topic=topic).count() > 0:
             UserTopic.objects.filter(user=user,topic=topic).delete()
         UserTopic.objects.create(user=user,topic=topic,importance=weight)
+        UserCache.objects.filter(user=user).delete()
     except UserTopic.DoesNotExist:
         logger.debug('error could not subscribe')
         return server_error("Could not subscribe user. ")
