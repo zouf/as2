@@ -208,10 +208,16 @@ def getNormFactors(uid, bid):
     return(fct)
 
 
-def getDiscussionRatings(discussion):
-    numNeg = DiscussionRating.objects.filter(rating__lte=0.0).count()
-    numPos  = DiscussionRating.objects.filter(rating__gt=0.0).count()
-    return (numPos, numNeg)
+def getDiscussionRatings(discussion,user):
+    numNeg = DiscussionRating.objects.filter(discussion=discussion,rating__lte=0.0).count()
+    numPos  = DiscussionRating.objects.filter(discussion=discussion,rating__gt=0.0).count()
+    rat = None
+    try:
+        thisUserRating = DiscussionRating.objects.get(discussion=discussion, user=user)
+        rat = thisUserRating.rating
+    except:
+        pass
+    return (numPos, numNeg, rat)
 
 def getNumRatings(bid):
     ratingFilter = BusinessRating.objects.filter(business=Business.objects.get(id=bid)).aggregate(Sum('rating'), Count('rating'))
