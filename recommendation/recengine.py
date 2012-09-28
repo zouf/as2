@@ -53,8 +53,7 @@ def normalize_importance(base,maxImportance=MAX_IMPORTANCE):
     
 
 def get_main_node_average(b, topic, user,edges):
-    thisAvg = 0
-    thisCount = 0
+    sumAverages = 0
     imp = 0  
     try:
         ut = UserTopic.objects.get(topic=topic)
@@ -70,25 +69,24 @@ def get_main_node_average(b, topic, user,edges):
                 avgCt += 1
                 ratSum += r.rating
             if avgCt != 0:
-                thisAvg = ratSum / avgCt
-                thisAvg = thisAvg * imp
-                thisCount += 1
+                sumAverages = ratSum / avgCt
+                sumAverages = sumAverages * imp
             else:
                 thisAvg = 0
             logger.debug('this avg is ' + str(thisAvg))
     
     #change this to something that isn't a query
+    sumWeight = imp
     if topic.id in edges:
         for edge in edges[topic.id]:
-            (childSum, childCount) = get_main_node_average(b,edge,user,edges)
-            if childCount > 0:
-                childAverage = childSum / childCount
-                thisAvg += childAverage
-                thisCount += 1
-        logger.debug('overall for node ' + str(topic.descr)+ ' count of ' + str(thisCount)+ ' avg of ' + str(thisAvg))
+            (childAverage, childWeight) = get_main_node_average(b,edge,user,edges)
+            if childWeight > 0:
+                sumAverages += childAverage
+                sumWeight += childWeight
+        logger.debug('overall for child node ' + str(topic.descr)+ ' has a sumWeight of ' + str(sumWeight)+ ' sumAvg of ' + str(childAverage))
     else:
         logger.debug('topic ' + str(topic)+ ' is a leaf')
-    return (thisAvg, thisCount)
+    return (sumAverages, sumWeight)
 
 
 
