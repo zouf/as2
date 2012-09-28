@@ -401,7 +401,7 @@ def get_businesses_map(request):
     logger.debug('Performing serialization...')
     logger.debug(businesses)
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
-    serialized['searchString'] = get_search_string(searchText,searchLocation, searchTypes, businesses.count(),isSearchLocation=res)
+    serialized['searchString'] = get_search_string(searchText,searchLocation, searchTypes, businesses.count(),isLocationSearch=res)
     logger.debug('Serialization complete...')
     return server_data(serialized,return_type) 
 
@@ -436,7 +436,7 @@ def get_businesses(request):
     logger.debug('Performing serialization...')
     logger.debug(businesses) 
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
-    serialized['searchString'] = get_search_string(searchText,searchLocation, searchTypes, businesses.count(),isSearchLocation=res)
+    serialized['searchString'] = get_search_string(searchText,searchLocation, searchTypes, businesses.count(),isLocationSearch=res)
     logger.debug('Serialization complete...')
     return server_data(serialized,"business")
 
