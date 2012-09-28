@@ -226,7 +226,7 @@ def is_searchtext_location(searchText, currentlocation):
     
     return searchLocation, (lat,lng)
         
-def get_search_string(searchText,searchLocation, searchTypes,num):
+def get_search_string(searchText,searchLocation, searchTypes,num,isLocationSearch):
     typeString = ""
     for t in searchTypes:
         tp = Type.objects.get(id=t)
@@ -243,7 +243,14 @@ def get_search_string(searchText,searchLocation, searchTypes,num):
     if typeString != "":
         searchString += "(" + typeString+ ") "
     
-    searchString += "returned " + str(num) + " results"
+    if searchString != "":
+        old = searchString
+        searchString = "Found " + str(num) + " businesses when searching for " + str(old) + "."
+    elif isLocationSearch:
+        searchString = "Displaying " + str(num) + " businesses near " + searchLocation + "."
+    else:
+        searchString = "Displaying " + str(num) + " businesses."
+        
     return searchString 
   
 
@@ -394,7 +401,7 @@ def get_businesses_map(request):
     logger.debug('Performing serialization...')
     logger.debug(businesses)
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
-    serialized['searchString'] = get_search_string(searchText,searchLocation, searchTypes, businesses.count())
+    serialized['searchString'] = get_search_string(searchText,searchLocation, searchTypes, businesses.count(),isSearchLocation=res)
     logger.debug('Serialization complete...')
     return server_data(serialized,return_type) 
 
@@ -414,6 +421,7 @@ def get_businesses(request):
     searchTypes = get_request_postlist_or_warn('selectedTypes', request)
     businesses = []
     
+    res = is_searchtext_location(searchText, user.current_location)
     #perform search
     if searchText != '' or searchTypes != []:     
         businesses = search_businesses_server(user,searchText,searchLocation,distanceWeight,searchTypes,low,high)
@@ -428,7 +436,7 @@ def get_businesses(request):
     logger.debug('Performing serialization...')
     logger.debug(businesses) 
     serialized = busserial.get_bus_data_ios(businesses ,user,detail=False)
-    serialized['searchString'] = get_search_string(searchText,searchLocation, searchTypes, businesses.count())
+    serialized['searchString'] = get_search_string(searchText,searchLocation, searchTypes, businesses.count(),isSearchLocation=res)
     logger.debug('Serialization complete...')
     return server_data(serialized,"business")
 
@@ -1000,7 +1008,6 @@ def add_comment(request,oid):
         business = bustopic.business
         topics = [bustopic.topic]
         
-    print('TOPICS ARE NOW' + str(topics))    
     logger.debug("Add a comment to " + str(business) + " for the topics " + str(topics))
     logger.debug('Review is ' + str(review))
 

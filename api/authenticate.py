@@ -20,11 +20,15 @@ def set_user_location(user,request):
         lat = float(request.GET['lat'])
         lon = float(request.GET['lon'])
         user.current_location = (lat,lon) 
+        g = geocoders.Google()
+        loc, (lat, lng) = g.geocode(str(lat)+", " + str(lon),exactly_one=False)[0] 
         logger.debug(str(user.current_location))
+        user.location_name = loc
     else:
         g = geocoders.Google()
-        _, (lat, lng) = g.geocode("08540",exactly_one=False)[0] 
+        loc, (lat, lng) = g.geocode("08540",exactly_one=False)[0] 
         user.current_location = (float(lat),float(lng)) 
+        user.location_name = loc
         logger.debug("Centering user in Princeton, NJ by default")
     return user
 
