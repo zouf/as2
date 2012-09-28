@@ -100,8 +100,13 @@ def get_bustopic_data(bustopic,user,detail):
     data['bustopicRatingAdjective'] = get_bustopic_adjective(bustopic, avg)
     data['bustopicID'] = bustopic.id
     data['topic'] = get_topic_data(bustopic.topic, user)       
-        
+    
     if detail:
+        try:
+            ut = UserTopic.objects.get(topic_id=bustopic.topic.id,user=user)
+            data['bustopicImportance'] = ut.importance   
+        except:
+            data['bustopicImportance'] = 0
         if bustopic.content:
             data['bustopicContent'] = bustopic.content
         else:
@@ -140,7 +145,10 @@ def get_bustopics_data(bustopics,user,detail):
         res = get_bustopic_data(cat,user,detail)
         if res:
             data.append(res)
-    return data
+    
+    
+    newlist = sorted(data,key=lambda bt: bt['bustopicImportance'],reverse=True)
+    return newlist
     
 #
 #
