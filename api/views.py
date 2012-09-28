@@ -1201,7 +1201,7 @@ def clear_caches():
 
 def internal_populate_database():
     Rating.objects.all().delete()
-    Business.objects.all().delete()
+    Business.objects.filter(state='NJ').delete()
     BusinessMeta.objects.all().delete()
     #Page.objects.all().delete()
     Photo.objects.all().delete()

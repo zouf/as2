@@ -42,14 +42,16 @@ def get_recommendation_by_topic(business,user):
         return avg
         
 
-MAX_IMPORTANCE = 1          
+MAX_IMPORTANCE = 1
+SCALE_NEUTRAL=1.5
+SCALE_USELESS=5 
 def normalize_importance(base,maxImportance=MAX_IMPORTANCE):
     if base > 0:
         return maxImportance
     elif base < 0:
-        return MAX_IMPORTANCE/6
+        return maxImportance/SCALE_USELESS
     else:
-        return maxImportance/3
+        return maxImportance/SCALE_NEUTRAL
     
 
 def get_main_node_average(b, topic, user,edges):
