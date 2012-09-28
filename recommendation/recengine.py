@@ -41,11 +41,27 @@ def get_recommendation_by_topic(business,user):
             Recommendation.objects.create(user=user,business=business,recommendation=avg)
         return avg
         
-           
-        
+
+MAX_IMPORTANCE = 1          
+def normalize_importance(base,maxImportance=MAX_IMPORTANCE):
+    if base > 0:
+        return maxImportance
+    elif base < 0:
+        return MAX_IMPORTANCE/6
+    else:
+        return maxImportance/3
+    
+
 def get_main_node_average(b, topic, user,edges):
     thisAvg = 0
-    thisCount = 0 
+    thisCount = 0
+    imp = 0  
+    try:
+        ut = UserTopic.objects.get(topic=topic)
+        imp = normalize_importance(ut.importance)
+    except:
+        imp = normalize_importance(0)
+
     for bt in b.businesstopic.all():
         if bt.topic_id == topic.id:
             avgCt = 0
@@ -55,6 +71,7 @@ def get_main_node_average(b, topic, user,edges):
                 ratSum += r.rating
             if avgCt != 0:
                 thisAvg = ratSum / avgCt
+                thisAvg = thisAvg * imp
                 thisCount += 1
             else:
                 thisAvg = 0
