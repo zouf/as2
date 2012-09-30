@@ -22,7 +22,8 @@ def create_article(title="Root", article_kwargs={}, **kwargs):
                          save=True)
     article.save()
     
-    
+
+
     
 def get_default_user():
     try:
@@ -61,7 +62,7 @@ def get_discussion_data(discussion,user,type=None):
     data['posRatings'] = numPos
     data['negRatings'] = numNeg
     if thisUsers:
-       data['thisUsers'] = thisUsers
+        data['thisUsers'] = thisUsers
     data['creator'] = get_user_details(user)
     
     data['children'] = []
@@ -98,6 +99,7 @@ def add_comment_to_businesstopic(bt,review,user, replyTo):
     
 
 
+
 def add_topic_to_bus(b,topic,user=get_default_user()):  
     logger.debug("Adding " + str(topic) + " to business " + str(b) )       
   
@@ -106,14 +108,8 @@ def add_topic_to_bus(b,topic,user=get_default_user()):
     except:
         bustopic = BusinessTopic.objects.create(topic=topic,business=b)
     
-#    try:
-#        Page.objects.get(bustopic=bustopic)
-#        logger.debug('here')
-#    except Page.DoesNotExist:
-#        logger.debug('create a page')
-#        pg = Page(name=topic.descr,bustopic = bustopic)
-#        pg.save()
-    #BusinessCache.objects.filter(business=b).delete()
+
+
     UserCache.objects.filter(business=b).delete()
 
     return bustopic

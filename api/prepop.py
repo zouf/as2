@@ -8,7 +8,7 @@ from api.models import Topic, Business, BusinessType, BusinessRating, \
     BusinessMeta, Type, BusinessTopicRating, BusinessTopic, UserTopic, Comment, \
     Review
 from api.photos import add_photo_by_url
-from api.topic_operations import add_topic, add_topic_to_bus
+from api.topic_operations import add_topic, add_topic_to_bus, create_article
 from as2 import settings
 from django.contrib.auth.models import User
 from gettext import lngettext
@@ -159,16 +159,26 @@ def prepop_businesses(user=get_default_user()):
             else:
                 typeofbus = Type.objects.create(descr=t,creator=get_default_user(),icon="blankicon.png")
             BusinessType.objects.create(business=b,bustype=typeofbus)    
-        
-          
+
         for t,rindex in tag_indices.items():    
             topic = Topic.objects.get(descr=t)
             if row[rindex] != '':
                 bustopic = add_topic_to_bus(b, topic, user)
                 bustopic.content = row[rindex]
-#                pg = Page.objects.get(bustopic=bustopic)
-#                pg.content = row[rindex]
-#                pg.save()
+
+                create_article(title=str(b.name) + ' ' + str(topic.descr),
+                content=row[rindex],
+                user_message='initial population',
+                user=user,
+                ip_address=None,
+                article_kwargs={'owner': user,
+                                'group': None,
+                                'group_read': True,
+                                'group_write': True,
+                                'other_read': True,
+                                'other_write':True,
+                                })
+                
                 bustopic.save()
                 logger.debug('Page content: ' + str(bustopic.content))
         
