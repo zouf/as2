@@ -7,13 +7,23 @@ from api.json_serializer import get_bustopic_data, get_user_details
 from api.models import Topic, BusinessTopic, Edge, Discussion, Review, Comment, \
     BusinessCache, UserCache
 from django.contrib.auth.models import User
-from wiki.models import Page
+from wiki.models.article import Article, ArticleRevision
 import api.json_serializer as jsonserial
 import datetime
-import recommendation.normalization as ratings
 import logging
+import recommendation.normalization as ratings
 logger = logging.getLogger(__name__)
 
+def create_article(title="Root", article_kwargs={}, **kwargs):
+    """Utility function:
+    Create a new urlpath with an article and a new revision for the article"""
+    article = Article(**article_kwargs)
+    article.add_revision(ArticleRevision(title=title, **kwargs),
+                         save=True)
+    article.save()
+    
+    
+    
 def get_default_user():
     try:
         user = User.objects.get(username='matt')
