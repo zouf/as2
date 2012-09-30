@@ -185,10 +185,7 @@ LOG_BASE = os.path.abspath(os.path.join('/var', 'log', 'as2'))
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 
-if not DEPLOY:
-    STATIC_URL='/static/'
-else:
-    STATIC_URL='http://allsortz.s3-website-us-east-1.amazonaws.com/'
+STATIC_URL='http://allsortz-test.s3-website-us-east-1.amazonaws.com/'
     
 RESULTS_DIR = '/tmp/'
 CLIB_DIR = os.path.join(BASE_DIR, 'clib')
@@ -202,8 +199,8 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-	  ("css", BASE_DIR+ "/css"),
-	  ("js", BASE_DIR+ "/js")
+	  ("css", BASE_DIR+ "/src/css"),
+	  ("js", BASE_DIR+ "/src/js")
 )
 
 # List of finder classes that know how to find static files in
@@ -226,6 +223,7 @@ TEMPLATE_LOADERS = (
 
 TEMPLATE_CONTEXT_PROCESSORS += (
      'django.core.context_processors.request',
+'sekizai.context_processors.sekizai'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -287,6 +285,13 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 	'django.contrib.contenttypes',
     'django.contrib.gis',
+    'mptt',
+    'sekizai',
+    'south',
+'django_notify',
+    
+'django.contrib.humanize',
+
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )

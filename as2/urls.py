@@ -1,6 +1,7 @@
 from as2 import settings
 from django.conf.urls import url, patterns, include
 from django.contrib import admin
+from wiki.urls import get_pattern as get_wiki_pattern
 
 
 admin.autodiscover()
@@ -8,12 +9,9 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('api.urls')),
-    url(r'^/?', 'coming_soon.views.coming_soon'),
-
-    url(r'^wiki/', include('wiki.urls')),       
+    url(r'^/?', 'coming_soon.views.index'),
     
-
-
+    (r'^wiki/?', get_wiki_pattern())
 )
 
 if settings.DEBUG:
