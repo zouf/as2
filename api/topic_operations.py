@@ -7,7 +7,6 @@ from api.json_serializer import get_bustopic_data, get_user_details
 from api.models import Topic, BusinessTopic, Edge, Discussion, Review, Comment, \
     BusinessCache, UserCache
 from django.contrib.auth.models import User
-from wiki.models import Page
 import api.json_serializer as jsonserial
 import datetime
 import recommendation.normalization as ratings
