@@ -9,7 +9,6 @@ from api.models import DiscussionRating, PhotoRating, UserTopic, Topic, Edge, \
 from api.ratings import get_avg_bustopic_rating, get_user_bustopic_rating, \
     get_bustopic_adjective
 from queries.models import QueryTopic
-from wiki.models import Page
 import api.ratings as ratings
 import json
 import logging

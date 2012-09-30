@@ -15,7 +15,6 @@ from gettext import lngettext
 from numpy.oldnumeric.random_array import binomial
 from queries.models import Query
 from recommendation.models import Recommendation
-from wiki.models import Page
 import csv
 import json
 import logging
