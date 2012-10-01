@@ -27,12 +27,22 @@ def edit_article(bustopic, title, content, summary,request):
     revision.set_from_request(request)
     bustopic.article.add_revision(revision)
 
-def create_article(bustopic,title="Root", article_kwargs={}, **kwargs):
+def create_article(bustopic,title="Root", article_kwargs={}, content,user_message,request):
     """Utility function:
     Create a new urlpath with an article and a new revision for the article"""
     article = Article(**article_kwargs)
-    article.add_revision(ArticleRevision(title=title, **kwargs),
-                         save=True)
+    ar = ArticleRevision()
+
+    ar.content = content 
+    ar.user_message =  summary 
+    ar.deleted = False
+    if request:
+        ar.set_from_request(request)
+    else:
+        ar.ip_address = None
+        ar.user = get_default_user()
+    article.add_revision(ar, save=True)
+
     article.save()
     bustopic.article=article
     bustopic.save() 

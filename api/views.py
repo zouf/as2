@@ -4,6 +4,7 @@ from api.business_serializer import ReadJSONError, get_single_bus_data_ios, \
     get_request_get_or_error, get_request_post_or_error, get_bus_data_ios, \
     get_request_post_or_warn, get_request_postlist_or_warn, \
     get_request_postlist_or_error
+from api.json_serializer import get_bustopic_history
 from api.models import Photo, PhotoRating, PhotoDiscussion, Discussion, Business, \
     Topic, DiscussionRating, BusinessRating, Type, BusinessType, Rating, \
     BusinessMeta, BusinessTopic, BusinessTopicRating, UserTopic, AllsortzUser, Edge, \
@@ -12,7 +13,7 @@ from api.photos import add_photo_by_url
 from api.ratings import rate_businesstopic_internal, rate_comment_internal
 from api.topic_operations import add_topic_to_bus, get_discussions_data, \
     get_discussion_data, add_review_to_business, add_comment_to_businesstopic, \
-    get_review_data,create_article,edit_article
+    get_review_data, create_article, edit_article
 from django.contrib.auth.models import User
 from django.contrib.gis.db.models.fields import PolygonField
 from django.contrib.gis.geos.factory import fromstr
@@ -936,22 +937,52 @@ def get_comments(request,oid):
     return server_data(data,"comments")
 
 
-def get_review_history(request,oid):
+def get_main_review_history(request,oid):
     try:
         user = auth.authenticate_api_request(request)
-        auth.authorize_user(user, request, "edit")
-        #bustopicID = get_request_get_or_error('busTopicID',request)
-        content = get_request_post_or_error('content', request)
+        auth.authorize_user(user, request, "view")
         bustopic = BusinessTopic.objects.get(id=oid)
     except Exception as e:
         return server_error(str(e))
     
     
-    data = dict()
-    data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
-    data['comments'] = get_discussions_data(discussions,user)
+    data = get_bustopic_history(bustopic)
     logger.debug(data)
-    return server_data(data,"comments")
+    return server_data(data,"history")
+
+def add_main_review_history(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "view")
+        busID = get_request_get_or_error('businessID', request)
+        topicID = get_request_get_or_error('topicID', request)
+        bus = Business.objects.get(id=busID)
+        topic = Topic.objects.get(id=topicID)
+        content = get_request_post_or_error('content', request)
+        
+    except Exception as e:
+        return server_error(str(e))
+    
+    bustopic = add_topic_to_bus(bus, topic, user)
+    
+
+    create_article(bustopic,title=str(bus.name) + ' ' + str(topic.descr),
+    user_message='User ' + str(user) + ' created the article on ' + str(topic),
+    content=content,
+    request=request,
+    article_kwargs={'owner': user,
+                    'group': None,
+                    'group_read': True,
+                    'group_write': True,
+                    'other_read': True,
+                    'other_write':True,
+                    }
+    )
+    
+    bustopic.save()
+    data = get_bustopic_history(bustopic)
+    logger.debug(data)
+    return server_data(data,"history")
 
 
 

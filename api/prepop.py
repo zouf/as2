@@ -166,19 +166,18 @@ def prepop_businesses(user=get_default_user()):
                 bustopic = add_topic_to_bus(b, topic, user)
                 bustopic.content = row[rindex]
 
-                create_article(bustopic,title=str(b.name) + ' ' + str(topic.descr),
+                create_article(bustopic,title='Prepopulating ' + str(b.name) + ' ' + str(topic.descr),
+                user_message='User ' + str(user) + ' created the article on ' + str(topic),
                 content=row[rindex],
-                user_message='initial population',
-                user=user,
-                ip_address=None,
-                article_kwargs={'owner': user,
-                                'group': None,
-                                'group_read': True,
-                                'group_write': True,
-                                'other_read': True,
-                                'other_write':True,
-                                })
-                
+                request=None,
+                    article_kwargs={'owner': user,
+                    'group': None,
+                    'group_read': True,
+                    'group_write': True,
+                    'other_read': True,
+                    'other_write':True,
+                    }
+                )
                 bustopic.save()
                 logger.debug('Page content: ' + str(bustopic.content))
         
