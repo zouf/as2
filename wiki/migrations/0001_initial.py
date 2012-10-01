@@ -14,7 +14,7 @@ class Migration(SchemaMigration):
             ('current_revision', self.gf('django.db.models.fields.related.OneToOneField')(blank=True, related_name='current_set', unique=True, null=True, to=orm['wiki.ArticleRevision'])),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, blank=True)),
+            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='owned_articles', null=True, to=orm['auth.User'])),
             ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.Group'], null=True, blank=True)),
             ('group_read', self.gf('django.db.models.fields.BooleanField')(default=True)),
             ('group_write', self.gf('django.db.models.fields.BooleanField')(default=True)),
@@ -52,7 +52,6 @@ class Migration(SchemaMigration):
             ('article', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wiki.Article'])),
             ('content', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=512)),
-            ('redirect', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='redirect_set', null=True, to=orm['wiki.Article'])),
         ))
         db.send_create_signal('wiki', ['ArticleRevision'])
 
@@ -62,6 +61,7 @@ class Migration(SchemaMigration):
         # Adding model 'URLPath'
         db.create_table('wiki_urlpath', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('article', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wiki.Article'])),
             ('slug', self.gf('django.db.models.fields.SlugField')(max_length=50, null=True, blank=True)),
             ('site', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['sites.Site'])),
             ('parent', self.gf('mptt.fields.TreeForeignKey')(blank=True, related_name='children', null=True, to=orm['wiki.URLPath'])),
@@ -74,35 +74,6 @@ class Migration(SchemaMigration):
 
         # Adding unique constraint on 'URLPath', fields ['site', 'parent', 'slug']
         db.create_unique('wiki_urlpath', ['site_id', 'parent_id', 'slug'])
-
-        # Adding model 'ArticlePlugin'
-        db.create_table('wiki_articleplugin', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('article', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wiki.Article'])),
-            ('deleted', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('wiki', ['ArticlePlugin'])
-
-        # Adding model 'ReusablePlugin'
-        db.create_table('wiki_reusableplugin', (
-            ('articleplugin_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['wiki.ArticlePlugin'], unique=True, primary_key=True)),
-        ))
-        db.send_create_signal('wiki', ['ReusablePlugin'])
-
-        # Adding M2M table for field articles on 'ReusablePlugin'
-        db.create_table('wiki_reusableplugin_articles', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('reusableplugin', models.ForeignKey(orm['wiki.reusableplugin'], null=False)),
-            ('article', models.ForeignKey(orm['wiki.article'], null=False))
-        ))
-        db.create_unique('wiki_reusableplugin_articles', ['reusableplugin_id', 'article_id'])
-
-        # Adding model 'RevisionPlugin'
-        db.create_table('wiki_revisionplugin', (
-            ('articleplugin_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['wiki.ArticlePlugin'], unique=True, primary_key=True)),
-            ('revision', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wiki.ArticleRevision'])),
-        ))
-        db.send_create_signal('wiki', ['RevisionPlugin'])
 
 
     def backwards(self, orm):
@@ -126,18 +97,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'URLPath'
         db.delete_table('wiki_urlpath')
-
-        # Deleting model 'ArticlePlugin'
-        db.delete_table('wiki_articleplugin')
-
-        # Deleting model 'ReusablePlugin'
-        db.delete_table('wiki_reusableplugin')
-
-        # Removing M2M table for field articles on 'ReusablePlugin'
-        db.delete_table('wiki_reusableplugin_articles')
-
-        # Deleting model 'RevisionPlugin'
-        db.delete_table('wiki_revisionplugin')
 
 
     models = {
@@ -194,7 +153,7 @@ class Migration(SchemaMigration):
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'other_read': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'other_write': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'})
+            'owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'owned_articles'", 'null': 'True', 'to': "orm['auth.User']"})
         },
         'wiki.articleforobject': {
             'Meta': {'unique_together': "(('content_type', 'object_id'),)", 'object_name': 'ArticleForObject'},
@@ -203,12 +162,6 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_mptt': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'object_id': ('django.db.models.fields.PositiveIntegerField', [], {})
-        },
-        'wiki.articleplugin': {
-            'Meta': {'object_name': 'ArticlePlugin'},
-            'article': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['wiki.Article']"}),
-            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'wiki.articlerevision': {
             'Meta': {'ordering': "('created',)", 'unique_together': "(('article', 'revision_number'),)", 'object_name': 'ArticleRevision'},
@@ -222,24 +175,14 @@ class Migration(SchemaMigration):
             'locked': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'previous_revision': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['wiki.ArticleRevision']", 'null': 'True', 'blank': 'True'}),
-            'redirect': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'redirect_set'", 'null': 'True', 'to': "orm['wiki.Article']"}),
             'revision_number': ('django.db.models.fields.IntegerField', [], {}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'blank': 'True'}),
             'user_message': ('django.db.models.fields.TextField', [], {'blank': 'True'})
         },
-        'wiki.reusableplugin': {
-            'Meta': {'object_name': 'ReusablePlugin', '_ormbases': ['wiki.ArticlePlugin']},
-            'articleplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['wiki.ArticlePlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'articles': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'shared_plugins_set'", 'symmetrical': 'False', 'to': "orm['wiki.Article']"})
-        },
-        'wiki.revisionplugin': {
-            'Meta': {'object_name': 'RevisionPlugin', '_ormbases': ['wiki.ArticlePlugin']},
-            'articleplugin_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['wiki.ArticlePlugin']", 'unique': 'True', 'primary_key': 'True'}),
-            'revision': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['wiki.ArticleRevision']"})
-        },
         'wiki.urlpath': {
             'Meta': {'unique_together': "(('site', 'parent', 'slug'),)", 'object_name': 'URLPath'},
+            'article': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['wiki.Article']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'level': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),
             'lft': ('django.db.models.fields.PositiveIntegerField', [], {'db_index': 'True'}),

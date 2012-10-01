@@ -15,9 +15,7 @@ import datetime
 import simplejson
 import urllib
 import urllib2
-import wiki.models
-
-
+import  wiki.models.article 
 QUAD_TWITTER_UNIT=560
 DOUBLE_TWITTER_UNIT=280
 
@@ -269,7 +267,7 @@ class BusinessTopic(models.Model):
     business = models.ForeignKey(Business,db_index=True,related_name='businesstopic')
     topic = models.ForeignKey(Topic)
     content = models.CharField(max_length=QUAD_TWITTER_UNIT,null=True)
-    article = models.ForeignKey('wiki.models.Article')
+    article = models.ForeignKey(wiki.models.article.Article,null=True)
     def __unicode__(self):
         return str(self.pk)
     

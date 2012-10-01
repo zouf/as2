@@ -90,6 +90,19 @@ def get_user_details(user):
    
     
     return data
+
+def get_bustopic_history(bustopic):
+    datalist = []
+    for a in bustopic.article.articlerevision_set.all():
+        data= dict()
+        data['modified'] = str(a.article.modified.strftime('%b %d %I:%M %p'))    
+        data['user'] = str(a.user)
+        data['summary'] = str(a.user_message)
+        data['article_id'] = str(a.id)
+        data['userIP'] = str(a.ip_address)
+        datalist.append(data)
+    return datalist
+    
  
 def get_bustopic_data(bustopic,user,detail):
     data = dict()
@@ -109,8 +122,8 @@ def get_bustopic_data(bustopic,user,detail):
                 data['bustopicImportance'] = ut.importance   
             except:
                 data['bustopicImportance'] = 0
-        if bustopic.content:
-            data['bustopicContent'] = bustopic.content
+        if bustopic.article:
+            data['bustopicContent'] = bustopic.article.current_revision.content
         else:
             data['bustopicContent'] = ''
     return data

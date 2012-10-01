@@ -14,14 +14,28 @@ import logging
 import recommendation.normalization as ratings
 logger = logging.getLogger(__name__)
 
-def create_article(title="Root", article_kwargs={}, **kwargs):
+def edit_article(bustopic, title, content, summary,request):
+    revision =  ArticleRevision()
+    revision.inherit_predecessor(bustopic.article)
+    if not title:
+        revision.title=bustopic.article.current_revision.title
+    else:
+        revision.title = title
+    revision.content = content 
+    revision.user_message =  summary 
+    revision.deleted = False
+    revision.set_from_request(request)
+    bustopic.article.add_revision(revision)
+
+def create_article(bustopic,title="Root", article_kwargs={}, **kwargs):
     """Utility function:
     Create a new urlpath with an article and a new revision for the article"""
     article = Article(**article_kwargs)
     article.add_revision(ArticleRevision(title=title, **kwargs),
                          save=True)
     article.save()
-    
+    bustopic.article=article
+    bustopic.save() 
 
 
     

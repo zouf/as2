@@ -166,7 +166,7 @@ def prepop_businesses(user=get_default_user()):
                 bustopic = add_topic_to_bus(b, topic, user)
                 bustopic.content = row[rindex]
 
-                create_article(title=str(b.name) + ' ' + str(topic.descr),
+                create_article(bustopic,title=str(b.name) + ' ' + str(topic.descr),
                 content=row[rindex],
                 user_message='initial population',
                 user=user,

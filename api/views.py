@@ -12,7 +12,7 @@ from api.photos import add_photo_by_url
 from api.ratings import rate_businesstopic_internal, rate_comment_internal
 from api.topic_operations import add_topic_to_bus, get_discussions_data, \
     get_discussion_data, add_review_to_business, add_comment_to_businesstopic, \
-    get_review_data
+    get_review_data,create_article,edit_article
 from django.contrib.auth.models import User
 from django.contrib.gis.db.models.fields import PolygonField
 from django.contrib.gis.geos.factory import fromstr
@@ -935,6 +935,26 @@ def get_comments(request,oid):
     logger.debug(data)
     return server_data(data,"comments")
 
+
+def get_review_history(request,oid):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "edit")
+        #bustopicID = get_request_get_or_error('busTopicID',request)
+        content = get_request_post_or_error('content', request)
+        bustopic = BusinessTopic.objects.get(id=oid)
+    except Exception as e:
+        return server_error(str(e))
+    
+    
+    data = dict()
+    data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
+    data['comments'] = get_discussions_data(discussions,user)
+    logger.debug(data)
+    return server_data(data,"comments")
+
+
+
 def edit_main_review(request,oid):
     try:
         user = auth.authenticate_api_request(request)
@@ -947,7 +967,8 @@ def edit_main_review(request,oid):
     
     logger.debug('Modifying bustopic review')
     logger.debug('new review is '+ str(content))
-    bustopic.content = content
+    edit_article(bustopic,title=None,content=content,summary='Mod by user ' + str(user), request=request)
+                
     bustopic.save()
     UserCache.objects.filter(business=bustopic.business).delete()
     logger.debug('done !')
@@ -1076,6 +1097,7 @@ def update_user(request):
             return server_error('Email ' +str(email) + ' already in use')
     
     try:
+        print 'updating user' 
         auth.register_asuser(user=user,newUname=uname,password=password,email=email,deviceID=deviceID)
     except  auth.RegistrationFailed as e:
         return server_error(str(e))
