@@ -1,72 +1,61 @@
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]>    <html class="no-js iem7"> <![endif]-->
-<!--[if (gt IEMobile 7)|!(IEMobile)]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="HandheldFriendly" content="True">
-        <meta name="MobileOptimized" content="320">
-        <meta name="viewport" content="width=device-width">
-        <meta http-equiv="cleartype" content="on">
+{% extends "base.html" %}
 
-        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="img/touch/apple-touch-icon-144x144-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="img/touch/apple-touch-icon-114x114-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="img/touch/apple-touch-icon-72x72-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" href="img/touch/apple-touch-icon-57x57-precomposed.png">
-        <link rel="shortcut icon" href="img/touch/apple-touch-icon.png">
+{% block body %}
+<script type="text/javascript">
+var initialLocation;
+var siberia = new google.maps.LatLng(60, 105);
+var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
+var browserSupportFlag =  new Boolean();
 
-        <!-- For iOS web apps. Delete if not needed. https://github.com/h5bp/mobile-boilerplate/issues/94 -->
-        <!--
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black">
-        -->
+function initialize() {
+  var myOptions = {
+    zoom: 16,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+  // Try W3C Geolocation (Preferred)
+  if(navigator.geolocation) {
+      browserSupportFlag = true;
+      navigator.geolocation.getCurrentPosition(function(position) {
+              initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+              map.setCenter(initialLocation);
+              var dat = {uname : 'none', password: 'generated_password', deviceID: '_webbrowser', lat:position.coords.latitude, lon:position.coords.longitude, min_x:'40.342117',min_y:'-74.668182',max_x:'40.368999', max_y: '-74.640717'};
+              $.ajax({
+                type: 'GET',
+                url: 'api/businesses/map/',
+                data: dat,
+                success: function(data){
+                },
+                error: function(xhr, type){
+                    alert('Ajax error!')
+                }
+            });    
 
-        <!-- This script prevents links from opening in Mobile Safari. https://gist.github.com/1042026 -->
-        <!--
-        <script>(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(d.href.indexOf("http")||~d.href.indexOf(e.host))&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone")</script>
-        -->
 
-        <link rel="stylesheet" href="{{STATIC_URL}}css/main.css" >
-        <link rel="stylesheet" href="css/normalize.css">
-        <link rel="stylesheet" href="css/main.css">
-        <script src="js/vendor/modernizr-2.6.1.min.js"></script>
-        {% block head %}{% endblock %}
-    </head>
-    <body>
+              }, function() {
+              handleNoGeolocation(browserSupportFlag);
+              });
+}
+  // Browser doesn't support Geolocation
+  else {
+    browserSupportFlag = false;
+    handleNoGeolocation(browserSupportFlag);
+  }
+  
+  function handleNoGeolocation(errorFlag) {
+    if (errorFlag == true) {
+      alert("Geolocation service failed.");
+      initialLocation = newyork;
+    } else {
+      alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
+      initialLocation = siberia;
+    }
+    map.setCenter(initialLocation);
+  }
+}
+</script>
 
-        <!-- Add your site or application content here -->
-<div id="background">
-	<div id="main">
-		<img src="{{STATIC_URL}}css/logo.png" width="400" >
-		<div class="Puritan-normal-400">
-        	
-<p>        	AllSortz is an exciting new startup based in Princeton, NJ. Our goal is to reinvent merchant-consumer interaction. 
-We are currently in the midst of development and are looking for highly motivated and ambitious individuals to join the team and help realize our vision. 
-</p>
-The main qualification we look for in potential AllSortz team members are an entrepreneurial spirit: hands-on, self-motivated, big picture thinking. Experience developing Android or iOS applications is also important for our development and future deployment.
-</p><p>
-
-Please contact Matt at jobs@allsortz.com for more details.
-</p>
+<div id="map_canvas" style="width: 500px; height:500px;">
 </div>
 
-<br/>
-<br/>
-
-		All Rights Reserved, AllSortz, Inc.
-		
-	</div>
-</div>
-        <script src="js/vendor/zepto.min.js"></script>
-        <script src="js/helper.js"></script>
-
-        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-        <script>
-            var _gaq=[["_setAccount","UA-XXXXX-X"],["_trackPageview"]];
-            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
-            g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
-            s.parentNode.insertBefore(g,s)}(document,"script"));
-        </script>
-    </body>
-</html>
+{%endblock%}
