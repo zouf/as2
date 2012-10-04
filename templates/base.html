@@ -29,7 +29,6 @@
         <!--
         <script>(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(d.href.indexOf("http")||~d.href.indexOf(e.host))&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone")</script>
         -->
-
         <link rel="stylesheet" href="{{STATIC_URL}}css/normalize.css">
         <link rel="stylesheet" href="{{STATIC_URL}}css/main.css">
         <script src="{{STATIC_URL}}js/vendor/modernizr-2.6.1.min.js"></script>
@@ -37,8 +36,12 @@
     <body onload="initialize()">
 
         <!-- Add your site or application content here -->
-        {% block body %}{% endblock %}
+        <div id="background">
 
+        {% block body %}{% endblock %}
+            
+		All Rights Reserved, AllSortz, Inc.
+        </div>
         <script src="{{STATIC_URL}}js/vendor/zepto.min.js"></script>
         <script src="{{STATIC_URL}}js/helper.js"></script>
 

@@ -27,7 +27,7 @@ def edit_article(bustopic, title, content, summary,request):
     revision.set_from_request(request)
     bustopic.article.add_revision(revision)
 
-def create_article(bustopic,title="Root", article_kwargs={}, content,user_message,request):
+def create_article(bustopic,title="Root", article_kwargs={}, content="",user_message="",request=None):
     """Utility function:
     Create a new urlpath with an article and a new revision for the article"""
     article = Article(**article_kwargs)

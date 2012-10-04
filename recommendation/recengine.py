@@ -74,8 +74,8 @@ def get_main_node_average(b, topic, user,edges):
                 sumAverages = ratSum / avgCt
                 sumAverages = sumAverages * imp
             else:
-                thisAvg = 0
-            logger.debug('this avg is ' + str(thisAvg))
+                sumAverages = 0
+            logger.debug('this avg is ' + str(sumAverages))
     
     #change this to something that isn't a query
     sumWeight = imp
