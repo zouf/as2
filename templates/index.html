@@ -1,72 +1,114 @@
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]>    <html class="no-js iem7"> <![endif]-->
-<!--[if (gt IEMobile 7)|!(IEMobile)]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="HandheldFriendly" content="True">
-        <meta name="MobileOptimized" content="320">
-        <meta name="viewport" content="width=device-width">
-        <meta http-equiv="cleartype" content="on">
+{% extends "base.html" %}
 
-        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="img/touch/apple-touch-icon-144x144-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="img/touch/apple-touch-icon-114x114-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="img/touch/apple-touch-icon-72x72-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" href="img/touch/apple-touch-icon-57x57-precomposed.png">
-        <link rel="shortcut icon" href="img/touch/apple-touch-icon.png">
+{% block body %}
+<script type="text/javascript">
+var initialLocation;
+var siberia = new google.maps.LatLng(60, 105);
+var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
+var browserSupportFlag =  new Boolean();
+var markersArray = [];
+var businessesOnMap = {}
 
-        <!-- For iOS web apps. Delete if not needed. https://github.com/h5bp/mobile-boilerplate/issues/94 -->
-        <!--
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black">
-        -->
 
-        <!-- This script prevents links from opening in Mobile Safari. https://gist.github.com/1042026 -->
-        <!--
-        <script>(function(a,b,c){if(c in b&&b[c]){var d,e=a.location,f=/^(a|html)$/i;a.addEventListener("click",function(a){d=a.target;while(!f.test(d.nodeName))d=d.parentNode;"href"in d&&(d.href.indexOf("http")||~d.href.indexOf(e.host))&&(a.preventDefault(),e.href=d.href)},!1)}})(document,window.navigator,"standalone")</script>
-        -->
+function addBusToMap(bus,map)
+{
+    if(bus.businessID in businessesOnMap)
+    {
+        return;
+    }
+    var busLatLng = new google.maps.LatLng(bus.latitude,bus.longitude);
+    var marker = new google.maps.Marker({
+      position: busLatLng,
+      map: map,
+      title:bus.businessName
+    });
+    var infowindow = new google.maps.InfoWindow({
+    content: '<div>' + bus.businessName + ' recommendation of ' + bus.ratingRecommendation + '</div><img src="'+bus.photoLargeURL+'" /></div></div>'
+    });   
+    google.maps.event.addListener(marker, 'click', function() {
+        infowindow.open(map,marker);
+    });
+    businessesOnMap[bus.businessID] = marker;
 
-        <link rel="stylesheet" href="{{STATIC_URL}}css/main.css" >
-        <link rel="stylesheet" href="css/normalize.css">
-        <link rel="stylesheet" href="css/main.css">
-        <script src="js/vendor/modernizr-2.6.1.min.js"></script>
-        {% block head %}{% endblock %}
-    </head>
-    <body>
+}
 
-        <!-- Add your site or application content here -->
-<div id="background">
-	<div id="main">
-		<img src="{{STATIC_URL}}css/logo.png" width="400" >
-		<div class="Puritan-normal-400">
-        	
-<p>        	AllSortz is an exciting new startup based in Princeton, NJ. Our goal is to reinvent merchant-consumer interaction. 
-We are currently in the midst of development and are looking for highly motivated and ambitious individuals to join the team and help realize our vision. 
-</p>
-The main qualification we look for in potential AllSortz team members are an entrepreneurial spirit: hands-on, self-motivated, big picture thinking. Experience developing Android or iOS applications is also important for our development and future deployment.
-</p><p>
+function handleMapResponse(data,map)
+{
+    var result = data.result;
+    var businesses = result.businesses;
+    for (var i = 0; i < businesses.length; i++) { 
+        addBusToMap(businesses[i],map);
+    }   
+}
+function setMapPoints(map,position)
+{
 
-Please contact Matt at jobs@allsortz.com for more details.
-</p>
+    var bds = map.getBounds();
+              var minx = bds.getSouthWest().lat()
+              var miny = bds.getSouthWest().lng()
+              var maxx = bds.getNorthEast().lat()
+              var maxy = bds.getNorthEast().lng()
+              var dat = {uname : 'none', password: 'generated_password', deviceID: '_webbrowser', lat:position.coords.latitude, lon:position.coords.longitude, min_x:minx,min_y:miny, max_x:maxx, max_y:maxy};
+              $.ajax({
+                type: 'GET',
+                url: 'api/businesses/map/',
+                data: dat,
+                success: function(data){    
+                    handleMapResponse(data,map);
+                },
+                error: function(xhr, type){
+                    alert('Ajax error!')
+                }
+              });    
+}
+
+
+function initialize() {
+  var myOptions = {
+    zoom: 16,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+  
+  // Try W3C Geolocation (Preferred)
+  if(navigator.geolocation) {
+    browserSupportFlag = true;
+    navigator.geolocation.getCurrentPosition(function(position) {
+            initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+            map.setCenter(initialLocation);
+            google.maps.event.addListener(map, 'idle', function() {
+                //1 seconds after the center of the map has changed, reload data
+                window.setTimeout(function() {
+                    setMapPoints(map,position);
+                    }, 1000);
+                });
+            }, function() {
+      handleNoGeolocation(browserSupportFlag);
+    });
+  }
+  // Browser doesn't support Geolocation
+  else {
+    browserSupportFlag = false;
+    handleNoGeolocation(browserSupportFlag);
+  }
+  
+  function handleNoGeolocation(errorFlag) {
+    if (errorFlag == true) {
+      alert("Geolocation service failed.");
+      initialLocation = newyork;
+    } else {
+      alert("Your browser doesn't support geolocation. We've placed you in Siberia.");
+      initialLocation = siberia;
+    }
+    map.setCenter(initialLocation);
+  }
+}
+
+initialize();
+
+</script>
+
+<div id="map_canvas" style="width: 500px; height:500px;">
 </div>
 
-<br/>
-<br/>
-
-		All Rights Reserved, AllSortz, Inc.
-		
-	</div>
-</div>
-        <script src="js/vendor/zepto.min.js"></script>
-        <script src="js/helper.js"></script>
-
-        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-        <script>
-            var _gaq=[["_setAccount","UA-XXXXX-X"],["_trackPageview"]];
-            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
-            g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
-            s.parentNode.insertBefore(g,s)}(document,"script"));
-        </script>
-    </body>
-</html>
+{%endblock%}
