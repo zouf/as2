@@ -26,6 +26,7 @@ def get_recommendation_by_topic(business,user):
         edges = {}
         for e in Edge.objects.prefetch_related('to_node', 'from_node').all():
             edges.setdefault(e.from_node.id, []).append(e.to_node)
+        print('getting main average')
         (runSum, runCt) = get_main_node_average(business,main,u,edges)
         if runCt > 0:
             avg = float(runSum)/float(runCt)
@@ -46,6 +47,7 @@ MAX_IMPORTANCE = 1
 SCALE_NEUTRAL=1.5
 SCALE_USELESS=5 
 def normalize_importance(base,maxImportance=MAX_IMPORTANCE):
+    return 1
     if base > 0:
         return maxImportance
     elif base < 0:
@@ -62,32 +64,39 @@ def get_main_node_average(b, topic, user,edges):
         imp = normalize_importance(ut.importance)
     except:
         imp = normalize_importance(0)
+    
+    avgCt = 0
+    ratSum = 0
 
+    print('normalized for ' + str(user) +' '+ str(imp))
     for bt in b.businesstopic.all():
+        #just get the average for this particular business topic
         if bt.topic_id == topic.id:
-            avgCt = 0
-            ratSum = 0
             for r in bt.bustopicrating.all():
+                print('Rating for ' + str(topic) + ' ' + str(r.rating))
                 avgCt += 1
                 ratSum += r.rating
             if avgCt != 0:
                 sumAverages = ratSum / avgCt
                 sumAverages = sumAverages * imp
-            else:
-                sumAverages = 0
-            logger.debug('this avg is ' + str(sumAverages))
+    print('average rating for ' + str(topic)+ ' is ' + str(sumAverages)) 
     
-    #change this to something that isn't a query
-    sumWeight = imp
+    
+    #if there is a rating at all for this topic, then count this topic 
+    if avgCt:
+        sumWeight = imp
+    else:
+        sumWeight =  0 #no ratings, means there should be no importance
     if topic.id in edges:
         for edge in edges[topic.id]:
             (childAverage, childWeight) = get_main_node_average(b,edge,user,edges)
             if childWeight > 0:
                 sumAverages += childAverage
                 sumWeight += childWeight
-        logger.debug('overall for child node ' + str(topic.descr)+ ' has a sumWeight of ' + str(sumWeight)+ ' sumAvg of ' + str(childAverage))
+        print('overall for child node ' + str(topic.descr)+ ' has a sumWeight of ' + str(sumWeight)+ ' sumAvg of ' + str(childAverage))
     else:
-        logger.debug('topic ' + str(topic)+ ' is a leaf')
+        print('topic ' + str(topic)+ ' is a leaf')
+    print('total average for ' + str(topic)+ ' is ' + str(sumAverages) + ' and weight is ' + str(sumWeight)) 
     return (sumAverages, sumWeight)
 
 
