@@ -60,7 +60,7 @@ function setMapPoints(map,position)
 }
 
 
-function initialize() {
+function initializeExploreMap() {
   var myOptions = {
     zoom: 16,
     mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -71,13 +71,14 @@ function initialize() {
   if(navigator.geolocation) {
     browserSupportFlag = true;
     navigator.geolocation.getCurrentPosition(function(position) {
+            alert('in get loc')
             initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
             map.setCenter(initialLocation);
             google.maps.event.addListener(map, 'idle', function() {
                 //1 seconds after the center of the map has changed, reload data
                 window.setTimeout(function() {
                     setMapPoints(map,position);
-                    }, 1000);
+                    }, 2000);
                 });
             }, function() {
       handleNoGeolocation(browserSupportFlag);
@@ -100,3 +101,5 @@ function initialize() {
     map.setCenter(initialLocation);
   }
 }
+
+window.onload = initializeExploreMap;

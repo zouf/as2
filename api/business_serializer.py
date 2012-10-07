@@ -141,11 +141,12 @@ def get_single_bus_data_ios(b, user,detail):
         d['zipcode'] = b.zipcode
         d['businessPhone'] = b.phone
         
-        d['businessHours'] = b.metadata.hours  #TODO Set hours
-        d['averagePrice'] = b.metadata.average_price  #TODO Set hours
-        d['servesAlcohol'] = b.metadata.serves  #TODO Set hours
-        d['hasWiFi'] = b.metadata.wifi  #TODO Set hours
-        d['businessURL'] = b.url #TODO Set URL
+        if b.metadata:
+            d['businessHours'] = b.metadata.hours  #TODO Set hours
+            d['averagePrice'] = b.metadata.average_price  #TODO Set hours
+            d['servesAlcohol'] = b.metadata.serves  #TODO Set hours
+            d['hasWiFi'] = b.metadata.wifi  #TODO Set hours
+            d['businessURL'] = b.url #TODO Set URL
     
         d['photo'] = get_photo_id(b)
         

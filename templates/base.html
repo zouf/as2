@@ -33,18 +33,16 @@
         <link rel="stylesheet" href="{{STATIC_URL}}css/main.css">
         <script src="{{STATIC_URL}}js/vendor/modernizr-2.6.1.min.js"></script>
     </head>
-    <body onload="initialize()">
+    <body>
 
         <!-- Add your site or application content here -->
         <div id="background" style="width:100%; height:100%">
 
         {% block body %}{% endblock %}
            
-        <div id ="footer">
-		All Rights Reserved, AllSortz, Inc.
-		</div>
         </div>
         <script src="{{STATIC_URL}}js/vendor/zepto.min.js"></script>
+        <script src="{{STATIC_URL}}js/explore.js"></script>
         <script src="{{STATIC_URL}}js/helper.js"></script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
