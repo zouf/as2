@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div id="busTitle" style="width:100%">
+<p>{{ result.businessName }}</p>
+</div>
+<div id="busPhotoHeader">
+    <img src="{{result.photoLargeURL}}" />
+</div>
+
+<p> Recommendation: {{result.ratingRecommendation}} </p>
+<div id="tabs">
+    <!--Tbas go here-->
+</div>
+<div id="sorts">
+    {% for s in result.categories %}
+        {{s.topic.parentName}}
+        {{s.bustopicAvgRating}}
+        {{s.bustopicContent}}
+    {%endfor%}
+</div>
+
+    
+<div id="busInfo">
+    <div id="address">
+        <p>{{result.streetAddr}}</p>
+        <p>{{result.businessCity}}, {{result.businessState}}</p>
+    </div>
+    <p>Distance: {{result.distanceFromCurrentUser}} mi.</p>
+    <p>{{result.businessPhone}}</p>
+    <p>{{result.businessHours}}</p>
+    <ul id="metaInfoList">
+        <li>Serves Alcohol: {{result.servesAlcohol}}</li>
+        <li>Has WiFi: {{result.hasWiFi}}</li>
+    </ul>
+
+</div>
+
+{%endblock%}

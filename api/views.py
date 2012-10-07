@@ -34,7 +34,10 @@ import api.photos as photos
 import api.prepop as prepop
 import cProfile
 import logging
-import simplejson as json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 #from wiki.models import Page
 
 
@@ -88,8 +91,6 @@ def get_business(request,oid):
     
     bus = Business.objects.get(id=oid)
     bus_data = get_single_bus_data_ios(bus,user,detail=True)
-    
-
     return server_data(bus_data,"business")
 
 def rate_business(request,oid):

@@ -4,9 +4,9 @@ var newyork = new google.maps.LatLng(40.69847032728747, -73.9514422416687);
 var browserSupportFlag =  new Boolean();
 var markersArray = [];
 var businessesOnMap = {}
+var infowindow = new google.maps.InfoWindow();;
 
-
-function addBusToMap(bus,map)
+function addBusToMap(bus,map,position)
 {
     if(bus.businessID in businessesOnMap)
     {
@@ -18,22 +18,22 @@ function addBusToMap(bus,map)
       map: map,
       title:bus.businessName
     });
-    var infowindow = new google.maps.InfoWindow({
-    content: '<div>' + bus.businessName + ' recommendation of ' + bus.ratingRecommendation + '</div><img src="'+bus.photoLargeURL+'" /></div></div>'
-    });   
+
     google.maps.event.addListener(marker, 'click', function() {
+        var link = '/business/'+bus.businessID+'/?uname=none&password=generated_password&deviceID=_webbrowser&lat='+position.coords.latitude+'&lon='+position.coords.longitude;
+        infowindow.setContent('<div>' + bus.businessName + ' recommendation of ' + bus.ratingRecommendation + '</div><a href="'+link+'"><img src="'+bus.photoLargeURL+'" /></a></div></div>');
         infowindow.open(map,marker);
     });
     businessesOnMap[bus.businessID] = marker;
 
 }
 
-function handleMapResponse(data,map)
+function handleMapResponse(data,map,position)
 {
     var result = data.result;
     var businesses = result.businesses;
     for (var i = 0; i < businesses.length; i++) { 
-        addBusToMap(businesses[i],map);
+        addBusToMap(businesses[i],map,position);
     }   
 }
 function setMapPoints(map,position)
@@ -50,9 +50,10 @@ function setMapPoints(map,position)
                 url: 'api/businesses/map/',
                 data: dat,
                 success: function(data){    
-                    handleMapResponse(data,map);
+                    handleMapResponse(data,map,position);
                 },
                 error: function(xhr, type){
+                    alert(xhr);
                     alert('Ajax error!')
                 }
               });    

@@ -11,7 +11,9 @@ urlpatterns = patterns('',
     url(r'^api/', include('api.urls')),
     
     (r'^wiki/?', get_wiki_pattern()),
-    url(r'^/?', 'coming_soon.views.index'),
+    url(r'^/?$', 'coming_soon.views.index'),
+
+    url(r'^business/(?P<oid>\d+)/?$', 'coming_soon.views.detail'),
 )
 
 if settings.DEBUG:
