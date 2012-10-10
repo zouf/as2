@@ -47,6 +47,8 @@ logger = logging.getLogger(__name__)
             
 MAX_MAP_RESULTS = 40
 MAX_SEARCH_LIMIT = 1000
+NUM_STARRED_RESULTS = 3
+
 def get_default_user():
     try:
         user = User.objects.get(username='matt')

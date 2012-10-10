@@ -20,6 +20,7 @@ import json
 import logging
 import operator
 import time
+from api.views import NUM_STARRED_RESULTS
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,12 @@ def get_bus_data_ios(business_list, user,detail=False):
         data['businesses'].append(d)
      
     newlist = sorted(data['businesses'],key=lambda bus: bus['ratingRecommendation'],reverse=True)
+    
+    i = 0
+    for e in newlist:
+        if i < NUM_STARRED_RESULTS:
+            e['starred'] =True
+        i += 1
     data['businesses'] = newlist
     data['userPreferences'] = get_usertopic_data(user)
     return data
