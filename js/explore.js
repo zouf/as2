@@ -71,7 +71,6 @@ function initializeExploreMap() {
   if(navigator.geolocation) {
     browserSupportFlag = true;
     navigator.geolocation.getCurrentPosition(function(position) {
-            alert('in get loc')
             initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
             map.setCenter(initialLocation);
             google.maps.event.addListener(map, 'idle', function() {

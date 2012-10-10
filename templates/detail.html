@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block body %}
+
+<div id="background" style="height:600px;">
 <div id="busTitle" style="width:100%">
 <p>{{ result.businessName }}</p>
 </div>
@@ -30,5 +32,5 @@
     <p>{{result.businessPhone}}</p>
     <p>{{result.businessHours}}</p>
 </div>
-
+</div>
 {%endblock%}

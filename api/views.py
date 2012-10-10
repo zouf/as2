@@ -47,7 +47,6 @@ logger = logging.getLogger(__name__)
             
 MAX_MAP_RESULTS = 40
 MAX_SEARCH_LIMIT = 1000
-NUM_STARRED_RESULTS = 3
 
 def get_default_user():
     try:
@@ -730,6 +729,7 @@ def subscribe_topic(request,oid):
             UserTopic.objects.filter(user=user,topic=topic).delete()
         UserTopic.objects.create(user=user,topic=topic,importance=weight)
         UserCache.objects.filter(user=user).delete()
+        Recommendation.objects.filter(user=user).delete()
     except UserTopic.DoesNotExist:
         logger.debug('error could not subscribe')
         return server_error("Could not subscribe user. ")

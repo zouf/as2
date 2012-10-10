@@ -20,8 +20,9 @@ import json
 import logging
 import operator
 import time
-from api.views import NUM_STARRED_RESULTS
 
+#TODO put this in a constants file
+NUM_STARRED_RESULTS = 3
 logger = logging.getLogger(__name__)
 
        
@@ -184,14 +185,11 @@ def get_single_bus_data_ios(b, user,detail):
             d['categories'] = get_bustopics_data(b.businesstopic.all(),u,detail=True)
             cachedata['categories'] = d['categories']
             UserCache.objects.create(cachedata=json.dumps(cachedata),user=user,business=b)
-    else:
-        logger.debug('NO DETAIL, so NO TOPIC DATA!')
 
     # if the business has this attribute et (from some other calculation) then use it
     if hasattr(b, 'distance'):
         d['distanceFromCurrentUser'] = "%.2f" % b.distance.mi
     else:
-        logger.debug('No distance! maybe geodist?')
         #calculate it
         dist = b.get_distance(user)
         if dist is not None:

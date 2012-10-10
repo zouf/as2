@@ -47,7 +47,6 @@ MAX_IMPORTANCE = 1
 SCALE_NEUTRAL=1.5
 SCALE_USELESS=5 
 def normalize_importance(base,maxImportance=MAX_IMPORTANCE):
-    return 1
     if base > 0:
         return maxImportance
     elif base < 0:
