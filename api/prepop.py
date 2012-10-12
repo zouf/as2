@@ -4,6 +4,8 @@ Created on Apr 2, 2012
 @author: Joey
 '''
 from api.business_operations import add_business_server
+
+from api.ratings import rate_businesstopic_internal
 from api.models import Topic, Business, BusinessType, BusinessRating, \
     BusinessMeta, Type, BusinessTopicRating, BusinessTopic, UserTopic, Comment, \
     Review
@@ -237,11 +239,7 @@ def prepop_topic_ratings():
                         rating_scaled = float(SUM)/float(SIZE)
                         logger.debug('giving rating' + str(rating_scaled))
                         
-                            
-                        BusinessTopicRating.objects.filter(businesstopic=bt,user=user).delete()
-                    #UserTopic.objects.create(user=user,topic=t,importance=1)
-                        rat = BusinessTopicRating(businesstopic=bt, user=user, rating=float(rating_scaled))
-                        rat.save()
+                        rate_businesstopic_internal(bustopic=bt,rating=float(rating_scaled),user=user)
                 except:
                         pass
                 #no rating        

@@ -486,14 +486,14 @@ def rate_business_topic(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "rate")
-        rating = int(get_request_get_or_error('rating', request))
+        rating = float(get_request_get_or_error('rating', request))
         bustopic = BusinessTopic.objects.get(id=oid)
     except ReadJSONError as e:
         return server_error(e.value)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(str(e))
-    except: 
-        return server_error('bustopic with id '+str(oid)+'not found')
+    except Exception as e: 
+        return server_error('bustopic with id '+str(oid)+'not found' + str(e))
     
     
     logger.debug('here')

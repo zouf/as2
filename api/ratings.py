@@ -103,13 +103,14 @@ def get_avg_bustopic_rating(bustopic):
 
 def get_user_bustopic_rating(bustopic,user):
     try:
-        r = BusinessTopicRating.objects.get(businesstopic=bustopic,user=user).rating
+        r = BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user)[0].rating
         if r >= 1:
             r = 1
         elif r <= 0:
             r = 0
         return r
-    except:
+    except Exception as e:
+        print(str(e))
         return -1
     
     
@@ -118,7 +119,6 @@ def rate_businesstopic_internal(bustopic,rating,user):
         rating = -1.0
     elif rating > 1:
         rating = 1.0
-    
     #remove existing rating
     if BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).count() > 0:
         BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).delete()
