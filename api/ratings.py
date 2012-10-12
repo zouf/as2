@@ -119,7 +119,6 @@ def rate_businesstopic_internal(bustopic,rating,user):
     elif rating > 1:
         rating = 1.0
     
-    logger.debug('blarg')
     #remove existing rating
     if BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).count() > 0:
         BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).delete()
@@ -129,12 +128,6 @@ def rate_businesstopic_internal(bustopic,rating,user):
     BusinessTopicRating.objects.create(businesstopic=bustopic, rating=rating,user=user) 
     
 def rate_comment_internal(comment,rating,user):
-    if rating < -1:
-        rating = -1.0
-    elif rating > 1:
-        rating = 1.0
-    
-    
     #remove existing rating
     
     if DiscussionRating.objects.filter(discussion=comment,user=user).count() > 0:

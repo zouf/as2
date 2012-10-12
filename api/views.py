@@ -498,7 +498,6 @@ def rate_business_topic(request,oid):
     
     logger.debug('here')
     rate_businesstopic_internal(bustopic=bustopic,user=user,rating=rating)
-    #data = serial.get_bustopic_data(bustopic,user)
     return server_data("success","bustopic")
 
 
@@ -1090,7 +1089,6 @@ def rate_comment(request,oid):
     except Exception as e:
         return server_error(str(e))
     
-    logger.debug('rating')
     rate_comment_internal(comment=comment,user=user,rating=rating)
     serialized = get_discussion_data(comment, user)
     return server_data(serialized,"comment")
