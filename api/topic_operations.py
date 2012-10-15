@@ -34,7 +34,7 @@ def create_article(bustopic,title="Root", article_kwargs={}, content="",user_mes
     ar = ArticleRevision()
 
     ar.content = content 
-    ar.user_message =  summary 
+    ar.user_message =  user_message 
     ar.deleted = False
     if request:
         ar.set_from_request(request)
@@ -113,7 +113,7 @@ def add_review_to_business(b,review,user):
     
 def add_comment_to_businesstopic(bt,review,user, replyTo):
     logger.debug("Adding comment " + str(review) + " to business topic " + str(bt))
-    if replyTo == '':
+    if replyTo == '' or replyTo == -1:
         btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)
     else:
         reply = Discussion.objects.get(id=int(replyTo))
