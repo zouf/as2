@@ -112,7 +112,7 @@ def get_bustopic_data(bustopic,user,detail):
     
     #if no rating, just assign to avg
     if data['bustopicRating'] < 0:
-        data['bustopicRating'] = avg
+        data['bustopicRating'] = -1
     print('USER BUSTOPIC RATING Is ' + str(data['bustopicRating']) + ' for '+str(bustopic.topic))
     data['bustopicRatingAdjective'] = get_bustopic_adjective(bustopic, avg)
     data['bustopicID'] = bustopic.id
