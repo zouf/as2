@@ -112,12 +112,14 @@ def add_review_to_business(b,review,user):
     return btd
     
 def add_comment_to_businesstopic(bt,review,user, replyTo):
-    logger.debug("Adding comment " + str(review) + " to business topic " + str(bt))
     if replyTo == '' or replyTo == -1:
+        
         btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)
+        logger.debug("Adding comment " + str(review) + " to business topic " + str(bt) + ' as a root ')
     else:
         reply = Discussion.objects.get(id=int(replyTo))
         btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=reply)
+        logger.debug("Adding comment " + str(review) + " to business topic " + str(bt) + ' as a child ')
 
     return btd
     

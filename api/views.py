@@ -1047,10 +1047,10 @@ def add_comment(request,oid):
         topicIDs = get_request_postlist_or_warn('topicIDs', request)
         topics = Topic.objects.filter(id__in=topicIDs)
         commentType = get_request_post_or_error('commentType',request)
-        replyTo = get_request_post_or_warn('replyToID', request)
+        replyTo = int(get_request_post_or_warn('replyToID', request))
         review = get_request_post_or_error('content', request)
     except Exception as e:
-        logger.debug('error ' + str(e))
+        logger.debug('error in add_comment ' + str(e))
         return server_error(str(e))
     except Exception as e:
         return server_error(str(e))
@@ -1058,26 +1058,16 @@ def add_comment(request,oid):
     
     if commentType == "review":
         business = Business.objects.get(id=oid)#('businessID', request)   
-    else:
-        bustopic = BusinessTopic.objects.get(id=oid)
-        business = bustopic.business
-        topics = [bustopic.topic]
-        
-    logger.debug("Add a comment to " + str(business) + " for the topics " + str(topics))
-    logger.debug('Review is ' + str(review))
-
-    if commentType=="comment":
-
-        try:
-            for t in topics:
-                bt = add_topic_to_bus(business,t,user)
-                add_comment_to_businesstopic(bt,review,user, replyTo)
-        except Exception as e:
-            logger.debug('error is ' + str(e))
-            return server_error(str(e))
-    else:
         add_review_to_business(business,review,user)
-        
+    else:
+        try:
+            bustopic = BusinessTopic.objects.get(id=oid)
+            business = bustopic.business
+            add_comment_to_businesstopic(bustopic,review,user, replyTo)
+        except Exception as e:
+            logger.debug("In adding comment error is " + str(e))
+    logger.debug('Review is ' + str(review) +  " reply to ID  is " + str(replyTo))
+
     return server_data("success","msg")
 
 def rate_comment(request,oid):
