@@ -1136,6 +1136,21 @@ def update_user(request):
     
     return server_data(serial.get_user_details(user),"userDetails")
 
+def update_user_picture(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "edit")
+        password = get_request_post_or_error('image', request)
+        deviceID=get_request_get_or_error('deviceID', request)
+    except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
+        return server_error(str(e))
+    
+    
+    
+    
+    return server_data(serial.get_user_details(user),"userDetails")
+
+
 '''
 PRAGMA Code to handle queries
 ''' 
