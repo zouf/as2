@@ -87,7 +87,7 @@ def get_discussion_data(discussion,user,type=None):
     data['negRatings'] = numNeg
     if thisUsers:
         data['thisUsers'] = thisUsers
-    data['creator'] = get_user_details(user)
+    data['creator'] = get_user_details(discussion.user)
     
     data['children'] = []
     for d in Discussion.objects.filter(reply_to=discussion):
