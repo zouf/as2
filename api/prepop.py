@@ -218,15 +218,15 @@ def prepop_topic_ratings():
                     #norm_given_rat = stats.norm(center,rating_given_sd)  #gaussian distribution for giving a rating
                     
                     #almost everything will get a rating
-                    prob_rat_given =  .8 # norm_given_rat.pdf(i)  *  1/norm_given_rat.pdf(center)
+                    prob_rat_given =  .6 # norm_given_rat.pdf(i)  *  1/norm_given_rat.pdf(center)
         
                     rat_given_rv = binomial(1, prob_rat_given, 1) #1 if rated, 0 otherwise
                     if rat_given_rv[0] != 0:
                         #norm_pos_rat = stats.norm(center,pos_rating_sd) #create a normal distribution
                         prob_pos_rat =  0.6 #norm_pos_rat.pdf(i)  *  1/norm_pos_rat.pdf(center) #probability positive
                         
-                        #like or dislike
-                        SIZE = 1
+                        #4 star system
+                        SIZE = 4
                         #We'll ge tan array that is of lenght SIZE and the probability of the event being '1' is prob_pos_rat
                         pos_rat_rv = binomial(1, prob_pos_rat, SIZE) #1 if positive, 0 negative
                         
