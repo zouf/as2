@@ -6,15 +6,26 @@ from wiki.urls import get_pattern as get_wiki_pattern
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^api/', include('api.urls')),
-    
-    (r'^wiki/?', get_wiki_pattern()),
-    url(r'^/?$', 'coming_soon.views.index'),
+urlpatterns = None
+if settings.RELEASED:
 
-    url(r'^business/(?P<oid>\d+)/?$', 'coming_soon.views.detail'),
-)
+    urlpatterns = patterns('',
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^api/', include('api.urls')),
+        
+        (r'^wiki/?', get_wiki_pattern()),
+        url(r'^/?$', 'coming_soon.views.index'),
+    
+        url(r'^business/(?P<oid>\d+)/?$', 'coming_soon.views.detail'),
+    )
+else:
+        urlpatterns = patterns('',
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^api/', include('api.urls')),
+        
+        (r'^wiki/?', get_wiki_pattern()),
+        url(r'^/?$', 'coming_soon.views.coming_soon'),
+    )
 
 if settings.DEBUG:
     urlpatterns += patterns('',
