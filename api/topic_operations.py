@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from wiki.models.article import Article, ArticleRevision
 import api.json_serializer as jsonserial
 import datetime
+import numpy as np 
 import logging
 import recommendation.normalization as ratings
 logger = logging.getLogger(__name__)
@@ -104,7 +105,9 @@ def get_discussions_data(discussions,user):
     filtered = discussions.filter(reply_to=None)
     for d in filtered:
         data.append(get_discussion_data(d, user))
-    return data
+    
+    newlist = sorted(data,key=lambda d: (np.log10(len(d['children'])) + 1)*(d['posRatings'] - d['negRatings']),reverse=True)
+    return newlist
 
 def add_review_to_business(b,review,user):
     logger.debug("Adding review " + str(review) + " to business " + str(b))

@@ -1055,20 +1055,21 @@ def add_comment(request,oid):
     except Exception as e:
         return server_error(str(e))
     
-    
+    comment = None 
     if commentType == "review":
         business = Business.objects.get(id=oid)#('businessID', request)   
-        add_review_to_business(business,review,user)
+        comment = add_review_to_business(business,review,user)
     else:
         try:
             bustopic = BusinessTopic.objects.get(id=oid)
             business = bustopic.business
-            add_comment_to_businesstopic(bustopic,review,user, replyTo)
+            comment = add_comment_to_businesstopic(bustopic,review,user, replyTo)
         except Exception as e:
             logger.debug("In adding comment error is " + str(e))
     logger.debug('Review is ' + str(review) +  " reply to ID  is " + str(replyTo))
 
-    return server_data("success","msg")
+    serialized = get_discussion_data(comment, user)
+    return server_data(serialized,"comment")
 
 def rate_comment(request,oid):
     try:
@@ -1128,16 +1129,25 @@ def update_user(request):
 
 def update_user_picture(request):
     try:
+        logger.debug('fix this2')
+        print('wtffff')
+        logger.debug(str(request.POST))
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "edit")
-        password = get_request_post_or_error('image', request)
+        image = get_request_post_or_error('image', request)
+        
         deviceID=get_request_get_or_error('deviceID', request)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(str(e))
     
     
     
-    
+    try:
+        print('updating user profilepic')
+        print(image)
+        add_photo_by_upload(image,None,user,True,"test caption","test title")
+    except Exception as e:
+        print('Error in profilepic ' + str(e))
     return server_data(serial.get_user_details(user),"userDetails")
 
 

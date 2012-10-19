@@ -173,7 +173,7 @@ def authenticate_api_request(request):
                 asuser.user = user
                 asuser.save()
         except User.DoesNotExist:
-            msg = 'user with username ' + str(uname) + ' str not found'
+            msg = 'user with username ' + str(uname) + ' not found'
             logger.error(msg)   
             raise AuthenticationFailed(msg)
 
