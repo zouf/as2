@@ -118,7 +118,7 @@ def create_asuser(user,device):
 
 def register_asuser(user, newUname, password, email, deviceID):
     asuser = AllsortzUser.objects.get(user=user)
-    device = Device.objects.get(deviceID=deviceID)
+    device = Device.objects.filter(deviceID=deviceID)[0]
     
     if password != '':
         user.set_password(password)
