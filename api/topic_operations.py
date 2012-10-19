@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from wiki.models.article import Article, ArticleRevision
 import api.json_serializer as jsonserial
 import datetime
+import numpy as np 
 import logging
 import recommendation.normalization as ratings
 logger = logging.getLogger(__name__)
@@ -104,7 +105,9 @@ def get_discussions_data(discussions,user):
     filtered = discussions.filter(reply_to=None)
     for d in filtered:
         data.append(get_discussion_data(d, user))
-    return data
+    
+    newlist = sorted(data,key=lambda d: (np.log10(len(d['children'])) + 1)*(d['posRatings'] - d['negRatings']),reverse=True)
+    return newlist
 
 def add_review_to_business(b,review,user):
     logger.debug("Adding review " + str(review) + " to business " + str(b))
@@ -112,12 +115,14 @@ def add_review_to_business(b,review,user):
     return btd
     
 def add_comment_to_businesstopic(bt,review,user, replyTo):
-    logger.debug("Adding comment " + str(review) + " to business topic " + str(bt))
     if replyTo == '' or replyTo == -1:
+        
         btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)
+        logger.debug("Adding comment " + str(review) + " to business topic " + str(bt) + ' as a root ')
     else:
         reply = Discussion.objects.get(id=int(replyTo))
         btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=reply)
+        logger.debug("Adding comment " + str(review) + " to business topic " + str(bt) + ' as a child ')
 
     return btd
     

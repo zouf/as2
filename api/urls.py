@@ -80,7 +80,7 @@ urlpatterns = patterns('api.views',
 
 
     (r'^user/?$', 'get_user'),
-    (r'^user/update/?$', 'update_user')
+    (r'^user/update/?$', 'update_user'),
     (r'^user/update/picture/?$', 'update_user_picture')
 
 
