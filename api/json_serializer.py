@@ -9,7 +9,7 @@ from api.models import DiscussionRating, PhotoRating, UserTopic, Topic, Edge, \
 from api.ratings import get_avg_bustopic_rating, get_user_bustopic_rating, \
     get_bustopic_adjective
 from queries.models import QueryTopic
-#import api.user_operations as userop 
+import api.user_operations as userop 
 import api.ratings as ratings
 import json
 import logging
@@ -76,7 +76,7 @@ def get_topic_data(topic,user,detail=False):
 def get_user_details(user,auth=False):
     data = dict()
     data['userName'] = user.username
-#    data['profile'] = userop.get_user_profile(user,auth)
+    data['profile'] = userop.get_user_profile(user,auth)
     if auth:
         data['userEmail'] = user.email
         try:

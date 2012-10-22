@@ -59,7 +59,7 @@ def get_bus_data_ios(business_list, user,detail=False):
             e['starred'] =True
         i += 1
     data['businesses'] = newlist
-    data['userPreferences'] = topic_type_serializer.get_usertopic_data((user)
+    data['userPreferences'] = topic_type_serializer.get_usertopic_data(user)
     return data
 
 class ReadJSONError(Exception):
