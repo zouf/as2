@@ -62,54 +62,6 @@ def get_bus_data_ios(business_list, user,detail=False):
     data['userPreferences'] = topic_type_serializer.get_usertopic_data(user)
     return data
 
-class ReadJSONError(Exception):
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
-
- 
-def get_request_post_or_error(key,request):
-    if key in request.POST:
-        return request.POST[key]
-    raise ReadJSONError("POST Key: " + str(key) + " not found in request " + str(request.path))
-
-
-def get_request_post_or_warn(key,request):
-    if key in request.POST:
-        return request.POST[key]
-    logger.debug("WARNING: could not get post with key"+ str(key));
-    logger.debug('WARNING: could not get post with key ' + str(key))
-    return ''
-
-def get_request_postlist_or_warn(key,request):
-    if key in request.POST:
-        logger.debug('in request.postlist')
-        logger.debug('trying to get list for ' + str(key))
-        logger.debug(request.POST[key])
-        try:
-            types = request.POST[key]
-            return (json.loads(types))
-        except Exception as e:
-            logger.debug(str(e))
-    logger.debug("WARNING: could not get post list with key "+ str(key));
-    logger.debug('WARNING: could not get post list with key ' + str(key))
-    return []
-
-
-def get_request_get_or_error(key,request):
-    if key in request.GET:
-        return request.GET[key]
-    raise ReadJSONError("GET Key: '" + str(key) + "' not found in request " + str(request.path))
-
-def get_request_postlist_or_error(key,request):
-    if key in request.POST:
-        logger.debug('in request.postlist')
-        logger.debug('trying to get list for ' + str(key))
-        logger.debug(request.POST[key])  
-        types = request.POST[key]
-        return (json.loads(types))
-    raise ReadJSONError("POST Key for list: " + str(key) + " not found in request " + str(request.path))
 
 def get_all_nearby(mylat,mylng,distance=1):
 
