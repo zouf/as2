@@ -5,8 +5,6 @@ Created on Jul 19, 2012
 '''
 #from photos.models import BusinessPhoto
 from api.authenticate import get_default_user
-from api.json_serializer import get_bustypes_data, get_bustopics_data, \
-    get_health_info, get_types_data, get_usertopic_data
 from api.models import Business, BusinessRating, BusinessTopic, BusinessType, \
     BusinessCache, Type, BusinessTopicRating, UserTopic, UserCache, Topic
 from api.photos import get_photo_id, get_photo_url_medium, get_photo_url_large
@@ -15,7 +13,8 @@ from decimal import getcontext, Decimal
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Avg
 from recommendation.recengine import get_best_current_recommendation, \
-    get_recommendation_by_topic, get_node_average,  get_main_node_average
+    get_recommendation_by_topic, get_node_average, get_main_node_average
+import api.json_serializer as topic_type_serializer
 import json
 import logging
 import operator
@@ -60,7 +59,7 @@ def get_bus_data_ios(business_list, user,detail=False):
             e['starred'] =True
         i += 1
     data['businesses'] = newlist
-    data['userPreferences'] = get_usertopic_data(user)
+    data['userPreferences'] = topic_type_serializer.get_usertopic_data((user)
     return data
 
 class ReadJSONError(Exception):
@@ -159,9 +158,9 @@ def get_single_bus_data_ios(b, user,detail):
         d['photo'] = get_photo_id(b)
         
         #d['ratingOverAllUsers']  = getBusAverageRating(b)
-        d['types'] = get_bustypes_data(bustypes,user)
+        d['types'] = topic_type_serializer.get_bustypes_data(bustypes,user)
         
-        d['health_info'] = get_health_info(b.metadata)
+        d['health_info'] = topic_type_serializer.get_health_info(b.metadata)
         
         d['photoMedURL'] = get_photo_url_medium(b)
     #    
@@ -182,7 +181,7 @@ def get_single_bus_data_ios(b, user,detail):
         except:
             u = User.objects.filter(id=user.id).prefetch_related('usertopic_set__topic').select_related()[0]
             cachedata = {} 
-            d['categories'] = get_bustopics_data(b.businesstopic.all(),u,detail=True)
+            d['categories'] = topic_type_serializer.get_bustopics_data(b.businesstopic.all(),u,detail=True)
             cachedata['categories'] = d['categories']
             UserCache.objects.create(cachedata=json.dumps(cachedata),user=user,business=b)
 
