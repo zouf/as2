@@ -357,6 +357,9 @@ class AllsortzUser(models.Model):
     '''Device (if owned) '''
     device = models.ForeignKey(Device,db_index=True)
     
+    '''Profile picture'''
+    profile_photo = models.ForeignKey(Photo)
+    
     registered = models.BooleanField()
   
     class Admin:

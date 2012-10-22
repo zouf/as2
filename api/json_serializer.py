@@ -9,6 +9,7 @@ from api.models import DiscussionRating, PhotoRating, UserTopic, Topic, Edge, \
 from api.ratings import get_avg_bustopic_rating, get_user_bustopic_rating, \
     get_bustopic_adjective
 from queries.models import QueryTopic
+#import api.user_operations as userop 
 import api.ratings as ratings
 import json
 import logging
@@ -61,7 +62,6 @@ def get_topic_data(topic,user,detail=False):
             TopicCache.objects.create(cachedata = json.dumps(data),topic=topic)
     if detail:
         for c in data['children']:
-      
             try:
                 logger.debug(c['topicID'])
                 ut = UserTopic.objects.get(topic_id=c['topicID'],user=user)
@@ -69,28 +69,38 @@ def get_topic_data(topic,user,detail=False):
             except Exception as e:
                 logger.debug('could not get the user weight. Error' + str(e))
                 c['userWeight'] = 0
-
+    
     return data
    
 
-def get_user_details(user):
+def get_user_details(user,auth=False):
     data = dict()
     data['userName'] = user.username
-    data['userEmail'] = user.email
+#    data['profile'] = userop.get_user_profile(user,auth)
+    if auth:
+        data['userEmail'] = user.email
+        try:
+            asuser = AllsortzUser.objects.get(user=user)
+            if asuser.registered:
+                data['registered'] = "true"
+            else:
+                data['registered'] = "false"
     
-    try:
-        asuser = AllsortzUser.objects.get(user=user)
-        if asuser.registered:
-            data['registered'] = "true"
-        else:
+        except:
             data['registered'] = "false"
-    
-    except:
-        data['registered'] = "false"
    
     
     return data
 
+
+
+def get_users_details(allUsers,user):
+    results = []
+    for u in allUsers:
+        if u.id  != user.id:
+            results.append(get_user_details(u,auth=False))
+
+    return results
 def get_bustopic_history(bustopic):
     datalist = []
     for a in bustopic.article.articlerevision_set.all():
@@ -113,11 +123,9 @@ def get_bustopic_data(bustopic,user,detail):
     #if no rating, just assign to avg
     if data['bustopicRating'] < 0:
         data['bustopicRating'] = -1
-    print('USER BUSTOPIC RATING Is ' + str(data['bustopicRating']) + ' for '+str(bustopic.topic))
     data['bustopicRatingAdjective'] = get_bustopic_adjective(bustopic, avg)
     data['bustopicID'] = bustopic.id
     data['topic'] = get_topic_data(bustopic.topic, user)       
-    
     if detail:
         if bustopic.topic.descr == 'Main':
             data['bustopicImportance'] = 10 #higher to make sure it gets sorted to top
@@ -158,8 +166,11 @@ def get_bustypes_data(bustypes,user):
         data.append(get_bustype_data(bt,user))
     return data
 
+
+
 def get_bustopics_data(bustopics,user,detail):
     data = []
+    
     for cat in bustopics:
         
         res = get_bustopic_data(cat,user,detail)

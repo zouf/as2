@@ -928,11 +928,9 @@ def get_comments(request,oid):
         bustopic = BusinessTopic.objects.get(id=oid)
     except Exception as e:
         return server_error(str(e))
-    
     discussions = Comment.objects.filter(businesstopic =bustopic)
     
     data = dict()
-    print(str(discussions))
     data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
     data['comments'] = get_discussions_data(discussions,user)
     logger.debug(data)
@@ -1100,6 +1098,18 @@ def get_user(request):
     return server_data(user_data,"userDetails")
 
 
+def get_users(request):
+    try:
+        user = auth.authenticate_api_request(request)
+        auth.authorize_user(user, request, "get")
+    except Exception as e:
+        return server_error(str(e))
+    user_data = dict()
+    user_data['users'] = serial.get_users_details(User.objects.all())
+    return server_data(user_data,"userDetails")
+
+
+
 def update_user(request):
     try:
         user = auth.authenticate_api_request(request)
@@ -1120,7 +1130,6 @@ def update_user(request):
             return server_error('Email ' +str(email) + ' already in use')
     
     try:
-        print 'updating user' 
         auth.register_asuser(user=user,newUname=uname,password=password,email=email,deviceID=deviceID)
     except  auth.RegistrationFailed as e:
         return server_error(str(e))
@@ -1130,7 +1139,6 @@ def update_user(request):
 def update_user_picture(request):
     try:
         logger.debug('fix this2')
-        print('wtffff')
         logger.debug(str(request.POST))
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "edit")
@@ -1143,13 +1151,10 @@ def update_user_picture(request):
     
     
     try:
-        print('updating user profilepic')
-        print(image)
         add_photo_by_upload(image,None,user,True,"test caption","test title")
     except Exception as e:
-        print('Error in profilepic ' + str(e))
+        return server_error(str(e))
     return server_data(serial.get_user_details(user),"userDetails")
-
 
 '''
 PRAGMA Code to handle queries

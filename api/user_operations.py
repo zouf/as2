@@ -36,3 +36,11 @@ def register_allsortz_user(user,uname,password,email):
         
     return view.server_data(serial.get_user_details(user))
 
+def get_user_profile(user):
+    result = dict()
+    try:
+        asuser = AllSortzUser.objects.get(user=user)
+        result['profilePic'] =  asuer.profile_photo.image.url
+    except:
+        pass
+    return result  

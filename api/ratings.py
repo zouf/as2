@@ -103,7 +103,9 @@ def get_avg_bustopic_rating(bustopic):
 
 def get_user_bustopic_rating(bustopic,user):
     try:
-        r = BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user)[0].rating
+        print('in user get bustopic rating') 
+        r = BusinessTopicRating.objects.get(businesstopic=bustopic,user=user).rating
+        print('after get user stopic rating') 
         if r >= 1:
             r = 1
         elif r <= 0:
@@ -124,6 +126,7 @@ def rate_businesstopic_internal(bustopic,rating,user):
         BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).delete()
     logger.debug('CREATING RAITNG FOR '
            +str(bustopic))
+    Recommendation.objects.filter(user=user).delete()
     UserCache.objects.filter(business=bustopic.business,user=user).delete()
     BusinessTopicRating.objects.create(businesstopic=bustopic, rating=rating,user=user) 
     

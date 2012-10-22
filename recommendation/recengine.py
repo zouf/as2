@@ -71,10 +71,17 @@ def get_main_node_average(b, topic, user,edges):
     for bt in b.businesstopic.all():
         #just get the average for this particular business topic
         if bt.topic_id == topic.id:
-            for r in bt.bustopicrating.all():
-                print('Rating for ' + str(topic) + ' ' + str(r.rating))
+            try:
+                #get the users rating if they have one
+                btr=BusinessTopicRating.objects.get(user=user,businesstopic=bt)
                 avgCt += 1
-                ratSum += r.rating
+                ratSum += btr.rating
+            except:
+                for r in bt.bustopicrating.all():
+                    print('Rating for ' + str(topic) + ' ' + str(r.rating))
+                    avgCt += 1
+                    ratSum += r.rating
+                pass
             if avgCt != 0:
                 sumAverages = ratSum / avgCt
                 sumAverages = sumAverages * imp

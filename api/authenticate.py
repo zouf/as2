@@ -104,8 +104,8 @@ def create_fake_user():
         genuser = User.objects.create(username="gen"+str(maxid.id))
         genuser.set_password("generated_password")
         genuser.save()
-    except: 
-        logger.error('Error in generating a fake user!')  
+    except Exception as e:
+        logger.error('Error in generating a fake user!' + str(e) + str(maxid))  
         raise('Error in generating a fake user!')
     return genuser
         

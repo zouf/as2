@@ -42,15 +42,6 @@ urlpatterns = patterns('api.views',
     (r'^topic/(?P<oid>\d+)/?$', 'get_topic'),
     #(r'^topic/add/?$', 'add_topic'),
 
-
-   #currently not designed / implemented    
-   # (r'^comments/?$', 'get_comment'),
-#    (r'^comment/(?P<oid>\d+)/?$', 'get_comment'),
-#    (r'^comment/add/?$', 'add_comment'),
-#    (r'^comment/remove/?$', 'remove_comment'),
-#    (r'^comment/rate/(?P<oid>\d+)/?$', 'rate_comment'),
-#    (r'^comment/edit/(?P<oid>\d+)/?$','edit_comment'),
-#    
     (r'^comment/(?P<oid>\d+)/?$', 'get_comment'),
     (r'^comments/(?P<oid>\d+)/?$', 'get_comments'),
     (r'^comment/add/(?P<oid>\d+)/?$', 'add_comment'),
@@ -80,8 +71,10 @@ urlpatterns = patterns('api.views',
 
 
     (r'^user/?$', 'get_user'),
+  #  (r'^users/?$', 'get_users'),
     (r'^user/update/?$', 'update_user'),
     (r'^user/update/picture/?$', 'update_user_picture')
+
 
 
 

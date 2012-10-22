@@ -99,14 +99,16 @@ def get_discussion_data(discussion,user,type=None):
     
     
 
-
+def sort_discussions(dleft,dright):
+    return True
 def get_discussions_data(discussions,user):
     data = []
     filtered = discussions.filter(reply_to=None)
     for d in filtered:
         data.append(get_discussion_data(d, user))
     
-    newlist = sorted(data,key=lambda d: (np.log10(len(d['children'])) + 1)*(d['posRatings'] - d['negRatings']),reverse=True)
+
+    newlist = data #sorted(data,key=lambda d: (np.log10(len(d['children'])) + 1)*(d['posRatings'] - d['negRatings']),reverse=True)
     return newlist
 
 def add_review_to_business(b,review,user):
