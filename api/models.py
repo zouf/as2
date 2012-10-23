@@ -138,7 +138,7 @@ class BusinessMeta(models.Model):
 ''' A photo. To be associated with a business or a user '''
 class  Photo(models.Model):
     user = models.ForeignKey(User,db_index=True) 
-    business = models.ForeignKey(Business,db_index=True,related_name='businessphoto')   
+    business = models.ForeignKey(Business,db_index=True,related_name='businessphoto',null=True)   
     is_default = models.BooleanField()
 
     def image_upload_to_profile(self, filename):
@@ -351,7 +351,7 @@ class AllsortzUser(models.Model):
     distance_threshold = models.IntegerField()
     
     '''Map to Django user'''
-    user = models.OneToOneField(User,db_index=True)
+    user = models.OneToOneField(User,db_index=True,related_name="asuser")
 
     ''' Use metric of standard '''
     metric = models.BooleanField(default=False)
@@ -360,7 +360,7 @@ class AllsortzUser(models.Model):
     device = models.ForeignKey(Device,db_index=True)
     
     '''Profile picture'''
-    profile_photo = models.ForeignKey(Photo)
+    profile_photo = models.ForeignKey(Photo,null=True)
     
     registered = models.BooleanField()
   

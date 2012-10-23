@@ -10,6 +10,8 @@ SPHINX_SERVER='127.0.0.1'
 
 WIKI_ANONYMOUS_WRITE=True
 
+#use time zones
+USE_TZ=True
 
 TEMPLATE_DEBUG = DEBUG
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__),
@@ -165,7 +167,7 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = '/var/www/as2/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.

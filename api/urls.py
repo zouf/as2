@@ -71,7 +71,7 @@ urlpatterns = patterns('api.views',
 
 
     (r'^user/?$', 'get_user'),
-  #  (r'^users/?$', 'get_users'),
+    (r'^users/?$', 'get_users'),
     (r'^user/update/?$', 'update_user'),
     (r'^user/update/picture/?$', 'update_user_picture')
 

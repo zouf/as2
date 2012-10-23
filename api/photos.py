@@ -60,6 +60,11 @@ def add_photo_by_url(phurl, business,user,default,caption,title):
     return p
 
 def add_photo_by_upload(img,b,user,default,caption,title):
-    bp =Photo(user=user, business=b, image=img, title=title, caption=caption,is_default=default)
-    bp.save(isUpload = True,isTextMod = False)
+    try:
+      print("trying to save!\n")
+      bp = Photo(user=user, business=b, image=img, title=title, caption=caption,is_default=default)
+      bp.save(isUpload = True,isTextMod = False)
+    except Exception as e:
+      bp = None
+      print(str(e))
     return bp

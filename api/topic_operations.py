@@ -11,6 +11,8 @@ from wiki.models.article import Article, ArticleRevision
 import api.json_serializer as jsonserial
 import datetime
 import numpy as np 
+import pytz
+from django.utils import timezone
 import logging
 import recommendation.normalization as ratings
 logger = logging.getLogger(__name__)
@@ -77,9 +79,9 @@ def get_discussion_data(discussion,user,type=None):
             data['commentType'] = 'comment'
         except:
             data['commentType'] = 'review'
-            
-    
-    data['date'] = str(discussion.date.strftime('%b %d %I:%M %p'))    
+           
+    #TODO GET TIMEZONE DATA FROM SOMEWHERE ELSE
+    data['date'] = str(discussion.date.astimezone(user.timezone).strftime('%b %d %I:%M %p'))    
       
     data['content'] = discussion.content
     data['commentID'] = discussion.id
@@ -88,7 +90,7 @@ def get_discussion_data(discussion,user,type=None):
     data['negRatings'] = numNeg
     if thisUsers:
         data['thisUsers'] = thisUsers
-    data['creator'] = get_user_details(discussion.user)
+    data['creator'] = get_user_details(discussion.user,auth=False)
     
     data['children'] = []
     for d in Discussion.objects.filter(reply_to=discussion):

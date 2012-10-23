@@ -6,7 +6,7 @@ from api.models import Photo, PhotoRating, PhotoDiscussion, Discussion, Business
     Topic, DiscussionRating, BusinessRating, Type, BusinessType, Rating, \
     BusinessMeta, BusinessTopic, BusinessTopicRating, UserTopic, AllsortzUser, Edge, \
     Comment, BusinessCache, UserCache, Review
-from api.photos import add_photo_by_url
+from api.photos import add_photo_by_url, add_photo_by_upload
 from api.ratings import rate_businesstopic_internal, rate_comment_internal
 from api.topic_operations import add_topic_to_bus, get_discussions_data, \
     get_discussion_data, add_review_to_business, add_comment_to_businesstopic, \
@@ -601,7 +601,7 @@ def get_business_reviews(request,oid):
     except: 
         return server_error('Business with id '+str(oid)+'not found')
     
-    discussions = Review.objects.filter(business =bus)
+    discussions = Review.objects.filter(business =bus).order_by('-date')
 
     data = dict()
     data['reviews'] = get_discussions_data(discussions,user)
@@ -974,7 +974,7 @@ def get_comments(request,oid):
         bustopic = BusinessTopic.objects.get(id=oid)
     except Exception as e:
         return server_error(str(e))
-    discussions = Comment.objects.filter(businesstopic =bustopic)
+    discussions = Comment.objects.filter(businesstopic =bustopic).order_by('-date')
     
     data = dict()
     data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
@@ -1050,7 +1050,7 @@ def edit_main_review(request,oid):
     UserCache.objects.filter(business=bustopic.business).delete()
     logger.debug('done !')
     
-    discussions = Comment.objects.filter(businesstopic =bustopic)
+    discussions = Comment.objects.filter(businesstopic =bustopic).order_by('-date')
     
     data = dict()
     data['busTopicInfo'] = serial.get_bustopic_data(bustopic, user, True)
@@ -1140,7 +1140,7 @@ def get_user(request):
         auth.authorize_user(user, request, "get")
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(str(e))
-    user_data = serial.get_user_details(user)
+    user_data = serial.get_user_details(user,auth=True)
     return server_data(user_data,"userDetails")
 
 
@@ -1151,7 +1151,10 @@ def get_users(request):
     except Exception as e:
         return server_error(str(e))
     user_data = dict()
-    user_data['users'] = serial.get_users_details(User.objects.all())
+    users = []
+    for asuser in AllsortzUser.objects.all().prefetch_related('user'):
+      users.append(asuser.user)
+    user_data['users'] = serial.get_users_details(users,user)
     return server_data(user_data,"userDetails")
 
 
@@ -1161,13 +1164,13 @@ def update_user(request):
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
         uname = get_request_post_or_error('userName', request)
-        password = get_request_post_or_error('userPassword', request)
+        password = get_request_post_or_warn('userPassword', request)
         email = get_request_post_or_error('userEmail', request)
         deviceID=get_request_get_or_error('deviceID', request)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(str(e))
     
-    
+    logger.debug('Submitted post ' + str(request.POST)) 
     if User.objects.filter(username=uname).count()> 0:
         if User.objects.get(username=uname) != user:
             return server_error('Username ' + str(uname) + ' taken')
@@ -1180,27 +1183,28 @@ def update_user(request):
     except  auth.RegistrationFailed as e:
         return server_error(str(e))
     
-    return server_data(serial.get_user_details(user),"userDetails")
+    logger.debug('RETURNING user data for ' + str(user))
+    return server_data(serial.get_user_details(user,auth=True),"userDetails")
 
 def update_user_picture(request):
     try:
-        logger.debug('fix this2')
-        logger.debug(str(request.POST))
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "edit")
-        image = get_request_post_or_error('image', request)
-        
+        image = request.FILES['file']
         deviceID=get_request_get_or_error('deviceID', request)
     except (auth.AuthenticationFailed, auth.AuthorizationError) as e:
         return server_error(str(e))
     
-    
-    
     try:
-        add_photo_by_upload(image,None,user,True,"test caption","test title")
+        print('upload photo ' + str(image))
+        bp = add_photo_by_upload(image,None,user,True,"test caption","test title")
+        print('adding photo' + str(image))
+        user.asuser.profile_photo =  bp;
+        user.asuser.save()
     except Exception as e:
+        print('error!\n' + str(e))
         return server_error(str(e))
-    return server_data(serial.get_user_details(user),"userDetails")
+    return server_data(serial.get_user_details(user,auth=True),"userPicture")
 
 '''
 PRAGMA Code to handle queries

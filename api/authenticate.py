@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import login
 from geopy import geocoders
 from queries.views import DISTANCE
+import pytz
 import logging
 
 logger= logging.getLogger(__name__)
@@ -22,12 +23,17 @@ def set_user_location(user,request):
         user.current_location = (lat,lon) 
         g = geocoders.Google()
         loc, (lat, lng) = g.geocode(str(lat)+", " + str(lon),exactly_one=False)[0] 
-        logger.debug(str(user.current_location))
+        #logger.debug(str(user.current_location))
         user.location_name = loc
+        #TODO figure out a better way to do this 
+        nyc = pytz.timezone("America/New_York")
+        user.timezone=nyc
     else:
         g = geocoders.Google()
         loc, (lat, lng) = g.geocode("08540",exactly_one=False)[0] 
         user.current_location = (float(lat),float(lng)) 
+        nyc = pytz.timezone("America/New_York")
+        user.timezone=nyc
         user.location_name = loc
         logger.debug("Centering user in Princeton, NJ by default")
     return user
@@ -44,14 +50,14 @@ def get_default_user():
     return user
 
 def create_device(request):
-    logger.debug('Creating a new device')
+    #logger.debug('Creating a new device')
     deviceID=request.GET['deviceID']
-    logger.debug('device id is ' + str(deviceID))
+    #logger.debug('device id is ' + str(deviceID))
     try:
         device = Device.objects.create(deviceID=deviceID,os=1,model=1, manufacturer =0)
     except Exception as e:
-        logger.debug(e)
-    logger.debug('creation done')
+        logger.debug(str(e))
+#    logger.debug('creation done')
     return device
 
 class AuthenticationFailed(Exception):
@@ -123,16 +129,17 @@ def register_asuser(user, newUname, password, email, deviceID):
     if password != '':
         user.set_password(password)
     else:
-        raise RegistrationFailed('Password should not be blank')
-    
+      pass
+
     if not asuser.registered: 
         if newUname != '':
             user.username = newUname
         else:
             raise RegistrationFailed('Username should not be blank.')
     else:
-        raise RegistrationFailed('Please dont change username')
-    
+      logger.debug('Updating the user ' + str(asuser.user))
+      pass
+
     if email != '':
         user.email = email
     else:
@@ -144,7 +151,7 @@ def register_asuser(user, newUname, password, email, deviceID):
     return user
 
 def authenticate_api_request(request):
-    logger.debug('authenticating user')
+#    logger.debug('authenticating user')
     if 'uname' not in request.GET or 'password' not in request.GET or 'deviceID' not in request.GET:
         logger.error("Username and password not specified in request URL")
         raise AuthenticationFailed("Username and password not specified in request URL")
@@ -154,15 +161,15 @@ def authenticate_api_request(request):
         deviceID = request.GET['deviceID']
     
     
-    logger.debug('uname is ' + str(uname) + ' password is ' + str(password))
+#    logger.debug('uname is ' + str(uname) + ' password is ' + str(password))
     #using only the device ID
     try:
         device = Device.objects.get(deviceID=deviceID)
     except Device.DoesNotExist:
         device = create_device(request)
-        logger.debug('device created' + str(device))  
+#        logger.debug('device created' + str(device))  
     
-    logger.debug("device is " + str(device))
+#    logger.debug("device is " + str(device))
     if uname != 'none':
         try:
             user = User.objects.get(username=uname)
