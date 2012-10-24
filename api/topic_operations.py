@@ -28,6 +28,7 @@ def create_revision(bustopic, title, content, summary,request):
     revision.user_message =  summary 
     revision.deleted = False
     revision.set_from_request(request)
+    revision.save()
     return revision
 
 
@@ -90,9 +91,14 @@ def get_discussion_data(discussion,user,type=None):
     data['date'] = str(discussion.date.astimezone(user.timezone).strftime('%b %d %I:%M %p'))    
     
     #TODO ADD DIFF
-    if isinstance(discussion,Comment):
-        data['proposedChange'] = discussion.proposedchange.content
-        logger.debug('getting the proposed change of ' + str(data['proposedChange']))
+    #if isinstance(discussion,Comment):
+    try:  
+      data['proposedChange'] = discussion.proposedchange.content
+      logger.debug('zouf2 proposed change for ' + str(discussion))
+    except Exception as e:
+      logger.debug('zouf3 for change to ' + str(discussion) + '  due to error ' + str(e))
+      
+      data['proposedChange'] = ''
 
     data['content'] = discussion.content
     data['commentID'] = discussion.id
@@ -104,9 +110,15 @@ def get_discussion_data(discussion,user,type=None):
     data['creator'] = get_user_details(discussion.user,auth=False)
     
     data['children'] = []
-    for d in Discussion.objects.filter(reply_to=discussion):
+    if(isinstance(discussion,Comment)):
+      for d in Comment.objects.filter(reply_to=discussion):
         cdata = get_discussion_data(d, user,'comment')
         data['children'].append(cdata)
+    else:
+       for d in Discussion.objects.filter(reply_to=discussion):
+        cdata = get_discussion_data(d, user,'comment')
+        data['children'].append(cdata)
+
     logger.debug(data)
     return data;
     

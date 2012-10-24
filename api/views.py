@@ -1063,7 +1063,7 @@ def get_comment(request,oid):
     try:
         user = auth.authenticate_api_request(request)
         auth.authorize_user(user, request, "get")
-        discussion = Discussion.objects.get(id=oid)
+        discussion = Comment.objects.get(id=oid)
     except Exception as e:
         return server_error(str(e))
     
