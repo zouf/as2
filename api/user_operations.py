@@ -12,6 +12,6 @@ def get_user_profile(user,auth=False):
         asuser = AllsortzUser.objects.get(user=user)
         result['profilePic'] =  asuser.profile_photo.image_medium.url
     except Exception as e:
-      print('error in getting profile pic ' + str(e))
-      pass
+        print('error in getting profile pic ' + str(e))
+        pass
     return result  

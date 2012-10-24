@@ -504,6 +504,7 @@ class Review(Discussion):
     
 class Comment(Discussion):
     businesstopic = models.ForeignKey(BusinessTopic,db_index=True,related_name='bustopiccomments')
+    proposedchange = models.ForeignKey(wiki.models.article.ArticleRevision,db_index=True,null=True)
     class Admin:
         pass
     def __unicode__(self):

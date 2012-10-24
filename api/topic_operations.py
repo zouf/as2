@@ -17,7 +17,7 @@ import logging
 import recommendation.normalization as ratings
 logger = logging.getLogger(__name__)
 
-def edit_article(bustopic, title, content, summary,request):
+def create_revision(bustopic, title, content, summary,request):
     revision =  ArticleRevision()
     revision.inherit_predecessor(bustopic.article)
     if not title:
@@ -28,7 +28,13 @@ def edit_article(bustopic, title, content, summary,request):
     revision.user_message =  summary 
     revision.deleted = False
     revision.set_from_request(request)
+    return revision
+
+
+def edit_article(bustopic, title, content, summary,request):
+    revision = create_revision(bustopic, title, content, summary,request)
     bustopic.article.add_revision(revision)
+
 
 def create_article(bustopic,title="Root", article_kwargs={}, content="",user_message="",request=None):
     """Utility function:
@@ -82,7 +88,12 @@ def get_discussion_data(discussion,user,type=None):
            
     #TODO GET TIMEZONE DATA FROM SOMEWHERE ELSE
     data['date'] = str(discussion.date.astimezone(user.timezone).strftime('%b %d %I:%M %p'))    
-      
+    
+    #TODO ADD DIFF
+    if isinstance(discussion,Comment):
+        data['proposedChange'] = discussion.proposedchange.content
+        logger.debug('getting the proposed change of ' + str(data['proposedChange']))
+
     data['content'] = discussion.content
     data['commentID'] = discussion.id
     (numPos, numNeg, thisUsers) = ratings.getDiscussionRatings(discussion,user)
@@ -118,16 +129,21 @@ def add_review_to_business(b,review,user):
     btd = Review.objects.create(business=b,content=review,user=user,reply_to=None)
     return btd
     
-def add_comment_to_businesstopic(bt,review,user, replyTo):
+def add_comment_to_businesstopic(bt,review,proposedChange,user, replyTo,request):
     if replyTo == '' or replyTo == -1:
-        
-        btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)
+        btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)        
         logger.debug("Adding comment " + str(review) + " to business topic " + str(bt) + ' as a root ')
     else:
         reply = Discussion.objects.get(id=int(replyTo))
         btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=reply)
-        logger.debug("Adding comment " + str(review) + " to business topic " + str(bt) + ' as a child ')
+        logger.debug("Adding discussion " + str(review) + " to business topic " + str(bt) + ' as a child ')
 
+    try:
+        btd.proposedchange = create_revision(bt,title=None,content=proposedChange,summary=review, request=request)
+        btd.save()
+        logger.debug('Created a revision with content ' + str(btd.proposedchange.content))
+    except Exception as e:
+        logger.debug('Error in creating a revision: ' + str(e))
     return btd
     
 

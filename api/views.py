@@ -1092,7 +1092,9 @@ def add_comment(request,oid):
         topics = Topic.objects.filter(id__in=topicIDs)
         commentType = get_request_post_or_error('commentType',request)
         replyTo = int(get_request_post_or_warn('replyToID', request))
-        review = get_request_post_or_error('content', request)
+        commentContent = get_request_post_or_error('content', request)
+        proposedChange = get_request_post_or_error('proposedChange', request)
+
     except Exception as e:
         logger.debug('error in add_comment ' + str(e))
         return server_error(str(e))
@@ -1102,15 +1104,15 @@ def add_comment(request,oid):
     comment = None 
     if commentType == "review":
         business = Business.objects.get(id=oid)#('businessID', request)   
-        comment = add_review_to_business(business,review,user)
+        comment = add_review_to_business(business,commentContent,user)
     else:
         try:
             bustopic = BusinessTopic.objects.get(id=oid)
             business = bustopic.business
-            comment = add_comment_to_businesstopic(bustopic,review,user, replyTo)
+            comment = add_comment_to_businesstopic(bustopic,commentContent,proposedChange,user, replyTo,request)
         except Exception as e:
             logger.debug("In adding comment error is " + str(e))
-    logger.debug('Review is ' + str(review) +  " reply to ID  is " + str(replyTo))
+    logger.debug('Review is ' + str(commentContent) +  " reply to ID  is " + str(replyTo))
 
     serialized = get_discussion_data(comment, user)
     return server_data(serialized,"comment")
