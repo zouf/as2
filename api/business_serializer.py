@@ -13,7 +13,7 @@ from decimal import getcontext, Decimal
 from django.contrib.auth.models import User
 from django.db.models.aggregates import Avg
 from recommendation.recengine import get_best_current_recommendation, \
-    get_recommendation_by_topic, get_node_average, get_main_node_average
+    get_recommendation_by_topic, get_node_average, get_main_node_average, get_average_simple
 import api.json_serializer as topic_type_serializer
 import json
 import logging
@@ -36,7 +36,7 @@ def test_serializer():
         newlist.append(f)
 
     t = Topic.objects.get(descr='Main')
-    res = get_main_node_average(newlist[0],t.id,get_default_user())
+    res = get_average_simple(b,user) #get_main_node_average(newlist[0],t.id,get_default_user())
 
 def get_bus_data_ios(business_list, user,detail=False):
     data = dict()

@@ -351,17 +351,23 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         logger.debug('searching with text: ' + str(searchText))
         qset = []
         logger.debug(polygon_search_bound)
-        results = Business.search.query(searchText)
-        results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
+        #results = Business.search.query(searchText)
+        try:
+          results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
             .filter(**{'@geodist__lt':dist_limit.m*1.0})\
             .query(searchText).order_by('-@geodist')
+        except Exception as e:
+          logger.debug('Error is ' + str(e))
+        logger.debug('results  are ' + str(results))
         geom_within = []
-        logger.debug(results.count())
-        if results.count() < MAX_SEARCH_LIMIT:
-            limit = results.count()
-        else:
-            limit = MAX_SEARCH_LIMIT
-            
+        try:
+          logger.debug(results.count())
+          if results.count() < MAX_SEARCH_LIMIT:
+              limit = results.count()
+          else:
+              limit = MAX_SEARCH_LIMIT
+        except Exception as e:
+          logger.debug('error is now ' + str(e))
 
         logger.debug("Limit for search " + str(searchText) + " is " + str(limit))
         for r in results[0:limit]:
@@ -1093,7 +1099,7 @@ def add_comment(request,oid):
         commentType = get_request_post_or_error('commentType',request)
         replyTo = int(get_request_post_or_warn('replyToID', request))
         commentContent = get_request_post_or_error('content', request)
-        proposedChange = get_request_post_or_error('proposedChange', request)
+        proposedChange = get_request_post_or_warn('proposedChange', request)
 
     except Exception as e:
         logger.debug('error in add_comment ' + str(e))

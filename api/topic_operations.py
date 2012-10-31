@@ -150,12 +150,13 @@ def add_comment_to_businesstopic(bt,review,proposedChange,user, replyTo,request)
         btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=reply)
         logger.debug("Adding discussion " + str(review) + " to business topic " + str(bt) + ' as a child ')
 
-    try:
-        btd.proposedchange = create_revision(bt,title=None,content=proposedChange,summary=review, request=request)
-        btd.save()
-        logger.debug('Created a revision with content ' + str(btd.proposedchange.content))
-    except Exception as e:
-        logger.debug('Error in creating a revision: ' + str(e))
+    if proposedChange != '':
+      try:
+          btd.proposedchange = create_revision(bt,title=None,content=proposedChange,summary=review, request=request)
+          btd.save()
+          logger.debug('Created a revision with content ' + str(btd.proposedchange.content))
+      except Exception as e:
+          logger.debug('Error in creating a revision: ' + str(e))
     return btd
     
 

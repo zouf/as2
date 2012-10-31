@@ -10,6 +10,7 @@ from api.models import PhotoRating, DiscussionRating, BusinessRating, \
     BusinessTopicRating, UserCache
 from django.db.models.aggregates import Count, Sum, Avg
 import logging
+from recommendation.models import *
 
 logger = logging.getLogger(__name__)
 HATE = 0
@@ -122,13 +123,19 @@ def rate_businesstopic_internal(bustopic,rating,user):
     elif rating > 1:
         rating = 1.0
     #remove existing rating
-    if BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).count() > 0:
-        BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).delete()
-    logger.debug('CREATING RAITNG FOR '
-           +str(bustopic))
+   
+    
+    try:
+      btr,_ = BusinessTopicRating.objects.get_or_create(businesstopic=bustopic,user=user)
+      btr.rating = rating
+      btr.save()
+    except Exception as e:
+      print('Error in get_or_create!' + str(e))
+    
     Recommendation.objects.filter(user=user).delete()
     UserCache.objects.filter(business=bustopic.business,user=user).delete()
-    BusinessTopicRating.objects.create(businesstopic=bustopic, rating=rating,user=user) 
+    if BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user).count() > 1:
+      print('Still Atomic Violation!')
     
 def rate_comment_internal(comment,rating,user):
     #remove existing rating

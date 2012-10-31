@@ -27,13 +27,16 @@ def get_recommendation_by_topic(business,user):
         for e in Edge.objects.prefetch_related('to_node', 'from_node').all():
             edges.setdefault(e.from_node.id, []).append(e.to_node)
         print('getting main average')
-        (runSum, runCt) = get_main_node_average(business,main,u,edges)
-        if runCt > 0:
-            avg = float(runSum)/float(runCt)
-            #logger.debug('AVG for business ' + str(business) + ' is ' + str(avg))
+        
+        avg = get_average_simple(business,user)
+        
+        #(runSum, runCt) = get_main_node_average(business,main,u,edges)
+        #if runCt > 0:
+        #    avg = float(runSum)/float(runCt)
+        #    #logger.debug('AVG for business ' + str(business) + ' is ' + str(avg))
 
-        else:
-            avg = 0  #get avg? some default? TODO
+        #else:
+        #    avg = 0  #get avg? some default? TODO
         try:
             rec = Recommendation.objects.get(user=user,business=business).delete()
             rec.recommendation = avg;
@@ -43,17 +46,56 @@ def get_recommendation_by_topic(business,user):
         return avg
         
 
-MAX_IMPORTANCE = 1
-SCALE_NEUTRAL=1.5
-SCALE_USELESS=5 
-def normalize_importance(base,maxImportance=MAX_IMPORTANCE):
+USELESS = 1
+NEUTRAL = 3
+IMPORTANT = 5
+def normalize_importance(base):
     if base > 0:
-        return maxImportance
+        return IMPORTANT
     elif base < 0:
-        return maxImportance/SCALE_USELESS
+        return USELESS
     else:
-        return maxImportance/SCALE_NEUTRAL
+        return NEUTRAL
     
+
+
+def get_average_simple(b,user):
+  sumRatings = 0
+  sumImportances = 0
+  logger.debug('zouf getting the recommendation for ' +str(user) + ' for ' + str(b)) 
+  for bt in b.businesstopic.all():
+    
+    #get user preferences
+    try:
+        ut = UserTopic.objects.get(topic=bt.topic)
+        logger.debug('zouf the importance for ' + str(bt.topic.descr) + ' is ' + str(ut.importance))
+        imp = normalize_importance(ut.importance)
+    except Exception as e:
+        logger.debug('error in normalizing importance. default to 3' + str(e))
+        imp = normalize_importance(0)
+    try:
+      btr = BusinessTopicRating.objects.filter(user=user,businesstopic=bt)[0]
+      sumRatings += btr.rating*imp
+      sumImportances += imp
+      logger.debug('users original rating for ' + str(bt.topic.descr) + ' was ' + str(btr.rating)+' and we changed it to ' + str(btr.rating*imp))
+    
+    except Exception as e:
+      logger.debug('rating wasnt found because ' + str(e))
+      calcAvgSum = 0
+      calcAvgCt = 0
+      for r in bt.bustopicrating.all():
+        calcAvgSum += r.rating *imp
+        calcAvgCt += imp
+      calcAvg = 0 
+      if calcAvgCt != 0:
+        calcAvg = calcAvgSum/calcAvgCt
+      print('calcAvgSum is ' + str(calcAvgSum))
+      print('calc avg ct is ' + str(calcAvgCt))
+      sumRatings += calcAvg*imp
+      sumImportances +=imp
+  if sumImportances == 0:
+    return 0
+  return sumRatings / sumImportances
 
 def get_main_node_average(b, topic, user,edges):
     sumAverages = 0

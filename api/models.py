@@ -527,7 +527,7 @@ class PhotoDiscussion(Discussion):
 '''   Types of ratings  '''
 class Rating(models.Model):
     user = models.ForeignKey(User,db_index=True)
-    rating = models.FloatField(db_index=True)
+    rating = models.FloatField(db_index=True,null=True)
     class Admin:
         pass
     
