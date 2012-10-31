@@ -571,7 +571,7 @@ def add_business_topic(request,oid):
     if BusinessTopic.objects.filter(business=bus,topic=topic).count() > 0:
         bustopic = BusinessTopic.objects.get(business=bus, topic=topic)
     else:
-        bustopic = BusinessTopic.objects.create(business=bus,topic=topic,creator=user)
+        bustopic = BusinessTopic.objects.create(business=bus,topic=topic)
     data = serial.get_bustopic_data(bustopic,user)
     return server_data(data,"BusinessTopic")
 
