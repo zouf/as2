@@ -572,7 +572,7 @@ def add_business_topic(request,oid):
         bustopic = BusinessTopic.objects.get(business=bus, topic=topic)
     else:
         bustopic = BusinessTopic.objects.create(business=bus,topic=topic)
-    data = serial.get_bustopic_data(bustopic,user)
+    data = serial.get_bustopic_data(bustopic,user,True)
     return server_data(data,"BusinessTopic")
 
 '''Disassociates a topic with a business '''
@@ -775,18 +775,14 @@ def subscribe_topic(request,oid):
     logger.debug('trying to subscribe')
     try:
         logger.debug('Creating a user subscription with user' + str(user)+ " weight " + str(weight) + " to  the topic " + str(topic)) 
-        
-        if UserTopic.objects.filter(user=user,topic=topic).count() > 0:
-            UserTopic.objects.filter(user=user,topic=topic).delete()
-        UserTopic.objects.create(user=user,topic=topic,importance=weight)
+        ut,_ = UserTopic.objects.get_or_create(user=user,topic=topic,importance=weight)
+        ut.importance = weight
+        ut.save()
         UserCache.objects.filter(user=user).delete()
         Recommendation.objects.filter(user=user).delete()
-    except UserTopic.DoesNotExist:
-        logger.debug('error could not subscribe')
-        return server_error("Could not subscribe user. ")
     except Exception as e:
-        logger.debug('exception')
-        logger.debug(e.value)
+        logger.debug('exception in subscribe_topic ' + str(e))
+        return server_error("Could not subscribe user. ")
 
     data = serial.get_topic_data(topic,user,detail=True)
     return server_data(data, "subscription")

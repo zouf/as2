@@ -67,12 +67,13 @@ def get_average_simple(b,user):
     
     #get user preferences
     try:
-        ut = UserTopic.objects.get(topic=bt.topic)
+        ut = UserTopic.objects.filter(topic=bt.topic)[0]
         logger.debug('zouf the importance for ' + str(bt.topic.descr) + ' is ' + str(ut.importance))
         imp = normalize_importance(ut.importance)
     except Exception as e:
         logger.debug('error in normalizing importance. default to 3' + str(e))
         imp = normalize_importance(0)
+        pass
     try:
       btr = BusinessTopicRating.objects.filter(user=user,businesstopic=bt)[0]
       sumRatings += btr.rating*imp

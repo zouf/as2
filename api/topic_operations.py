@@ -18,6 +18,9 @@ import recommendation.normalization as ratings
 logger = logging.getLogger(__name__)
 
 def create_revision(bustopic, title, content, summary,request):
+    
+    
+    
     revision =  ArticleRevision()
     revision.inherit_predecessor(bustopic.article)
     if not title:
@@ -56,7 +59,7 @@ def create_article(bustopic,title="Root", article_kwargs={}, content="",user_mes
     article.save()
     bustopic.article=article
     bustopic.save() 
-
+    return ar
 
     
 def get_default_user():
@@ -146,15 +149,36 @@ def add_comment_to_businesstopic(bt,review,proposedChange,user, replyTo,request)
         btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)        
         logger.debug("Adding comment " + str(review) + " to business topic " + str(bt) + ' as a root ')
     else:
-        reply = Discussion.objects.get(id=int(replyTo))
-        btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=reply)
-        logger.debug("Adding discussion " + str(review) + " to business topic " + str(bt) + ' as a child ')
+        if replyTo != 0:
+          reply = Discussion.objects.get(id=int(replyTo))
+          btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=reply)
+          logger.debug("Adding discussion " + str(review) + " to business topic " + str(bt) + ' as a child ')
+        else:
+          btd = Comment.objects.create(businesstopic=bt,content=review,user=user,reply_to=None)
+          logger.debug("Adding discussion " + str(review) + " to business topic " + str(bt) + ' as a root comment ')
+  
 
+    # if theres a proposed change
     if proposedChange != '':
       try:
-          btd.proposedchange = create_revision(bt,title=None,content=proposedChange,summary=review, request=request)
-          btd.save()
-          logger.debug('Created a revision with content ' + str(btd.proposedchange.content))
+          # the intial data for the business is empty
+          if bt.article == None:
+            btd.proposedchange = create_article(bt,title=bt, user_message=review, content=proposedChange, request=request, article_kwargs={'owner': user,
+                    'group': None,
+                    'group_read': True,
+                    'group_write': True,
+                    'other_read': True,
+                    'other_write':True,
+                    }
+                )
+            btd.save()
+            #invalidate the caches
+                      #otherwise just create a revision
+          else:
+            btd.proposedchange = create_revision(bt,title=None,content=proposedChange,summary=review, request=request)
+            btd.save()
+          logger.debug('Invalidate the cache!\n"')
+          UserCache.objects.filter(user=user,business=bt.business).delete()
       except Exception as e:
           logger.debug('Error in creating a revision: ' + str(e))
     return btd

@@ -105,7 +105,11 @@ def get_avg_bustopic_rating(bustopic):
 def get_user_bustopic_rating(bustopic,user):
     try:
         print('in user get bustopic rating') 
-        r = BusinessTopicRating.objects.get(businesstopic=bustopic,user=user).rating
+        rset = BusinessTopicRating.objects.filter(businesstopic=bustopic,user=user)
+
+        if rset.count() > 1:
+          logger.debug('Still have multiple ratings for users!')
+        r = rset[0].rating
         print('after get user stopic rating') 
         if r >= 1:
             r = 1
@@ -113,7 +117,7 @@ def get_user_bustopic_rating(bustopic,user):
             r = 0
         return r
     except Exception as e:
-        print(str(e))
+        logger.debug(" For topic " + str(bustopic.topic.descr) + " in " + str(bustopic.business) + " exception " + str(e)) 
         return -1
     
     

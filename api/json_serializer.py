@@ -67,7 +67,7 @@ def get_topic_data(topic,user,detail=False):
                 ut = UserTopic.objects.get(topic_id=c['topicID'],user=user)
                 c['userWeight'] =  ut.importance            
             except Exception as e:
-                logger.debug('could not get the user weight. Error' + str(e))
+                #logger.debug('could not get the user weight. Error' + str(e))
                 c['userWeight'] = 0
     
     return data

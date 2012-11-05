@@ -528,6 +528,7 @@ class PhotoDiscussion(Discussion):
 class Rating(models.Model):
     user = models.ForeignKey(User,db_index=True)
     rating = models.FloatField(db_index=True,null=True)
+    date = models.DateTimeField(auto_now=True)
     class Admin:
         pass
     

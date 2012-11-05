@@ -197,7 +197,7 @@ def authenticate_api_request(request):
             asuser = AllsortzUser.objects.get(device=device) 
     
     
-    logger.debug('authenticate user ' + str(asuser.user))
+    #logger.debug('authenticate user ' + str(asuser.user))
     user = authenticate(username=asuser.user, password=password)
     if not  user:
         raise AuthenticationFailed('Incorrect username password combination')
