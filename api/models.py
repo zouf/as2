@@ -4,18 +4,16 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos.factory import fromstr
 from django.contrib.localflavor.us.models import USStateField, PhoneNumberField
 from django.core.files.base import ContentFile
-from django.db.models.query import QuerySet
 from django.utils.encoding import smart_str
 from djangosphinx.models import SphinxSearch
 from geopy import distance
-from geopy.point import Point
 from os.path import basename
+import wiki.models.article
 import StringIO
 import datetime
 import simplejson
 import urllib
 import urllib2
-import  wiki.models.article 
 QUAD_TWITTER_UNIT=560
 DOUBLE_TWITTER_UNIT=280
 

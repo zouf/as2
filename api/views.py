@@ -1,35 +1,31 @@
 #from allsortz.search import get_all_nearbyfrom api.business_operations import add_business_server, edit_business_server
 from api.business_operations import add_business_server, edit_business_server
-import api.business_serializer as  business_serializer 
 from api.json_serializer import get_bustopic_history
-from api.models import Photo, PhotoRating, PhotoDiscussion, Discussion, Business, \
-    Topic, DiscussionRating, BusinessRating, Type, BusinessType, Rating, \
-    BusinessMeta, BusinessTopic, BusinessTopicRating, UserTopic, AllsortzUser, Edge, \
-    Comment, BusinessCache, UserCache, Review
+from api.models import Photo, PhotoRating, Discussion, Business, Topic, \
+    BusinessRating, Type, BusinessType, Rating, BusinessMeta, BusinessTopic, \
+    BusinessTopicRating, UserTopic, AllsortzUser, Comment, BusinessCache, UserCache, \
+    Review
 from api.photos import add_photo_by_url, add_photo_by_upload
 from api.ratings import rate_businesstopic_internal, rate_comment_internal
 from api.topic_operations import add_topic_to_bus, get_discussions_data, \
     get_discussion_data, add_review_to_business, add_comment_to_businesstopic, \
     get_review_data, create_article, edit_article
 from django.contrib.auth.models import User
-from django.contrib.gis.db.models.fields import PolygonField
 from django.contrib.gis.geos.factory import fromstr
-from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
 from django.contrib.gis.measure import D
-from django.db.models.aggregates import Avg
 from django.http import HttpResponse
 from geopy import geocoders, distance
 from geopy.units import radians
 from queries.models import Query, QueryTopic
-from queries.views import perform_query_from_param, perform_query_from_obj
+from queries.views import perform_query_from_obj
 from recommendation.models import Recommendation
 import api.authenticate as auth
+import api.business_serializer as  business_serializer
 import api.business_serializer as busserial
 import api.json_serializer as serial
 import api.photos as photos
 import api.prepop as prepop
-import cProfile
 import logging
 try:
     import json
@@ -264,7 +260,7 @@ def is_searchtext_location(searchText, currentlocation):
         return None
     logger.debug('location is ' + str(searchLocation))
     
-    (cLat, cLon) = currentlocation
+    (_, _) = currentlocation
     dist = distance.distance((lat,lng),currentlocation)
     
     
@@ -353,21 +349,19 @@ def search_businesses_server(user,searchText,searchLocation,distanceWeight,searc
         logger.debug(polygon_search_bound)
         #results = Business.search.query(searchText)
         try:
-          results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng))\
-            .filter(**{'@geodist__lt':dist_limit.m*1.0})\
-            .query(searchText).order_by('-@geodist')
+            results = Business.search.geoanchor('latit','lonit', radians(lat),radians(lng)).filter(**{'@geodist__lt':dist_limit.m*1.0}).query(searchText).order_by('-@geodist')
         except Exception as e:
-          logger.debug('Error is ' + str(e))
+            logger.debug('Error is ' + str(e))
         logger.debug('results  are ' + str(results))
         geom_within = []
         try:
-          logger.debug(results.count())
-          if results.count() < MAX_SEARCH_LIMIT:
-              limit = results.count()
-          else:
-              limit = MAX_SEARCH_LIMIT
+            logger.debug(results.count())
+            if results.count() < MAX_SEARCH_LIMIT:
+                limit = results.count()
+            else:
+                limit = MAX_SEARCH_LIMIT
         except Exception as e:
-          logger.debug('error is now ' + str(e))
+            logger.debug('error is now ' + str(e))
 
         logger.debug("Limit for search " + str(searchText) + " is " + str(limit))
         for r in results[0:limit]:
@@ -608,7 +602,7 @@ def get_business_reviews(request,oid):
         return server_error('Business with id '+str(oid)+'not found')
     
     discussions = Review.objects.filter(business =bus).order_by('-date')
-
+    discussions.append(Comment.objects.filter(businesstopic__business=bus).order_by('-date'))
     data = dict()
     data['reviews'] = get_discussions_data(discussions,user)
     return server_data(data,"businessReviews")
@@ -1157,7 +1151,7 @@ def get_users(request):
     user_data = dict()
     users = []
     for asuser in AllsortzUser.objects.all().prefetch_related('user'):
-      users.append(asuser.user)
+        users.append(asuser.user)
     user_data['users'] = serial.get_users_details(users,user)
     return server_data(user_data,"userDetails")
 
