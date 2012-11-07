@@ -35,7 +35,7 @@ def set_user_location(user,request):
         nyc = pytz.timezone("America/New_York")
         user.timezone=nyc
         user.location_name = loc
-        logger.debug("Centering user in Princeton, NJ by default")
+        #logger.debug("Centering user in Princeton, NJ by default")
     return user
 
 
@@ -56,8 +56,8 @@ def create_device(request):
     try:
         device = Device.objects.create(deviceID=deviceID,os=1,model=1, manufacturer =0)
     except Exception as e:
-        logger.debug(str(e))
-#    logger.debug('creation done')
+        logger.error('Exception with value ' + str(e))
+    #logger.debug('creation done')
     return device
 
 class AuthenticationFailed(Exception):
@@ -137,7 +137,7 @@ def register_asuser(user, newUname, password, email, deviceID):
         else:
             raise RegistrationFailed('Username should not be blank.')
     else:
-      logger.debug('Updating the user ' + str(asuser.user))
+      #logger.debug('Updating the user ' + str(asuser.user))
       pass
 
     if email != '':
@@ -188,16 +188,12 @@ def authenticate_api_request(request):
     #auth the user by device alone   
     else:            
         if AllsortzUser.objects.filter(device=device).count() == 0:
-            logger.debug('creating an ASUSER')
             logger.debug('Creating a new AllSortz User')
             genuser = create_fake_user()  
             asuser = create_asuser(genuser, device)
                 
         else:
             asuser = AllsortzUser.objects.get(device=device) 
-    
-    
-    #logger.debug('authenticate user ' + str(asuser.user))
     user = authenticate(username=asuser.user, password=password)
     if not  user:
         raise AuthenticationFailed('Incorrect username password combination')

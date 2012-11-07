@@ -498,7 +498,7 @@ class Review(Discussion):
     class Admin:
         pass
     def __unicode__(self):
-        return 'Review object for '  + str(self.user) + " for businesstopic " + str(self.businesstopic) ;
+        return 'Review object for '  + str(self.user) + " for business " + str(self.business) ;
     
 class Comment(Discussion):
     businesstopic = models.ForeignKey(BusinessTopic,db_index=True,related_name='bustopiccomments')

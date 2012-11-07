@@ -542,7 +542,6 @@ def rate_business_topic(request,oid):
         return server_error('bustopic with id '+str(oid)+'not found' + str(e))
     
     
-    logger.debug('here')
     rate_businesstopic_internal(bustopic=bustopic,user=user,rating=rating)
     return server_data("success","bustopic")
 
@@ -566,6 +565,8 @@ def add_business_topic(request,oid):
         bustopic = BusinessTopic.objects.get(business=bus, topic=topic)
     else:
         bustopic = BusinessTopic.objects.create(business=bus,topic=topic)
+    
+    UserCache.objects.filter(business=bus).delete()
     data = serial.get_bustopic_data(bustopic,user,True)
     return server_data(data,"BusinessTopic")
 
@@ -1087,7 +1088,7 @@ def add_comment(request,oid):
         topicIDs = get_request_postlist_or_warn('topicIDs', request)
         topics = Topic.objects.filter(id__in=topicIDs)
         commentType = get_request_post_or_error('commentType',request)
-        replyTo = int(get_request_post_or_warn('replyToID', request))
+        replyToID = get_request_post_or_warn('replyToID', request)
         commentContent = get_request_post_or_error('content', request)
         proposedChange = get_request_post_or_warn('proposedChange', request)
 
@@ -1105,10 +1106,11 @@ def add_comment(request,oid):
         try:
             bustopic = BusinessTopic.objects.get(id=oid)
             business = bustopic.business
-            comment = add_comment_to_businesstopic(bustopic,commentContent,proposedChange,user, replyTo,request)
+            if replyToID != '':
+              comment = add_comment_to_businesstopic(bustopic,commentContent,proposedChange,user, int(replyToID),request)
         except Exception as e:
             logger.debug("In adding comment error is " + str(e))
-    logger.debug('Review is ' + str(commentContent) +  " reply to ID  is " + str(replyTo))
+    logger.debug('Review is ' + str(commentContent) +  " reply to ID  is " + str(replyToID))
 
     serialized = get_discussion_data(comment, user)
     return server_data(serialized,"comment")

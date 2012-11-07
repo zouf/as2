@@ -46,7 +46,7 @@ def get_recommendation_by_topic(business,user):
         return avg
         
 
-USELESS = 1
+USELESS = 0
 NEUTRAL = 3
 IMPORTANT = 5
 def normalize_importance(base):
