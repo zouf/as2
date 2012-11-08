@@ -291,7 +291,7 @@ INSTALLED_APPS = (
     'sekizai',
     'south',
 'django_notify',
-    
+  'coming_soon',    
 'django.contrib.humanize',
 
     # Uncomment the next line to enable admin documentation:

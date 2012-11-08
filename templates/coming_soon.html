@@ -1,23 +1,38 @@
 {% extends "base.html" %}
 
 {% block body %}
-	<div id="main">
+	<div id="healthSurvey" class = "Puritan-normal-400">
 		<img src="{{STATIC_URL}}css/logo.png" width="400" >
-		<div class="Puritan-normal-400">
 
-<p>        	AllSortz is an exciting new startup based in Princeton, NJ. Our goal is to reinvent merchant-consumer interaction.
-We are currently in the midst of development and are looking for highly motivated and ambitious individuals to join the team and help realize our vision.
+<p>        	AllSortz is an exciting new startup based in Princeton, NJ. Our goal is to get people to go out and enjoy the food that is offered in your community. Whether you're new to town and want to know the best 
+place for lunch, or you're a veteran of Main St. who's interested in new dishes at your favorite restaurant, AllSortz is here to serve you.
 </p>
-The main qualification we look for in potential AllSortz team members are an entrepreneurial spirit: hands-on, self-motivated, big picture thinking. Experience developing Android or iOS applications is also important for our development and future deployment.
-</p><p>
+<p>
+We understand that there are a myriad of restrictions people are faced with when going out to eat. Your child might have a peanut allergy, or you might want to know that your coffee is fair trade. We're hard at work compiling a way for you to not only find places you'll love, but places that fit your diet, lifestyle, and restrictions. If you want to understand the food you eat, and to learn to eat healthy outside the home, give us your e-mail and we'll be in touch. 
+</p>
 
-Please contact Matt at jobs@allsortz.com for more details.
+<p>
+
+If you want to tell us a little more about yourself, please take our <a href="/health">survey</a>, so we can better serve your needs. Don't worry, we'll keep all of your information anonymous and secure.
 </p>
+
+
+<div id="submit_bubble">
+<form method="post" action="">
+        {{ form.id }}
+        
+
+
+        <input type="text" value="Email" name="email" id="id_email"
+         onblur="if (this.value == '') {this.value = 'Email';}"
+          onfocus="if (this.value == 'Email') {this.value = '';}" />
+        <br /> 
+        <input type="submit" value="Sign me up" class="submit_button">
+    
+    </form>
+    
+    </div>
+
 </div>
 
-<br/>
-<br/>
-		All Rights Reserved, AllSortz, Inc.
-
-	</div>
 {% endblock %}

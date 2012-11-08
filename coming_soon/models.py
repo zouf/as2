@@ -4,14 +4,19 @@ from django.contrib.localflavor.us.models import USStateField
 from django.forms import ModelForm
 # Create your models here.
 
+class Visitor(models.Model):
+  ip = models.IPAddressField(blank=True)#define field ip
+  date = models.DateTimeField(auto_now_add=True, editable=False)
+  referer = models.URLField(blank=True, verify_exists=False)# define field referer
+  user_agent = models.CharField(blank=True, max_length=100) #define field user_agent
 
 class InterestedUser(models.Model):
-    first_name = models.CharField(_('first name'), max_length=30, blank=True, null=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True, null=True)
-    email = models.EmailField(_('e-mail address'))
-    city = models.CharField(_('city'), max_length=50, blank=True, null=True)
-    state = USStateField(choices = STATE_CHOICES, blank=True,null=True)
-
+    first_name = models.CharField( max_length=30, blank=True, null=True)
+    last_name = models.CharField( max_length=30, blank=True, null=True)
+    email = models.EmailField()
+    city = models.CharField( max_length=50, blank=True, null=True)
+    state = USStateField(blank=True,null=True)
+    visited_from = models.ForeignKey(Visitor, null=True)
     def __unicode__(self):
         return self.email
 
@@ -19,4 +24,5 @@ class InterestedUser(models.Model):
 class InterestedUserForm(ModelForm):
     class Meta:
         model = InterestedUser
-        exclude = ('first_name','last_name')
+        exclude = ('first_name','last_name', 'city', 'state', 'visited_from')
+
