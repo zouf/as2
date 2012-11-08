@@ -10,9 +10,9 @@
         <meta name="viewport" content="width=device-width">
         <meta http-equiv="cleartype" content="on">
        <link href='http://fonts.googleapis.com/css?family=Puritan' rel='stylesheet' type='text/css'>
-        <script type="text/javascript"
+<!--        <script type="text/javascript"
       src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAefqg5thWNg8s8YTq0CWRdQD7jt1VEruM&sensor=false"></script>
-
+-->
 
         <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{STATIC_URL}}img/touch/apple-touch-icon-144x144-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{STATIC_URL}}img/touch/apple-touch-icon-114x114-precomposed.png">
@@ -31,13 +31,18 @@
         -->
         <link rel="stylesheet" href="{{STATIC_URL}}css/normalize.css">
         <link rel="stylesheet" href="{{STATIC_URL}}css/main.css">
-        <script src="{{STATIC_URL}}js/vendor/modernizr-2.6.1.min.js"></script>
+       <script src="{{STATIC_URL}}js/vendor/modernizr-2.6.1.min.js"></script>
     </head>
     <body>
+          <div id="main" role="main">
 
         <!-- Add your site or application content here -->
-          <div id="background">
+          <header></header>
+          <div id="content">
             {% block body %}{% endblock %}
+
+          </div>
+          <footer></footer>
 
           </div>
           <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
