@@ -4,7 +4,6 @@ from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 import os.path
 import socket
 DEBUG = True
-RELEASED = False
 SPHINX_API_VERSION = 0x116
 SPHINX_SERVER='127.0.0.1'
 
@@ -76,7 +75,7 @@ BROKER_PASSWORD = "guest"
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_ACCESS_KEY_ID='AKIAJNT6HH4SMZYBZJKQ'
 AWS_SECRET_ACCESS_KEY='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'
-AWS_STORAGE_BUCKET_NAME='allsortz-test'
+AWS_STORAGE_BUCKET_NAME='as-november'
 
 #AWS_CALLING_FORMAT=CallingFormat.SUBDOMAIN
 
@@ -187,7 +186,7 @@ LOG_BASE = os.path.abspath(os.path.join('/var', 'log', 'as2'))
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 
-STATIC_URL='http://allsortz-test.s3-website-us-east-1.amazonaws.com/'
+STATIC_URL='http://as-november.s3-website-us-east-1.amazonaws.com/'
     
 RESULTS_DIR = '/tmp/'
 CLIB_DIR = os.path.join(BASE_DIR, 'clib')

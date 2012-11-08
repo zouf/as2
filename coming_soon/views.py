@@ -12,9 +12,13 @@ def coming_soon(request):
 def index(request):
     return render_to_response('index.html', context_instance=RequestContext(request))    
  
-
+#experimenting with web version of app
 def detail(request,oid):
     req =  get_business(request,oid);
     context = json.loads(req.content)
     return render_to_response('detail.html', context, context_instance=RequestContext(request)) 
-             
+
+def health_survey(request):
+  return render_to_response('health.html', context_instance=RequestContext(request))    
+
+
