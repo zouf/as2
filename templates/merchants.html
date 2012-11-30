@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{%block header%}
+
+
+<ul class="nav">
+  <li  ><a href="/">Home</a></li>
+  <li ><a href="/about">About</a></li>
+  <li ><a href="/contact">Contact</a></li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">More <b class="caret"></b></a>
+  <ul class="dropdown-menu">
+  <li><a href="/health">Survey</a></li>
+  <li class="divider"></li>
+  <li class="nav-header">Merchants</li>
+  <li class="active"><a href="#">Join</a></li>
+  </ul>
+  </li>
+  </ul>
+
+
+{%endblock%}
+
+
+{% block body %}
+
+     <div class="hero-unit">
+              <h1>Join the Revolution</h1>
+
+              <p class="lead">
+              We're leading the way to bring more people in your front door. Give us your information and we'll get in touch with ways we can work together that were impossible before.
+</p>
+
+</div>
+{% endblock %}
+

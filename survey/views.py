@@ -371,6 +371,7 @@ def visible_survey_list(request,
     if login_required and not login_user.is_authenticated():
         return redirect_to_login(request.path)
     else:
+        print 'zoufzoufzouf'
         return object_list(request,
             **{ 'queryset': Survey.objects.filter(visible=True),
               'allow_empty': True,

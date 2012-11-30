@@ -1,4 +1,5 @@
 {% extends "survey/base.html" %}
+{%block body%}
 {% load i18n %}
 {% block content %}{% load survey %}
 <h1>{% trans "Surveys"%}</h1>
@@ -26,3 +27,5 @@
 </table>
 </fieldset>
 {% endblock %}
+
+{%endblock%}

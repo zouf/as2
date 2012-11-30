@@ -1,7 +1,7 @@
 """Survey Models
 """
 import datetime
-
+import pytz
 from django.db import models
 from django.conf import settings
 from django.core.cache import cache
@@ -77,7 +77,8 @@ class Survey(models.Model):
         if not self.visible: return False
         value = cache.get(self._cache_name)
         if value is not None: return value
-        now = datetime.datetime.now()
+        nyc = pytz.timezone("America/New_York")
+        now = nyc.localize(datetime.datetime.now())
         if self.opens >= now:
             value = False
             duration = (now - self.opens).seconds

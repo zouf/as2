@@ -18,19 +18,23 @@
 
 {%endblock%}
 
-
-
 {% block body %}
-    <div class="container">
     <p class="lead">
     We want you to enjoy yourself when you go out. We want you to find the dish you'll rave to your friends about. If you have an allergy, food restriction, or you're dieting we know how hard this can be. "Is the pasta really gluten free?" and "Did they get the note about my son's peanut allergy" are real concerns. Help us find you places that fit your eating habits by answering the survey below. We'll use your feedback to get in touch with restauranteurs and make it easier, more fun, and safer for you to enjoy a meal while out on the town.
     </p>
-    <div id="surveyMonkeyInfo" style="margin-left:20%;"><div><script src="http://www.surveymonkey.com/jsEmbed.aspx?sm=_2ftaFxgHtply4oAtYE0bV_2fA_3d_3d"> </script></div></div>	
+
+{% load i18n %}
+{% block content %}
+<hr>
+<form method="post" class="focus-input" action="">
+    {% for question_form in survey.forms %}
+        {{ question_form.as_template }}
+    {% endfor %}
+  <input type="submit" value="{% trans 'Submit' %}" class="btn btn-large btn-success" name="__vote" />
+</form>
+{% endblock %}
 
 
-
-
-</div>
 
 
 {% endblock %}

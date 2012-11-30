@@ -58,6 +58,7 @@ class BaseAnswerForm(Form):
         # or we could pass in the template name ... whatever we want
         # import pdb; pdb.set_trace()
         t = loader.get_template('forms/form.html')
+        print t.render(c)
         return t.render(c)
 
     def save(self, commit=True):
@@ -220,9 +221,9 @@ def forms_for_survey(survey, request, edit_existing=False):
 class CustomDateWidget(TextInput):
     class Media:
         js = ('/admin/jsi18n/',
-              settings.ADMIN_MEDIA_PREFIX + 'js/core.js',
-              settings.ADMIN_MEDIA_PREFIX + "js/calendar.js",
-              settings.ADMIN_MEDIA_PREFIX + "js/admin/DateTimeShortcuts.js",
+              settings.STATIC_URL+ 'js/core.js',
+              settings.STATIC_URL + "js/calendar.js",
+              settings.STATIC_URL + "js/admin/DateTimeShortcuts.js",
               )
 
     def __init__(self, attrs={}):
@@ -231,9 +232,9 @@ class CustomDateWidget(TextInput):
 class CustomTimeWidget(TextInput):
     class Media:
         js = ('/admin/jsi18n/',
-              settings.ADMIN_MEDIA_PREFIX + 'js/core.js',
-              settings.ADMIN_MEDIA_PREFIX + "js/calendar.js",
-              settings.ADMIN_MEDIA_PREFIX + "js/admin/DateTimeShortcuts.js",
+              settings.STATIC_URL + 'js/core.js',
+              settings.STATIC_URL + "js/calendar.js",
+              settings.STATIC_URL + "js/admin/DateTimeShortcuts.js",
               )
 
 

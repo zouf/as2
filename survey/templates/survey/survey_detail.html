@@ -1,4 +1,7 @@
-{% extends "survey/base.html" %}{% load i18n %}
+{% extends "survey/base.html" %}
+
+{%block body %}
+{% load i18n %}
 {% block styles %}
 <style type="text/css">
 input[type="radio"] { vertical-align: top; }
@@ -15,6 +18,8 @@ div.horizontal ul {margin-left:20px; padding-left:10px; display: inline;}
     {% for question_form in survey.forms %}
         {{ question_form.as_template }}
     {% endfor %}
-    <div class="submit-row"><input type="submit" value="{% trans 'Submit' %}" class="default" name="__vote" /></div>
+    <div class="btn"><input type="submit" value="{% trans 'Submit' %}" class="default" name="__vote" /></div>
 </form>
 {% endblock %}
+
+{%endblock%}
