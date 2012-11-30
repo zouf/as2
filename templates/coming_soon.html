@@ -1,37 +1,49 @@
 {% extends "base.html" %}
 
-{% block body %}
-		
 
-        <p class="lead">
+{% block body %}
+
+     <div class="hero-unit">
+              <h1>Eat Healthy</h1>
+
+              <p class="lead">
       AllSortz is an exciting new startup based in Princeton, NJ. Our goal is to get people to go out and enjoy the food that is offered in your community. Whether you're new to town and want to know the best 
 place for lunch, or you're a veteran of Main St. who's interested in new dishes at your favorite restaurant, AllSortz is here to serve you.</p>
-
-<p class="lead"> 
-We understand that there are a myriad of restrictions people are faced with when going out to eat. Your child might have a peanut allergy, or you might want to know that your coffee is fair trade. We're hard at work compiling a way for you to not only find places you'll love, but places that fit your diet, lifestyle, and restrictions. If you want to understand the food you eat, and to learn to eat healthy outside the home, give us your e-mail and we'll be in touch. 
-       	
-</p>
-<p class="lead">
-
-If you want to tell us a little more about yourself, please take our <a href="/health">survey</a>, so we can better serve your needs. Don't worry, we'll keep all of your information anonymous and secure.
-</p>
+<a class="btn btn-primary btn-large" href="/learn/">Learn more &raquo;</a>
 
 
+</div>
+
+<div class="row">
+<div class="span4">
+<h2>Merchants</h2>
+<p>Do you own a restaurant? We want our customers to find food they love at your place!
+If you are a merchant and you want to be part of the AllSortz community, give us your information and we'll be in touch.</p>
+<p><a class="btn" href="/merchants/">Join &raquo;</a></p>
+</div>
+
+
+
+<div class="span4">
+<h2>Sign Up</h2>
+<p>Do you want to find places to eat that match your style? Please provide us with your e-mail so we can send you updates on our progress</p>
 <form method="post" action="">
 {{ form.id }}
-
-
-
 <input type="text" value="Email" name="email" id="id_email"
  onblur="if (this.value == '') {this.value = 'Email';}"
   onfocus="if (this.value == 'Email') {this.value = '';}" />
 <br /> 
  <input type="submit" value="Sign up" class="btn btn-large btn-success" />
-
 </form>
-    
+</div>
+
+<div class="span4">
+<h2>Help Us</h2>
+<p>Ultimately, we're here to serve you. Help us to help you by taking our anonymous survey.
+</p>
+<p><a class="btn" href="/health/">Take our survey &raquo;</a></p>
+</div>
+</div>
 
 
-
-
-{% endblock %}
+{%endblock%}
