@@ -11,7 +11,7 @@
     <link href="{{STATIC_URL}}css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
-        padding-top: 20px;
+        padding-top: 60px;
         padding-bottom: 40px;
       }
 
@@ -55,10 +55,10 @@
 
     <!-- Fav and touch icons -->
     <link rel="shortcut icon" href="{{STATIC_URL}}img/favicon.ico">
-   <!-- <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">-->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{STATIC_URL}}img/icons/apple-icon-144.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{STATIC_URL}}img/icons/apple-icon-114.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{STATIC_URL}}img/icons/apple-icon-72.png">
+    <link rel="apple-touch-icon-precomposed" href="{{STATIC_URL}}img/icons/apple-icon-57.png">
   </head>
 
   <body>
@@ -71,26 +71,11 @@
   <span class="icon-bar"></span>
   <span class="icon-bar"></span>
   </a>
-  <a class="brand" href="/">
-        <img src="{{STATIC_URL}}img/favicon.ico" width="27"  >
+  <a class="brand" href="/"> AllSortz
   </a>
 
   <div class="nav-collapse collapse">
-  <ul class="nav">
-  <li class="active"><a href="#">Home</a></li>
-  <li><a href="/about">About</a></li>
-  <li><a href="/contact">Contact</a></li>
-  <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown">More <b class="caret"></b></a>
-  <ul class="dropdown-menu">
-  <li><a href="/health">Survey</a></li>
-  <li class="divider"></li>
-  <li class="nav-header">Merchants</li>
-  <li><a href="#">Join</a></li>
-  <li><a href="#">What we do</a></li>
-  </ul>
-  </li>
-</ul>
+  {% block header%}{%endblock%}
   <form class="navbar-form pull-right">
   <input class="span2" type="text" placeholder="Email">
   <input class="span2" type="password" placeholder="Password">
@@ -107,8 +92,8 @@
   <!-- Main hero unit for a primary marketing message or call to action -->
   {%block body %}{%endblock%}
 
-  {% include "marketing_bottom.html" %}
      </div> <!-- /container -->
+  {% include "marketing_bottom.html" %}
 
     <!-- Le javascript
     ================================================== -->

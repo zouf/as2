@@ -41,9 +41,7 @@ def coming_soon(request):
   context_instance=RequestContext(request)
   )    
 
-def index(request):
-    return render_to_response('index.html', context_instance=RequestContext(request))    
- 
+
 ##experimenting with web version of app
 #def detail(request,oid):
 #    req =  get_business(request,oid);
@@ -53,4 +51,12 @@ def index(request):
 def health_survey(request):
     return render_to_response('health.html', context_instance=RequestContext(request))    
 
+def about(request):
+    return render_to_response('about.html', context_instance=RequestContext(request))    
+def contact(request):
+  return render_to_response('contact.html', context_instance=RequestContext(request))    
+def merchants(request):
+  return render_to_response('merchants.html', context_instance=RequestContext(request))    
+def learn(request):
+  return render_to_response('details.html', context_instance=RequestContext(request))    
 
