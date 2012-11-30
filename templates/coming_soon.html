@@ -1,38 +1,37 @@
 {% extends "base.html" %}
 
 {% block body %}
-	<div id="healthSurvey" class = "Puritan-normal-400">
-		<img src="{{STATIC_URL}}css/logo.png" width="400" >
+		
 
-<p>        	AllSortz is an exciting new startup based in Princeton, NJ. Our goal is to get people to go out and enjoy the food that is offered in your community. Whether you're new to town and want to know the best 
-place for lunch, or you're a veteran of Main St. who's interested in new dishes at your favorite restaurant, AllSortz is here to serve you.
-</p>
-<p>
+        <p class="lead">
+      AllSortz is an exciting new startup based in Princeton, NJ. Our goal is to get people to go out and enjoy the food that is offered in your community. Whether you're new to town and want to know the best 
+place for lunch, or you're a veteran of Main St. who's interested in new dishes at your favorite restaurant, AllSortz is here to serve you.</p>
+
+<p class="lead"> 
 We understand that there are a myriad of restrictions people are faced with when going out to eat. Your child might have a peanut allergy, or you might want to know that your coffee is fair trade. We're hard at work compiling a way for you to not only find places you'll love, but places that fit your diet, lifestyle, and restrictions. If you want to understand the food you eat, and to learn to eat healthy outside the home, give us your e-mail and we'll be in touch. 
+       	
 </p>
-<p>
+<p class="lead">
 
 If you want to tell us a little more about yourself, please take our <a href="/health">survey</a>, so we can better serve your needs. Don't worry, we'll keep all of your information anonymous and secure.
 </p>
 
 
-<div id="submit_bubble">
 <form method="post" action="">
-        {{ form.id }}
-        
+{{ form.id }}
 
 
-        <input type="text" value="Email" name="email" id="id_email"
-         onblur="if (this.value == '') {this.value = 'Email';}"
-          onfocus="if (this.value == 'Email') {this.value = '';}" />
-        <br /> 
-         <a class="btn btn-large btn-success" href="#"><input type="submit" value="Sign me up"></a>
+
+<input type="text" value="Email" name="email" id="id_email"
+ onblur="if (this.value == '') {this.value = 'Email';}"
+  onfocus="if (this.value == 'Email') {this.value = '';}" />
+<br /> 
+ <input type="submit" value="Sign up" class="btn btn-large btn-success" />
+
+</form>
     
-    </form>
-    
-    </div>
 
-</div>
+
 
 
 {% endblock %}
