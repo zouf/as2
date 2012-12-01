@@ -279,8 +279,8 @@ INSTALLED_APPS = (
     'djangosphinx',
     'recommendation',
   	'registration', 
-	 #'celery',
-     #'djcelery',
+    'survey',
+    
     'storages',
     'queries',
     'wiki',

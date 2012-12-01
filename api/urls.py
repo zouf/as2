@@ -47,7 +47,6 @@ urlpatterns = patterns('api.views',
     (r'^comment/add/(?P<oid>\d+)/?$', 'add_comment'),
     (r'^comment/rate/(?P<oid>\d+)/?$', 'rate_comment'),
     (r'^review/edit/(?P<oid>\d+)/?$', 'edit_main_review'),
-    (r'^review/history/(?P<oid>\d+)/?$', 'get_review_history'),
 
     (r'^review/(?P<oid>\d+)/?$', 'get_review'),
 
