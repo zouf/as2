@@ -53,16 +53,9 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <!-- Fav and touch icons -->
-    <link rel="shortcut icon" href="{{STATIC_URL}}img/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{STATIC_URL}}img/icons/apple-icon-144.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{STATIC_URL}}img/icons/apple-icon-114.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{STATIC_URL}}img/icons/apple-icon-72.png">
-    <link rel="apple-touch-icon-precomposed" href="{{STATIC_URL}}img/icons/apple-icon-57.png">
   </head>
 
   <body>
-
   <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="navbar-inner">
   <div class="container">
@@ -74,14 +67,6 @@
   <a class="brand" href="/"> AllSortz
   </a>
 
-  <div class="nav-collapse collapse">
-  {% block header%}{%endblock%}
-  <form class="navbar-form pull-right">
-  <input class="span2" type="text" placeholder="Email">
-  <input class="span2" type="password" placeholder="Password">
-  <button type="submit" class="btn">Sign in</button>
-  </form>
-  </div><!--/.nav-collapse -->
   </div>
   </div>
   </div>
@@ -89,16 +74,26 @@
 
   <div class="container">
 
-  <!-- Main hero unit for a primary marketing message or call to action -->
-  {%block body %}{%endblock%}
+<h2>Thanks</h2>
+<p class="lead">
+Thanks for signing up! We will stay in touch as merchants join our cause and commit to being transparent with what goes into the food your eat.</p>
 
-     </div> <!-- /container -->
+<p>In the meantime: </p>
+<p><a class="btn" href="http://www.allsortz.com/health/">Take our survey &raquo;</a></p>
+
+<br>
+<p> -The AllSortz Team</p>
+
+
+</div>
+
   {% include "marketing_bottom.html" %}
           <hr>
 
       <div class="footer">
         <p>&copy; AllSortz Inc. 2012</p>
       </div>
+
 
 
     <!-- Le javascript
@@ -109,3 +104,6 @@
 
   </body>
 </html>
+
+{% block body %}
+{% endblock %}
