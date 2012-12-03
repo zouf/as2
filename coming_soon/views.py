@@ -4,20 +4,31 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 import datetime
 from django.template.context import RequestContext
+from django.template import loader
 from survey.models import *
 from survey.forms import *
 import logging
 from django.core.mail import send_mail, EmailMultiAlternatives
-
+from django.core.mail import EmailMultiAlternatives
 logger = logging.getLogger(__name__)
 
 def send_thankyou(to):
-  subject, from_email = 'Thanks!', 'matt@allsortz.com'
-  text_content = 'Thanks for signing up!'
-  html_content = '<p>Thanks for signing up! We will be in touch </p><br><br><p>-The AllSortz Team</p>'
+  subject, from_email = 'thanks!', 'matt@allsortz.com'
+  text_content = 'thanks for signing up!'
+  html_content = '<p>thanks for signing up! we will be in touch </p><br><br><p>-the allsortz team</p>'
   msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
   msg.attach_alternative(html_content, "text/html")
   msg.send()
+
+def send_response_email(to,content,subject):
+  subject, from_email = subject, 'matt@allsortz.com'
+  text_content = 'thanks for signing up!'
+  html_content = content 
+  msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+  msg.attach_alternative(html_content, "text/html")
+  msg.send()
+
+
 
 def coming_soon(request):
   #try:
@@ -34,14 +45,17 @@ def coming_soon(request):
 
   interesteduser = InterestedUser()
   if request.method == "POST":
-  formset = InterestedUserForm(request.POST)
+      formset = InterestedUserForm(request.POST)
       if formset.is_valid():
           iu = formset.save()
           iu.save()
-          send_thankyou(iu.email)
-          return render_to_response('signup_thanks.html', {
+          t = loader.get_template('signup_thanks.html')
+          c = Context({})
+          content = t.render(c)
+          send_response_email(iu.email, content,'Thanks!')
+          return HttpResponseRedirect('/')
   else:
-      formset = InterestedUserForm(instance=interesteduser, initial={'email': 'E-mail'})
+    formset = InterestedUserForm(instance=interesteduser, initial={'email': 'E-mail'})
   return render_to_response('coming_soon.html', {
       "form": formset,
   },
@@ -65,11 +79,6 @@ def survey_detail(request, survey_slug='eatinghealthy',
 
     """
     survey = get_object_or_404(Survey.objects.filter(visible=True), slug=survey_slug)
-    if survey.closed:
-        if survey.answers_viewable_by(request.user):
-            return HttpResponseRedirect(reverse('survey-results', None, (),
-                                                {'survey_slug': survey_slug}))
-        raise Http404 #(_('Page not found.')) # unicode + exceptions = bad
     # if user has a session and have answered some questions
     # and the survey does not accept multiple answers,
     # go ahead and redirect to the answers, or a thank you
@@ -92,7 +101,10 @@ def survey_detail(request, survey_slug='eatinghealthy',
     if (request.POST and all(form.is_valid() for form in survey.forms)):
         for form in survey.forms:
             form.save()
-        return _survey_redirect(request, survey,group_slug=group_slug)
+        t = loader.get_template('survey_thanks.html')
+        c = Context({})
+        content = t.render(c)
+        return HttpResponseRedirect('http://www.allsortz.com')
     # Redirect either to 'survey.template_name' if this attribute is set or
     # to the default template
     return render_to_response(survey.template_name or template_name,
