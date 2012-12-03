@@ -76,9 +76,10 @@
 
   <div class="nav-collapse collapse">
   {% block header%}{%endblock%}
-  <form class="navbar-form pull-right">
-  <input class="span2" type="text" placeholder="Email">
-  <input class="span2" type="password" placeholder="Password">
+
+  <form class="navbar-form pull-right" method="post" action="/login">
+  <input class="span2" type="text" placeholder="Email or Username" id="id_un" name='un'>
+  <input class="span2" type="password" placeholder="Password" id="id_pwd" name='pwd'>
   <button type="submit" class="btn">Sign in</button>
   </form>
   </div><!--/.nav-collapse -->

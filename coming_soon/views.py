@@ -10,6 +10,8 @@ from survey.forms import *
 import logging
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth import authenticate
+
 logger = logging.getLogger(__name__)
 
 def send_thankyou(to):
@@ -31,36 +33,36 @@ def send_response_email(to,content,subject):
 
 
 def coming_soon(request):
-  #try:
-  #  hit = Visitor() #created a visitor log start
-  #  hit.ip = request.META.get("REMOTE_ADDR", "") #get visitor ip
-  #  hit.date = datetime.datetime.now() # get visitor time
-  #  hit.referer = request.META.get("HTTP_REFERER", "") #get visitor referer
-  #  hit.user_agent = request.META.get("HTTP_USER_AGENT", "") # get visitor user agent
-  #  hit.save() #save in database
-  #except Exception as e:
-  #  logger.debug('Error in log' + str(e))
-  #  pass
-
-
   interesteduser = InterestedUser()
+  formset = InterestedUserForm(instance=interesteduser, initial={'email': 'E-mail'})
+
   if request.method == "POST":
       formset = InterestedUserForm(request.POST)
       if formset.is_valid():
           iu = formset.save()
           iu.save()
+          un = request.POST['username']
+          pwd = request.POST['password']
+          try:
+            newuser = User.objects.create(username=request.POST['username'])
+            newuser.email=iu.email
+            newuser.set_password(pwd)
+            newuser.save()
+          except Exception as e:
+            logger.error('error in create user ' + str(e))
+            pass
+
+          authenticate(username=un, password=pwd) 
+
           t = loader.get_template('signup_thanks.html')
           c = Context({})
           content = t.render(c)
           send_response_email(iu.email, content,'Thanks!')
-          return HttpResponseRedirect('/')
+          formset = InterestedUserForm(instance=interesteduser, initial={'email': 'E-mail'})
+          return render_to_response('coming_soon.html', {"form": formset }, context_instance=RequestContext(request) )    
   else:
     formset = InterestedUserForm(instance=interesteduser, initial={'email': 'E-mail'})
-  return render_to_response('coming_soon.html', {
-      "form": formset,
-  },
-  context_instance=RequestContext(request)
-  )    
+    return render_to_response('coming_soon.html', {"form": formset }, context_instance=RequestContext(request) )    
 
 
 ##experimenting with web version of app
@@ -115,6 +117,23 @@ def survey_detail(request, survey_slug='eatinghealthy',
 
 
 
+def login(request):
+  if request.method== 'POST':
+    print(request.POST)
+    pwd = request.POST['pwd']
+    usernameOrEmail = request.POST['un']
+    try:
+      user = authenticate(username=usernameOrEmail, password=pwd)
+      if user:
+        print 'yallo'
+    except Exception as e:
+      print('error!')
+      print (str(e))
+      
+      pass
+
+    print(str(user))
+  return render_to_response('coming_soon.html', context_instance=RequestContext(request))    
 
 
 def about(request):

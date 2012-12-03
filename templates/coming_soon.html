@@ -46,14 +46,50 @@ If you are a merchant and you want to be part of the AllSortz community, give us
 <div class="span4">
 <h2>Sign Up</h2>
 <p>Do you want to find places to eat that match your style? Please provide us with your e-mail so we can send you updates on our progress</p>
+<!-- Button to trigger modal -->
+<a href="#myModal" role="button" class="btn" data-toggle="modal">Sign up </a>
+
+<!-- Modal -->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Sign Up</h3>
+  </div>
+<div class="modal-body">
 <form method="post" action="">
 {{ form.id }}
-<input type="text" value="Email" name="email" id="id_email"
- onblur="if (this.value == '') {this.value = 'Email';}"
-  onfocus="if (this.value == 'Email') {this.value = '';}" />
-<br /> 
- <input type="submit" value="Sign up" class="btn btn-large btn-success" />
+
+
+<form class="form-horizontal">
+   <div class="control-group">
+    <div class="controls">
+      <input type="text" id="id_username" placeholder="Username">
+    </div>
+  </div>
+
+  
+  <div class="control-group">
+    <div class="controls">
+      <input type="text" id="id_email" placeholder="Email">
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <input type="password" id="id_password" placeholder="Password">
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <input type="submit" value="Sign up" class="btn btn-large btn-success" />
+    </div>
+  </div>
 </form>
+
+
+
+</div>
+</div>
+
 </div>
 
 <div class="span4">
