@@ -3,6 +3,7 @@
         <div {{ bound_field.form.question.qstyle|default_if_none:""|safe }}>
     {% endif %}
     {% include "forms/field.html" %}
+    <hr>
     {% if forloop.first %}
         </div>
     {% endif %}

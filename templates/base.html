@@ -76,12 +76,19 @@
 
   <div class="nav-collapse collapse">
   {% block header%}{%endblock%}
+  {% if user.is_authenticated %}
+  <form class="navbar-form pull-right" method="post" action="/logout">
+  <button type="submit" class="btn">Logout</button>
+  </form>
 
+
+  {%else%}
   <form class="navbar-form pull-right" method="post" action="/login">
-  <input class="span2" type="text" placeholder="Email or Username" id="id_un" name='un'>
+  <input class="span2" type="text" placeholder="Username" id="id_un" name='un'>
   <input class="span2" type="password" placeholder="Password" id="id_pwd" name='pwd'>
   <button type="submit" class="btn">Sign in</button>
   </form>
+  {%endif%}
   </div><!--/.nav-collapse -->
   </div>
   </div>
@@ -96,11 +103,11 @@
      </div> <!-- /container -->
   {% include "marketing_bottom.html" %}
           <hr>
-
+    <div class="container">
       <div class="footer">
         <p>&copy; AllSortz Inc. 2012</p>
       </div>
-
+    </div>
 
     <!-- Le javascript
     ================================================== -->

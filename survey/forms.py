@@ -21,7 +21,10 @@ import uuid
 class BaseAnswerForm(Form):
     def __init__(self, question, user, interview_uuid, session_key, edit_existing=False, *args, **kwdargs):
         self.question = question
-        self.session_key = session_key.lower()
+        try:
+          self.session_key = session_key.lower()
+        except:
+          self.session_key = None
         self.user = user
         self.interview_uuid = interview_uuid
         self.answer = None
@@ -208,7 +211,10 @@ QTYPE_FORM = {
 def forms_for_survey(survey, request, edit_existing=False):
     ## add session validation to base page.
     sp = str(survey.id) + '_'
-    session_key = request.session.session_key.lower()
+    try:
+      session_key = request.session.session_key.lower()
+    except:
+      session_key = None
     login_user = request.user
     random_uuid = uuid.uuid4().hex
     if request.POST: # bug in forms

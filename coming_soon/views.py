@@ -10,7 +10,8 @@ from survey.forms import *
 import logging
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.core.mail import EmailMultiAlternatives
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,7 @@ def coming_soon(request):
           return render_to_response('coming_soon.html', {"form": formset }, context_instance=RequestContext(request) )    
   else:
     formset = InterestedUserForm(instance=interesteduser, initial={'email': 'E-mail'})
+    print request.user.is_authenticated()
     return render_to_response('coming_soon.html', {"form": formset }, context_instance=RequestContext(request) )    
 
 
@@ -99,14 +101,12 @@ def survey_detail(request, survey_slug='eatinghealthy',
         request.session[skey] = (request.session.get(skey, False) or
                                  request.method == 'POST')
         request.session.modified = True ## enforce the cookie save.
+    
     survey.forms = forms_for_survey(survey, request, allow_edit_existing_answers)
     if (request.POST and all(form.is_valid() for form in survey.forms)):
         for form in survey.forms:
             form.save()
-        t = loader.get_template('survey_thanks.html')
-        c = Context({})
-        content = t.render(c)
-        return HttpResponseRedirect('http://www.allsortz.com')
+        return render_to_response('survey_thanks.html', context_instance=RequestContext(request))    
     # Redirect either to 'survey.template_name' if this attribute is set or
     # to the default template
     return render_to_response(survey.template_name or template_name,
@@ -117,24 +117,22 @@ def survey_detail(request, survey_slug='eatinghealthy',
 
 
 
-def login(request):
-  if request.method== 'POST':
-    print(request.POST)
-    pwd = request.POST['pwd']
-    usernameOrEmail = request.POST['un']
-    try:
-      user = authenticate(username=usernameOrEmail, password=pwd)
-      if user:
-        print 'yallo'
-    except Exception as e:
-      print('error!')
-      print (str(e))
-      
-      pass
 
-    print(str(user))
-  return render_to_response('coming_soon.html', context_instance=RequestContext(request))    
+def logout_view(request):
+  logout(request)
+  print('hello!')
+  return HttpResponseRedirect('http://www.allsortz.com')
 
+
+def login_user(request):
+  username = request.POST['un']
+  password = request.POST['pwd']
+  user = authenticate(username=username, password=password)
+  if user is not None:
+    login(request, user)
+    return HttpResponseRedirect('/')
+  else:
+    return HttpResponseRedirect('/')
 
 def about(request):
     return render_to_response('about.html', context_instance=RequestContext(request))    
