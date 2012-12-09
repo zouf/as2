@@ -202,7 +202,8 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 	  ("css", BASE_DIR+ "/src/css"),
 	  ("js", BASE_DIR+ "/src/js"),
-	  ("img", BASE_DIR+ "/src/img")
+	  ("img", BASE_DIR+ "/src/img"),
+	  ("bootstrap", BASE_DIR+ "/src/bootstrap")
 )
 
 # List of finder classes that know how to find static files in

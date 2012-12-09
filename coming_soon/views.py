@@ -1,5 +1,6 @@
 # Create your views here.
-from coming_soon.models import InterestedUserForm, InterestedUser, Visitor
+from coming_soon.models import InterestedUserForm, InterestedUser, Visitor, InterestedMerchant, InterestedMerchantForm
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 import datetime
@@ -138,8 +139,13 @@ def about(request):
     return render_to_response('about.html', context_instance=RequestContext(request))    
 def contact(request):
   return render_to_response('contact.html', context_instance=RequestContext(request))    
+
+
+
 def merchants(request):
-  return render_to_response('merchants.html', context_instance=RequestContext(request))    
+  m = InterestedMerchant()
+  formset = InterestedUserForm(instance=m)
+  return render_to_response('merchants.html',{'form':formset}, context_instance=RequestContext(request))    
 def learn(request):
   return render_to_response('details.html', context_instance=RequestContext(request))    
 

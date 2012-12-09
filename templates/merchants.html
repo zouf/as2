@@ -30,6 +30,20 @@
               We're leading the way to bring more people in your front door. Give us your information and we'll get in touch with ways we can work together that were impossible before.
 </p>
 
+
+
+</div>
+
+<div class="container">
+<form class="form-horizontal">
+  {% for f in form.fieldset %}
+  <div class="control-group">
+    <div class="controls">
+        {{f}}
+    </div>
+  </div>
+  {%endfor%}
+</form>
 </div>
 {% endblock %}
 
