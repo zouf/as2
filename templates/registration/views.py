@@ -4,11 +4,14 @@ Views which allow users to create and activate accounts.
 """
 
 
-from django.shortcuts import redirect
-from django.shortcuts import render_to_response
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
-
+#from privatebeta.models import InviteRequest
 from registration.backends import get_backend
+
+
 
 
 def activate(request, backend,
@@ -92,7 +95,7 @@ def activate(request, backend,
                               context_instance=context)
 
 
-def register(request, backend, success_url='/', form_class=None,
+def register(request, backend, success_url=None, form_class=None,
              disallowed_url='registration_disallowed',
              template_name='registration/registration_form.html',
              extra_context=None):
@@ -176,6 +179,7 @@ def register(request, backend, success_url='/', form_class=None,
     
     """
     backend = get_backend(backend)
+    print(backend)
     if not backend.registration_allowed(request):
         return redirect(disallowed_url)
     if form_class is None:
@@ -184,7 +188,30 @@ def register(request, backend, success_url='/', form_class=None,
     if request.method == 'POST':
         form = form_class(data=request.POST, files=request.FILES)
         if form.is_valid():
+            first_name =request.POST['firstname'] 
+            last_name =request.POST['lastname'] 
+            email = request.POST['email']
+#            
+#            try:
+#                ir = InviteRequest.objects.get(email=email)
+#                print('checking for '+str(email))
+#                if ir.invited == False:
+#                    print('not invited!')
+#                    return HttpResponseRedirect("/invites/signuprequired/")
+#            except: 
+#                print('error in signgup')
+#                return HttpResponseRedirect("/invites/signuprequired/")
+#                
+            
             new_user = backend.register(request, **form.cleaned_data)
+            new_user.first_name = first_name
+            new_user.last_name = last_name
+            new_user.email = email
+            new_user.save()
+            new_user = authenticate(username=request.POST['username'],
+                                    password=request.POST['password1'])
+            login(request, new_user)
+            return HttpResponseRedirect("/user_details/"+str(new_user.id)+"/")
             if success_url is None:
                 to, args, kwargs = backend.post_registration_redirect(request, new_user)
                 return redirect(to, *args, **kwargs)

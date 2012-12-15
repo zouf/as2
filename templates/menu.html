@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{%block header%}
+<ul class="nav">
+  <li  ><a href="/">Home</a></li>
+  <li ><a href="/about">About</a></li>
+  <li ><a href="/contact">Contact</a></li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">More <b class="caret"></b></a>
+  <ul class="dropdown-menu">
+  <li class="active"><a href="#">Survey</a></li>
+  <li class="divider"></li>
+  <li class="nav-header">Merchants</li>
+  <li ><a href="/merchants">Join</a></li>
+  </ul>
+  </li>
+  </ul>
+
+
+{%endblock%}
+
+{% block body %}
+    <p class="lead">
+    
+    </p>
+    Fill out below
+{% load i18n %}
+{% block content %}
+<div class="container">
+  {% for mi in menuitems %}
+    {{mi }}
+    {% endfor %}
+</div>
+<hr>
+<form method="post" class="focus-input" action="">
+    {{mform}}
+  <input type="submit" value="{% trans 'Submit' %}" class="btn btn-large btn-success" name="__vote" />
+</form>
+{% endblock %}
+
+
+
+
+{% endblock %}

@@ -34,6 +34,9 @@ class RegistrationForm(forms.Form):
                                 widget=forms.TextInput(attrs=attrs_dict),
                                 label=_("Username"),
                                 error_messages={'invalid': _("This value may contain only letters, numbers and @/./+/-/_ characters.")})
+    firstname = forms.CharField(label=_("First Name"))
+    lastname = forms.CharField(label=_("Last Name"))
+    
     email = forms.EmailField(widget=forms.TextInput(attrs=dict(attrs_dict,
                                                                maxlength=75)),
                              label=_("E-mail"))
