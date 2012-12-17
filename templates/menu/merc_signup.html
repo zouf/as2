@@ -1,0 +1,46 @@
+
+{% extends "base.html" %}
+{%block header%}
+  <ul class="nav">
+  <li ><a href="/">Home</a></li>
+  <li ><a href="/about">About</a></li>
+  <li ><a href="#">Contact</a></li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">More <b class="caret"></b></a>
+  <ul class="dropdown-menu">
+  <li><a href="/health">Survey</a></li>
+  <li class="divider"></li>
+  <li class="nav-header">Merchants</li>
+  <li class="active"><a href="/merchants">Join</a></li>
+  </ul>
+  </li>
+  </ul>
+
+
+{%endblock%}
+
+{% block body %}
+
+<p class="lead">
+Please fill out info below
+</p>
+
+{% load i18n %}
+{% block content %}
+<hr>
+
+  <form class="" method="post" action="/merc_signup">
+
+  <div class="control-group">
+    {{form.as_p}}
+    <div class="controls">
+ 
+      <input type="submit" value="Submit" class="btn btn-large btn-success" />
+    </div>
+  </div>
+</form>
+
+
+{% endblock %}
+{% endblock %}
+
