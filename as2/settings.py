@@ -9,6 +9,9 @@ SPHINX_SERVER='127.0.0.1'
 
 WIKI_ANONYMOUS_WRITE=True
 
+REGISTRATION_OPEN=True
+
+
 #use time zones
 USE_TZ=True
 
@@ -294,7 +297,7 @@ INSTALLED_APPS = (
 'django_notify',
   'coming_soon',    
 'django.contrib.humanize',
-
+'menu',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )

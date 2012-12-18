@@ -1,0 +1,23 @@
+
+      {% if elem.field.choices %}
+      <div class="span3">
+      <p> {{elem.label}}</p>
+       <select name="{{elem.name}}" id="id_{{elem.name}}">
+      {% for value, text in elem.field.choices %}
+      {% if value == elem.value %}
+        <option selected value={{value}}>{{text}}</option>
+      {%else%}
+        <option value={{value}}>{{text}}</option>
+      {%endif%}
+        {% endfor %}
+      </select>
+    </div>
+
+    {%else%}
+    <div class="span3">
+      <p> {{elem.label}} </p>
+      {{elem}}
+    </div>
+    {%endif%}
+
+

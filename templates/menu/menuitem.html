@@ -1,5 +1,17 @@
 <div class="container">
-  {{m.name}}
-  {{m.price}}
+  {%if m.editing%}
+    {% load i18n %}
+    {%include "menu/editmenuitem.html"%}
+  <input type="submit" value="{% trans 'Submit' %}" class="btn btn-large btn-success" name="__vote" />
+<input type="hidden" value="{{business.id}}" class="btn btn-large btn-success" name="business" id="id_business" />
+
+
+  {%else %}
+    {{m.name}}
+    {{m.price}}
+  <a href="/menu/{{business.id}}/edit/{{m.id}}">edit</a>
+  <a href="/menu/{{business.id}}/remove/{{m.id}}">delete</a>
+
+  {%endif%}
 </div>
 

@@ -10,8 +10,10 @@ urlpatterns = patterns('',
                 url(r'^admin/', include(admin.site.urls)),
         
         url(r'^/?', include('coming_soon.urls')),
+        url(r'^/?', include('menu.urls')),
         url(r'^api/', include('api.urls')),
         url(r'^surveys/', include('survey.urls')),
+        (r'^accounts/', include('registration.backends.simple.urls')),
         (r'^wiki/?', get_wiki_pattern()),
     
 )

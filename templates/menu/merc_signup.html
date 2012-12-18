@@ -29,12 +29,31 @@ Please fill out info below
 {% block content %}
 <hr>
 
-  <form class="" method="post" action="/merc_signup">
+  <form class="form-horizontal" method="post" action="/merc_signup">
+        {% for elem in form %}
+      <div class="control-group">
+      <div class="controls">
 
-  <div class="control-group">
-    {{form.as_p}}
-    <div class="controls">
+        {% if elem.field.choices %}
+             <select name="{{elem.name}}" id="id_{{elem.name}}">
+      {% for value, text in elem.field.choices %}
+      {% if value == elem.value %}
+        <option selected value={{value}}>{{text}}</option>
+      {%else%}
+        <option value={{value}}>{{text}}</option>
+      {%endif%}
+        {% endfor %}
+      </select>
+
+      {%else%}
+        <input type="text" name="{{elem.name}}" id="id_{{elem.name}}" Placeholder="{{elem.label}}"/>
+      {%endif%}
+      </div>
+    </div>
  
+      {%endfor%}
+  <div class="control-group">  
+    <div class="controls">
       <input type="submit" value="Submit" class="btn btn-large btn-success" />
     </div>
   </div>

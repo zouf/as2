@@ -21,12 +21,12 @@ DOUBLE_TWITTER_UNIT=280
 
 ''' A business can be any kind of merchant '''
 class Business(models.Model):
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250,db_index=True)
     date = models.DateTimeField(auto_now=True)
     search = SphinxSearch()
-    lat = models.FloatField()
-    lon = models.FloatField()
-    geom = models.PointField()
+    lat = models.FloatField(db_index=True)
+    lon = models.FloatField(db_index=True)
+    geom = models.PointField(db_index=True)
     #point = models.PointField(geography=True)
 
     profile_photo = models.ForeignKey('Photo',related_name='profile_photo',null=True)
@@ -526,7 +526,7 @@ class PhotoDiscussion(Discussion):
 class Rating(models.Model):
     user = models.ForeignKey(User,db_index=True)
     rating = models.FloatField(db_index=True,null=True)
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now=True,db_index=True)
     class Admin:
         pass
     

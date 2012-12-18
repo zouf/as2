@@ -22,7 +22,6 @@
     <p class="lead">
       Menu for {{business.name}}    
     </p>
-{% load i18n %}
 {% block content %}
 <hr>
 <div class="container">
@@ -39,15 +38,16 @@
 <hr>
 <p class="lead">
 Add an item:
-
 </p>
-<form method="post" class="focus-input" action="">
-    {{mform}}
+
+{% if not editing%}
+{% load i18n %}
+{% include "menu/editmenuitem.html" %}
   <input type="submit" value="{% trans 'Submit' %}" class="btn btn-large btn-success" name="__vote" />
   <input type="hidden" value="{{business.id}}" class="btn btn-large btn-success" name="business" id="id_business" />
-</form>
-{% endblock %}
 
+{%endif%}
+{% endblock %}
 
 
 

@@ -1,6 +1,7 @@
 # Create your views here.
-from coming_soon.models import InterestedUserForm, InterestedUser, Visitor, InterestedMerchant, InterestedMerchantForm
+from coming_soon.models import InterestedUserForm, InterestedUser, Visitor
 
+from menu.models import *
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 import datetime
@@ -37,7 +38,7 @@ def send_response_email(to,content,subject):
 def coming_soon(request):
   interesteduser = InterestedUser()
   formset = InterestedUserForm(instance=interesteduser, initial={'email': 'E-mail'})
-
+  print request.POST
   if request.method == "POST":
       formset = InterestedUserForm(request.POST)
       if formset.is_valid():
@@ -64,7 +65,6 @@ def coming_soon(request):
           return render_to_response('coming_soon.html', {"form": formset }, context_instance=RequestContext(request) )    
   else:
     formset = InterestedUserForm(instance=interesteduser, initial={'email': 'E-mail'})
-    print request.user.is_authenticated()
     return render_to_response('coming_soon.html', {"form": formset }, context_instance=RequestContext(request) )    
 
 
@@ -131,9 +131,11 @@ def login_user(request):
   user = authenticate(username=username, password=password)
   if user is not None:
     login(request, user)
-    return HttpResponseRedirect('/')
-  else:
-    return HttpResponseRedirect('/')
+    
+    if InterestedBusiness.objects.filter(owner=user).count() > 0:
+      b =InterestedBusiness.objects.filter(owner=user)[0]
+      return HttpResponseRedirect('/menu/'+str(b.id))
+  return HttpResponseRedirect('/')
 
 def about(request):
     return render_to_response('about.html', context_instance=RequestContext(request))    
@@ -143,9 +145,8 @@ def contact(request):
 
 
 def merchants(request):
-  m = InterestedMerchant()
   formset = InterestedUserForm(instance=m)
-  return render_to_response('merchants.html',{'form':formset}, context_instance=RequestContext(request))    
+  return render_to_response('merchants.html',{}, context_instance=RequestContext(request))    
 def learn(request):
   return render_to_response('details.html', context_instance=RequestContext(request))    
 
