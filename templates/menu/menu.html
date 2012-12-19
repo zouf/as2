@@ -21,7 +21,7 @@
 {% block body %}
     <p class="lead">
       Menu for {{business.name}}    
-    </p>
+      </p>
 {% block content %}
 <hr>
 <div class="container">
@@ -36,13 +36,15 @@
   {% endfor %}
 </div>
 <hr>
+{% if not editing%}
 <p class="lead">
 Add an item:
 </p>
 
-{% if not editing%}
 {% load i18n %}
 {% include "menu/editmenuitem.html" %}
+
+
   <input type="submit" value="{% trans 'Submit' %}" class="btn btn-large btn-success" name="__vote" />
   <input type="hidden" value="{{business.id}}" class="btn btn-large btn-success" name="business" id="id_business" />
 

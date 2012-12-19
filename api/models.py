@@ -26,7 +26,7 @@ class Business(models.Model):
     search = SphinxSearch()
     lat = models.FloatField(db_index=True)
     lon = models.FloatField(db_index=True)
-    geom = models.PointField(db_index=True)
+    geom = models.PointField()
     #point = models.PointField(geography=True)
 
     profile_photo = models.ForeignKey('Photo',related_name='profile_photo',null=True)

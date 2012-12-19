@@ -1,0 +1,30 @@
+<table class="table">
+{%  for name,value in nutrition.attrs %}
+<tr>
+  <td>
+    {{name}}
+    </td><td>
+    {{value}}
+  </td>
+</tr>
+{%endfor%}
+</table>
+
+<!--
+  <tr><td>
+      Calories
+  </td><td>
+       {{nutrition.get_calories_display}}
+  </td></tr><tr><td>
+  Cholesterol
+  </td><td>
+  {{nutrition.get_cholesterol_display}}
+  </td></tr><tr><td>
+   Fat
+  </td><td>
+   {{nutrition.get_fat_display}}
+    </td></tr><tr><td>
+   Saturated Fat
+   </td><td>
+    {{nutrition.get_saturated_display}}
+    </td></tr></table>-->

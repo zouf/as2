@@ -1,6 +1,9 @@
 
+<div class="span3">
+  {%if elem.errors %}
+    <p class="text-error">{{elem.errors}}</p>
+  {%endif%}
       {% if elem.field.choices %}
-      <div class="span3">
       <p> {{elem.label}}</p>
        <select name="{{elem.name}}" id="id_{{elem.name}}">
       {% for value, text in elem.field.choices %}
@@ -11,13 +14,11 @@
       {%endif%}
         {% endfor %}
       </select>
-    </div>
 
     {%else%}
-    <div class="span3">
       <p> {{elem.label}} </p>
       {{elem}}
-    </div>
     {%endif%}
 
+    </div>
 

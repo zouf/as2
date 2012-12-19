@@ -145,7 +145,7 @@ class MenuItem(models.Model):
         pass
 
 class NutritionInfo(models.Model):
-  menuitem = models.ForeignKey(MenuItem)
+  menuitem = models.OneToOneField(MenuItem, related_name='nutrition')
   calories = models.CharField("Calories",max_length=2,choices=AMOUNTS,default='U')
   fat = models.CharField("Total Fat",max_length=2,choices=AMOUNTS,default='u')
   saturatedfat = models.CharField("Saturated Fat",max_length=2,choices=AMOUNTS,default='U')
@@ -158,9 +158,14 @@ class NutritionInfo(models.Model):
   fiber = models.CharField("Fiber",max_length=2,choices=AMOUNTS,default='U')
   wholegrain = models.CharField("Whole Grain",max_length=2,choices=AMOUNTS,default='U')
   cholesterol = models.CharField("Cholesterol", max_length=2,choices=AMOUNTS,default='U')
+  def attrs(self):
+    for field in self._meta.fields:
+      if field.name != 'menuitem' and field.name != 'id':
+        yield field.verbose_name, getattr(self, field.name)
+    
 
 class OtherRestrictions(models.Model):
-    menuitem = models.ForeignKey(MenuItem)
+    menuitem = models.OneToOneField(MenuItem,related_name='otherinfo')
     #booleans to check for meats
     msg = models.CharField('Contains MSG',max_length=2,choices=BOOLEAN,default='U')
     chicken = models.CharField('Contains chicken',max_length=2,choices=BOOLEAN,default='U')
@@ -180,12 +185,16 @@ class OtherRestrictions(models.Model):
     vegan = models.CharField('Vegan',max_length=2,choices=BOOLEAN,default='U')
     pescetarian = models.CharField('Pescetarian',max_length=2,choices=BOOLEAN,default='U')
     vegetarian = models.CharField('Vegetarian',max_length=2,choices=BOOLEAN,default='U')
-
+    def attrs(self):
+      for field in self._meta.fields:
+        if field.name != 'menuitem' and field.name != 'id':
+          yield field.verbose_name, getattr(self, field.name)
+ 
 
 
 
 class AllergyInfo(models.Model):
-  menuitem = models.ForeignKey(MenuItem)
+  menuitem = models.OneToOneField(MenuItem, related_name='allergy')
   peanut_free = models.CharField("Peanut Free",max_length=2,choices=BOOLEAN,default='U')
   gluten_free = models.CharField("Gluten Free",max_length=2,choices=BOOLEAN,default='U')
   treenut_free = models.CharField("Treenut Free",max_length=2,choices=BOOLEAN,default='U')
@@ -193,6 +202,10 @@ class AllergyInfo(models.Model):
   dairy_free = models.CharField("Dairy Free",max_length=2,choices=BOOLEAN,default='U')
   sesame_free = models.CharField("Sesame Free",max_length=2,choices=BOOLEAN,default='U')
   lactose_free = models.CharField("Lactose Free",max_length=2,choices=BOOLEAN,default='U')
-
+  def attrs(self):
+    for field in self._meta.fields:
+      if field.name != 'menuitem' and field.name != 'id':
+        yield field.verbose_name, getattr(self, field.name)
+ 
 
 

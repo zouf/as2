@@ -1,17 +1,43 @@
-<div class="container">
+<div class="row">
   {%if m.editing%}
     {% load i18n %}
     {%include "menu/editmenuitem.html"%}
   <input type="submit" value="{% trans 'Submit' %}" class="btn btn-large btn-success" name="__vote" />
 <input type="hidden" value="{{business.id}}" class="btn btn-large btn-success" name="business" id="id_business" />
 
+{%else %}
 
-  {%else %}
-    {{m.name}}
-    {{m.price}}
-  <a href="/menu/{{business.id}}/edit/{{m.id}}">edit</a>
-  <a href="/menu/{{business.id}}/remove/{{m.id}}">delete</a>
-
+  <div class="span2">
+    <p class="lead">{{m.name}}</p>
+  </div>
+  <div class="span8">
+    <ul class="nav nav-tabs">
+       <li><a href="#nutrition" data-toggle="tab">Nutrition Info</a></li>
+       <li><a href="#allergy" data-toggle="tab">Allergen Info</a></li>
+        <li><a href="#otherinfo" data-toggle="tab">Other Info</a></li>
+      </ul>
+    <div class="tab-content">
+       <div class="tab-pane active" id="nutrition">
+         {% with nutrition=m.nutrition%}
+         {%include "menu/nutrition.html"%}
+         {%endwith%}
+       </div>
+       <div class="tab-pane" id="allergy">
+          {% with allergy=m.allergy %}
+          {%include "menu/allergy.html"%}
+          {%endwith%}
+        </div>
+        <div class="tab-pane" id="otherinfo">
+          {% with otherinfo=m.otherinfo %}
+          {%include "menu/otherinfo.html"%}
+          {%endwith%}
+        </div>
+    </div>
+  </div>
+  <div class="span2">
+    <a href="/menu/{{business.id}}/edit/{{m.id}}">edit</a>
+    <a href="/menu/{{business.id}}/remove/{{m.id}}">delete</a>
+  </div>
   {%endif%}
 </div>
 
