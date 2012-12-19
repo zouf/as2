@@ -1,0 +1,36 @@
+<VirtualHost *:80>
+	ServerAdmin admin@allsortz.com
+
+	WSGIScriptAlias / /var/www/as2/src/apache/django.wsgi
+	WSGIDaemonProcess as2 \
+	    user=django \
+	    group=django \
+	    python-path=/var/www/as2/env/lib/python2.7/site-packages
+	WSGIProcessGroup as2
+
+	DocumentRoot /var/www/as2
+
+	# Forbid default access to filesystem
+	# -larryv, 18 Sep 2012
+	<Directory />
+		AllowOverride None
+		Order Deny,Allow
+		Deny from All
+	</Directory>
+
+	<Directory /var/www/as2>
+		AllowOverride None
+		Options None
+		Order Allow,Deny
+		Allow from All
+	</Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>
