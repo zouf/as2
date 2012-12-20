@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block body %}
+  <style type="text/css">
+    .menutitle
+    {
+      text-align:center; 
+    
+    }
+
+  </style>
+  <div class="container menutitle">
+    <h1>The Menus</h1>
+  </div>
+
+  <div class="container">
+    <hr>
+    {% for b in businesses %}
+    <a href="/menu/{{b.id}}/"><h4>{{b.name}}</h4></a>
+    <p><i>{{b.city}}, {{b.state}}</i></p>
+    <p>    <i>{{b.menuitem.count}} dishes listed </i> </p>
+    <hr>
+    {%endfor%}
+  </div>
+
+{%endblock%}
+

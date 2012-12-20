@@ -1,0 +1,22 @@
+<style type="text/css">
+  .busname
+  {
+    text-align:center;
+  }
+
+
+</style>
+
+<div class="container busname">
+  <h1>{{business.name}}</h1>
+  </div>
+  <div class="container">
+  <p><i>{{business.address}} {{business.city}}, {{business.state}} {{business.zipcode}}</i></p>
+  <p><i>{{business.phone}}</i></p>
+  <p class="lead">{{business.description}}</p>
+    {% if request.user == business.owner %}
+      <a href="/menu/{{business.id}}/edit/">edit</a>
+      {%endif%}
+  </div>
+
+

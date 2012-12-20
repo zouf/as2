@@ -1,0 +1,21 @@
+<div class="row">
+  {%if m.editing%}
+    {% load i18n %}
+    {%include "menu/menuelements/editmenuitem.html"%}
+  <input type="submit" value="{% trans 'Submit' %}" class="btn btn-large btn-success" name="__vote" />
+<input type="hidden" value="{{business.id}}" class="btn btn-large btn-success" name="business" id="id_business" />
+
+{%else %}
+
+  <div class="span4">
+    <p class="lead"><a href="/menu/{{business.id}}/details/{{m.id}}/">{{m.name}}</a></p>
+  </div>
+  <div class="span4">
+    <i>{{m.description}}
+  </div>
+  <div class="span4">
+    <p class="lead">${{m.price}}</p>
+  </div>
+{%endif%}
+</div>
+

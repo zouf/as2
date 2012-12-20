@@ -4,10 +4,10 @@
       <div class="accordian-heading">
         <a class="accordian-toggle" data-toggle="collapse" data-parent="#accordian3" href="#collapseZero"><h3>Basic Info</h3></a>
       </div>
-      <div id="collapseZero" class="accordian-body collapse in">
+      <div id="collapseZero" class="accordian-body collapse">
         <div class="accordian-inner">
           {%for elem in mform %}
-            {%include "menu/editmenufield.html" %}
+            {%include "menu/menuelements/editmenufield.html" %}
           {%endfor%}
         </div>
       </div>
@@ -15,11 +15,11 @@
       <div class="accordian-heading">
         <a class="accordian-toggle" data-toggle="collapse" data-parent="#accordian3" href="#collapseOne"><h3>Nutrition Info</h3></a>
       </div>
-      <div id="collapseOne" class="accordian-body collapse in">
+      <div id="collapseOne" class="accordian-body collapse">
         <div class="accordian-inner">
           {%for elem in nform %}
 
-            {%include "menu/editmenufield.html" %}
+            {%include "menu/menuelements/editmenufield.html" %}
           {%endfor%}
         </div>
       </div>
@@ -27,11 +27,11 @@
       <div class="accordian-heading">
         <a class="accordian-toggle" data-toggle="collapse" data-parent="#accordian3" href="#collapseTwo"><h3>Allergen Info<h3></a>
       </div>
-      <div id="collapseTwo" class="accordian-body collapse in">
+      <div id="collapseTwo" class="accordian-body collapse">
         <div class="accordian-inner">
           {%for elem in aform %}
 
-            {%include "menu/editmenufield.html" %}
+            {%include "menu/menuelements/editmenufield.html" %}
           {%endfor%}
         </div>
       </div>
@@ -39,11 +39,11 @@
       <div class="accordian-heading">
         <a class="accordian-toggle" data-toggle="collapse" data-parent="#accordian3" href="#collapseThree"><h3>Other Info<h3></a>
       </div>
-      <div id="collapseThree" class="accordian-body collapse in">
+      <div id="collapseThree" class="accordian-body collapse ">
         <div class="accordian-inner">
           {%for elem in oiform %}
 
-            {%include "menu/editmenufield.html" %}
+            {%include "menu/menuelements/editmenufield.html" %}
           {%endfor%}
         </div>
       </div>

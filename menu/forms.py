@@ -13,6 +13,16 @@ class MenuItemForm(ModelForm):
         model = MenuItem  
         exclude = ('business')
 
+    def clean(self):
+      cleaned_data = self.cleaned_data
+      name = cleaned_data.get('name')
+      bus = self.instance.business
+#      if MenuItem.objects.filter(business=bus, name=name).count() > 0:
+#        raise ValidationError("Dish already entered!")
+      return cleaned_data
+  
+
+
 
 
 class AllergyInfoForm(ModelForm):

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block body %}
+{% if editing  %}
+
+  {% with busform as form %}
+  {% include "menu/merchant/merchant_form.html"%}
+  {%endwith%}
+
+{%else%}
+  {%include "menu/merchant/details.html" %}
+  <style type="text/css">
+    .menutitle
+    {
+      text-align:center;
+    }
+
+  </style>
+  <div class="container">
+    <hr>
+    <h2 class="menutitle">The Menu</h2>
+    {% for thekey, value in menuitems.items %}
+      <h4>{{ thekey }} </h4>
+      {% for k, v in value.items %}
+      <h5>{{k}}</h5>
+        {% for m in v %}
+          {% include "menu/menuelements/menuitem.html" %}
+        {%endfor%}
+      {%endfor%}
+    {% endfor %}
+  </div>
+
+  {% if request.user == business.owner %}
+  <div class="container">
+      <hr>
+  {% if not editing%}
+  <p class="lead">
+  Add an item:
+  </p>
+
+  {% load i18n %}
+  {% include "menu/menuelements/editmenuitem.html" %}
+
+
+  <input type="submit" value="{% trans 'Submit' %}" class="btn btn-large btn-success" name="__vote" />
+  <input type="hidden" value="{{business.id}}" class="btn btn-large btn-success" name="business" id="id_business" />
+
+  {%endif%}
+  </div>
+  {%endif%}
+
+
+{%endif%}
+{% endblock %}

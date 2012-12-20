@@ -50,9 +50,87 @@ REDMEAT =  (
 )
 
 
-# Create your models here.
+''' A photo. To be associated with a business or a user '''
+class  BasePhoto(models.Model):
+    user = models.ForeignKey(User,db_index=True) 
+    is_default = models.BooleanField()
+
+    def image_upload_to_profile(self, filename):
+        today = datetime.datetime.today()
+        return 'user_uploads/profilepics/%s/%s-%s-%s.%s.%s/profile/%s' % (self.user.username, today.year, today.month, today.day, today.hour, today.minute, basename(filename))
+            
+    def image_upload_to_thumb(self, filename):
+        today = datetime.datetime.today()
+        return 'user_uploads/%s/%s-%s-%s.%s.%s/web/%s' % (self.user.username, today.year, today.month, today.day, today.hour, today.minute, basename(filename))
+    
+    def image_upload_to_medium(self, filename):
+        today = datetime.datetime.today()
+        return 'user_uploads/%s/%s-%s-%s.%s.%s/medium/%s' % (self.user.username, today.year, today.month, today.day, today.hour, today.minute, basename(filename))
+#    
+#    def image_upload_to_mini(self,filename):
+#        today = datetime.datetime.today()
+#        return 'user_uploads/%s/%s-%s-%s.%s.%s/thumb2/%s' % (self.user.username, today.year, today.month, today.day, today.hour, today.minute, filename)
+#    
+    image = models.ImageField(upload_to=image_upload_to_profile)
+    image_medium = models.ImageField(upload_to=image_upload_to_medium)
+    image_thumb = models.ImageField(upload_to=image_upload_to_thumb)
+
+    #image_mini = models.ImageField(upload_to=image_upload_to_mini)
+
+    date = models.DateTimeField(auto_now=True)
+    
+    
+    title = models.CharField(blank=True, max_length=300)
+    caption = models.TextField(blank=True)
+    class Admin:
+        pass
+    def save(self, isUpload,isTextMod):
+        #Original photo
+        if not isTextMod:
+            if isUpload:
+                imgFile = Image.open(self.image)
+            else:
+                imgFile = Image.open(str(self.image))
+            #Convert to RGB
+            #logger.debug(imgFile)
+            if imgFile.mode not in ('L', 'RGB'):
+                imgFile = imgFile.convert('RGB')
+            
+            #Save a thumbnail for each of the given dimensions
+            #The IMAGE_SIZES looks like:
+            IMAGE_SIZES = {'image'    : (320, 120),
+                           'image_medium'    : (225,225),
+                           'image_thumb'    : (125,125)}
+    
+            #each of which corresponds to an ImageField of the same name
+            for field_name, size in IMAGE_SIZES.iteritems():
+                width, height = imgFile.size
+                
+                #if width > height:
+                #    fitSize = (height, height)
+                #else:
+                #    fitSize = (width,width)
+                fitSize = size 
+               
+                #img.thumbnail(size, Image.ANTIALIAS)              
+                
+                field = getattr(self, field_name)
+                working = imgFile.copy()
+                working = ImageOps.fit(working,fitSize, Image.ANTIALIAS)
+                working.thumbnail(size,Image.ANTIALIAS)
+                fp=StringIO.StringIO()
+                working.save(fp, "png", quality=95)
+                cf = ContentFile(fp.getvalue())
+                field.save(name=self.image.name, content=cf, save=False);
+            
+        #Save instance of Photo
+        super(Photo, self).save()
+    
+
+   # Create your models here.
 class InterestedBusiness(models.Model):
     name = models.CharField('Restaurant Name',max_length=250)
+    description = models.TextField('Description')
     owner = models.ForeignKey(User,null=True)
     date = models.DateTimeField(auto_now=True)
     search = SphinxSearch()
@@ -131,12 +209,11 @@ class InterestedBusiness(models.Model):
 
 
 class MenuItem(models.Model):
-
-    business = models.ForeignKey('menu.InterestedBusiness')
+    business = models.ForeignKey('menu.InterestedBusiness', related_name='menuitem')
     name = models.CharField("Dish Name",max_length=60,db_index=True)
-    category = models.CharField("What Type of Dish",max_length=60,db_index=True)
+    description = models.TextField("Description of Dish")
+    category = models.CharField("Dish Type (e.g. Appetizer)",max_length=60,db_index=True)
     meal = models.CharField("Meal",max_length=2,choices=AVAILABILITY,default='U')
- 
     price = models.DecimalField("Price",max_digits=10, decimal_places=2,null=True)
     
     
@@ -208,4 +285,9 @@ class AllergyInfo(models.Model):
         yield field.verbose_name, getattr(self, field.name)
  
 
+class BusinessPhoto(BasePhoto):
+  business = models.ForeignKey(InterestedBusiness)
+
+class DishPhoto(BasePhoto):
+  menuitem  = models.ForeignKey(MenuItem)
 

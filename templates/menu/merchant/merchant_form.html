@@ -1,0 +1,44 @@
+{% load i18n %}
+{% block content %}
+<hr>
+
+  <form class="form-horizontal" method="post" action="">
+        {% for elem in form %}
+      <div class="control-group">
+      <div class="controls">
+
+        {% if elem.field.choices %}
+             <select name="{{elem.name}}" id="id_{{elem.name}}">
+      {% for value, text in elem.field.choices %}
+      {% if value == elem.value %}
+        <option selected value={{value}}>{{text}}</option>
+      {%else%}
+        <option value={{value}}>{{text}}</option>
+      {%endif%}
+        {% endfor %}
+      </select>
+
+      {%else%}
+      {% if elem.value%}
+
+      <input type="text" name="{{elem.name}}" id="id_{{elem.name}}" value="{{elem.value}}"/>
+      {%else %}
+
+      <input type="text" name="{{elem.name}}" id="id_{{elem.name}}" Placeholder="{{elem.label}}"/>
+
+      {%endif%}
+      {%endif%}
+      </div>
+    </div>
+
+      {%endfor%}
+  <div class="control-group">
+    <div class="controls">
+      <input type="submit" value="Submit" class="btn btn-large btn-success" />
+    </div>
+  </div>
+</form>
+
+
+{% endblock %}
+
